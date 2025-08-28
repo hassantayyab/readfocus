@@ -122,9 +122,7 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
           <div className='flex items-center justify-between mb-3'>
             <div className='flex items-center space-x-3'>
               <span className='text-sm font-semibold text-gray-700'>Reading Progress</span>
-              <span className='text-xs text-gray-500'>
-                {Math.round(progress)}% complete
-              </span>
+              <span className='text-xs text-gray-500'>{Math.round(progress)}% complete</span>
             </div>
             <div className='text-xs text-gray-500'>
               {chunks.length - currentChunkIndex - 1} chunks remaining
@@ -155,7 +153,9 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
               <div className='bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-6 border border-yellow-200 shadow-sm'>
                 <div className='flex items-center space-x-2 mb-4'>
                   <span className='text-lg'>🔑</span>
-                  <h4 className='text-lg font-semibold text-yellow-800'>Key Terms in This Section</h4>
+                  <h4 className='text-lg font-semibold text-yellow-800'>
+                    Key Terms in This Section
+                  </h4>
                 </div>
                 <div className='flex flex-wrap gap-3'>
                   {currentChunk.highlightedWords.map((keyword, index) => (
@@ -184,7 +184,7 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
                 <span>←</span>
                 <span>Previous</span>
               </button>
-              
+
               <button
                 onClick={toggleAutoScroll}
                 className={`flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:shadow-lg ${
@@ -196,7 +196,7 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
                 <span>{isAutoScrolling ? '⏸' : '▶'}</span>
                 <span>{isAutoScrolling ? 'Pause' : 'Auto Play'}</span>
               </button>
-              
+
               <div className='flex items-center space-x-2'>
                 <span className='text-sm text-gray-600 hidden sm:block'>Speed:</span>
                 <select
@@ -215,7 +215,9 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
               onClick={goToNextChunk}
               className='flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
             >
-              <span>{currentChunkIndex === chunks.length - 1 ? 'Complete Reading' : 'Next Chunk'}</span>
+              <span>
+                {currentChunkIndex === chunks.length - 1 ? 'Complete Reading' : 'Next Chunk'}
+              </span>
               <span>{currentChunkIndex === chunks.length - 1 ? '✓' : '→'}</span>
             </button>
           </div>
