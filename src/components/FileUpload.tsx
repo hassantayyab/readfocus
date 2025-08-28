@@ -64,19 +64,30 @@ const FileUpload: React.FC<FileUploadProps> = ({
         aria-label='File upload input'
       />
 
-      <button
-        onClick={handleFileSelect}
-        disabled={disabled || isUploading}
-        className='w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 hover:bg-blue-50 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed'
-      >
-        <div className='space-y-2'>
-          <div className='text-3xl'>📁</div>
-          <div className='text-sm font-medium text-gray-700'>
-            {isUploading ? 'Processing file...' : 'Upload Text File'}
+              <button
+          onClick={handleFileSelect}
+          disabled={disabled || isUploading}
+          className='w-full border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg group'
+        >
+          <div className='space-y-4'>
+            <div className='text-4xl transform group-hover:scale-110 transition-transform duration-300'>
+              {isUploading ? '⏳' : '📁'}
+            </div>
+            <div>
+              <div className='text-lg font-semibold text-gray-700 mb-1'>
+                {isUploading ? 'Processing your file...' : 'Drop your file here'}
+              </div>
+              <div className='text-sm text-gray-500'>
+                {isUploading ? 'Please wait while we process your content' : 'Support for .txt files • PDF coming soon'}
+              </div>
+            </div>
+            {!isUploading && (
+              <div className='inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium'>
+                <span>Browse Files</span>
+              </div>
+            )}
           </div>
-          <div className='text-xs text-gray-500'>Support for .txt files (PDF coming soon)</div>
-        </div>
-      </button>
+        </button>
 
       {uploadError && (
         <div className='text-sm text-red-600 bg-red-50 p-3 rounded-lg'>{uploadError}</div>
