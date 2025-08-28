@@ -2,6 +2,7 @@
 
 import FileUpload from '@/components/FileUpload';
 import FocusTimer from '@/components/FocusTimer';
+import ReadingView from '@/components/ReadingView';
 import StreakCounter from '@/components/StreakCounter';
 import TextInput from '@/components/TextInput';
 import { useState } from 'react';
@@ -16,8 +17,26 @@ export default function HomePage() {
     }
   };
 
+  const handleCompleteReading = () => {
+    setIsReading(false);
+    // TODO: Add to reading stats, increment streak, etc.
+  };
+
+  const handleCloseReading = () => {
+    setIsReading(false);
+  };
+
   return (
-    <div className='max-w-4xl mx-auto space-y-8'>
+    <>
+      {isReading && (
+        <ReadingView
+          text={inputText}
+          onComplete={handleCompleteReading}
+          onClose={handleCloseReading}
+        />
+      )}
+      
+      <div className='max-w-4xl mx-auto space-y-8'>
       {/* Hero Section */}
       <div className='text-center space-y-4'>
         <h1 className='text-4xl font-bold text-gray-900'>Transform Your Reading Experience</h1>
@@ -92,7 +111,8 @@ export default function HomePage() {
             Build consistent reading habits with gamified progress
           </p>
         </div>
+              </div>
       </div>
-    </div>
+    </>
   );
 }
