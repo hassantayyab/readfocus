@@ -40,6 +40,3 @@ next-env.d.ts
 # IDE
 .vscode/
 .idea/
-
-# Cursor specific
-.cursor/
