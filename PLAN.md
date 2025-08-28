@@ -50,7 +50,7 @@ Unlike distraction blockers (like Forest) or speed-reading tools (like Bionic Re
 
 **Features:**
 
-- Browser extension to capture webpage text.
+- Browser extension to capture webpage text. Perhaps this can help: https://developer.chrome.com/docs/ai/summarizer-api. just a suggestion. feel free to use a better approach.
 - Mobile share-to-app functionality.
 - Session stats: reading time, focus score, comprehension accuracy.
 - Light gamification: XP points and unlockable achievements.
