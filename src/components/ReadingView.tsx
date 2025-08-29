@@ -1,7 +1,10 @@
 'use client';
 
+import { Button } from '@/components/ui';
+import { APP_CONFIG } from '@/lib/config';
+import { TextChunk } from '@/types';
 import { chunkText } from '@/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ReadingViewProps {
   text: string;
@@ -10,35 +13,44 @@ interface ReadingViewProps {
 }
 
 const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) => {
-  const [chunks, setChunks] = useState<ReturnType<typeof chunkText>>([]);
+  const [chunks, setChunks] = useState<TextChunk[]>([]);
   const [currentChunkIndex, setCurrentChunkIndex] = useState(0);
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
-  const [autoScrollSpeed, setAutoScrollSpeed] = useState(3000); // 3 seconds default
+  const [autoScrollSpeed, setAutoScrollSpeed] = useState(3000); // in milliseconds
+  const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const textChunks = chunkText(text, 150); // Default chunk size
-    setChunks(textChunks);
-    setCurrentChunkIndex(0);
+    if (text) {
+      setChunks(chunkText(text, APP_CONFIG.settings.defaultChunkSize));
+      setCurrentChunkIndex(0);
+    }
   }, [text]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    if (isAutoScrolling && chunks.length > 0) {
-      interval = setInterval(() => {
-        setCurrentChunkIndex((prev) => {
-          if (prev >= chunks.length - 1) {
+    if (isAutoScrolling) {
+      autoScrollIntervalRef.current = setInterval(() => {
+        setCurrentChunkIndex((prevIndex) => {
+          if (prevIndex < chunks.length - 1) {
+            return prevIndex + 1;
+          } else {
+            // Reached end of text
+            clearInterval(autoScrollIntervalRef.current!);
             setIsAutoScrolling(false);
-            onComplete();
-            return prev;
+            onComplete(); // Call onComplete when reading finishes
+            return prevIndex;
           }
-          return prev + 1;
         });
       }, autoScrollSpeed);
+    } else {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+      }
     }
 
     return () => {
-      if (interval) clearInterval(interval);
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+      }
     };
   }, [isAutoScrolling, autoScrollSpeed, chunks.length, onComplete]);
 
@@ -71,7 +83,7 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
       const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
       highlightedContent = highlightedContent.replace(
         regex,
-        `<mark class="bg-yellow-300 text-yellow-900 px-2 py-1 rounded-md font-semibold shadow-sm">${keyword}</mark>`,
+        `<mark class="bg-yellow-300 text-yellow-900 px-2 py-1 rounded-md font-semibold shadow-sm">${keyword}</mark>`
       );
     });
 
@@ -80,69 +92,77 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
 
   if (!chunks.length) {
     return (
-      <div className='fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50'>
-        <div className='bg-white rounded-lg p-8 max-w-md w-full mx-4'>
-          <div className='text-center'>
-            <div className='text-2xl mb-4'>⏳</div>
-            <p>Processing your text...</p>
-          </div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div className="mx-4 w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-lg">
+          <div className="mb-4 text-6xl">📚</div>
+          <h3 className="mb-4 text-2xl font-bold text-gray-800 md:text-3xl">No Content to Read</h3>
+          <p className="mb-6 text-base leading-relaxed text-gray-700 md:text-lg">
+            Please provide some text to start your guided reading session.
+          </p>
+          <Button onClick={onClose} variant="primary" size="lg">
+            Go Back
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4'>
-      <div className='bg-white rounded-2xl shadow-2xl max-w-5xl w-full h-[92vh] flex flex-col overflow-hidden border border-gray-200'>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="flex h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg">
         {/* Header */}
-        <div className='flex items-center justify-between p-6 bg-gradient-to-r from-blue-500 to-indigo-500 text-white'>
-          <div className='flex items-center space-x-6'>
-            <div>
-              <h2 className='text-2xl font-bold'>📖 Guided Reading</h2>
-              <p className='text-blue-100 text-sm'>
-                Focus on one chunk at a time for better comprehension
-              </p>
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <div>
+                <h2 className="text-2xl font-bold text-white md:text-3xl">📖 Guided Reading</h2>
+                <p className="text-lg text-blue-100">
+                  Focus on one chunk at a time for better comprehension
+                </p>
+              </div>
+              <div className="rounded-xl bg-white/20 px-4 py-2">
+                <span className="text-sm font-medium">
+                  Chunk {currentChunkIndex + 1} of {chunks.length}
+                </span>
+              </div>
             </div>
-            <div className='bg-white/20 rounded-lg px-4 py-2'>
-              <span className='text-sm font-medium'>
-                Chunk {currentChunkIndex + 1} of {chunks.length}
-              </span>
-            </div>
+            <button
+              onClick={onClose}
+              className="flex h-10 w-10 items-center justify-center rounded-full text-3xl text-white/80 transition-all hover:bg-white/10 hover:text-white"
+            >
+              ×
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className='text-white/80 hover:text-white text-3xl transition-smooth hover:bg-white/10 rounded-full w-10 h-10 flex items-center justify-center'
-          >
-            ×
-          </button>
         </div>
 
         {/* Progress Bar */}
-        <div className='px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b'>
-          <div className='flex items-center justify-between mb-3'>
-            <div className='flex items-center space-x-3'>
-              <span className='text-sm font-semibold text-gray-700'>Reading Progress</span>
-              <span className='text-xs text-gray-500'>{Math.round(progress)}% complete</span>
+        <div className="border-b bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <span className="text-sm font-semibold text-gray-700">Reading Progress</span>
+              <span className="rounded-full bg-white px-3 py-1 text-xs text-gray-500">
+                {Math.round(progress)}% complete
+              </span>
             </div>
-            <div className='text-xs text-gray-500'>
+            <div className="rounded-full bg-white px-3 py-1 text-xs text-gray-500">
               {chunks.length - currentChunkIndex - 1} chunks remaining
             </div>
           </div>
-          <div className='w-full bg-gray-200 rounded-full h-3 shadow-inner'>
+          <div className="h-3 w-full rounded-full bg-gray-200 shadow-inner">
             <div
-              className='bg-gradient-to-r from-blue-500 to-indigo-500 h-3 rounded-full transition-all duration-500 shadow-sm'
+              className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 shadow-sm transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
         {/* Reading Content */}
-        <div className='flex-1 overflow-y-auto bg-gradient-to-b from-white to-gray-50'>
-          <div className='max-w-4xl mx-auto p-8 md:p-12'>
+        <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-gray-50">
+          <div className="mx-auto max-w-4xl p-8 md:p-12">
             {/* Reading Text */}
-            <div className='bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-100 mb-8'>
-              <div className='prose prose-lg max-w-none'>
-                <div className='text-xl md:text-2xl leading-relaxed text-gray-800 font-medium'>
+            <div className="mb-8 rounded-2xl border border-gray-100 bg-white p-8 shadow-lg md:p-12">
+              <div className="prose prose-lg max-w-none">
+                <div className="text-xl leading-relaxed font-medium text-gray-800 md:text-2xl">
                   {highlightKeywords(currentChunk.content, currentChunk.highlightedWords)}
                 </div>
               </div>
@@ -150,18 +170,18 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
 
             {/* Keywords Display */}
             {currentChunk.highlightedWords.length > 0 && (
-              <div className='bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-6 border border-yellow-200 shadow-sm'>
-                <div className='flex items-center space-x-2 mb-4'>
-                  <span className='text-lg'>🔑</span>
-                  <h4 className='text-lg font-semibold text-yellow-800'>
+              <div className="rounded-2xl border border-yellow-200 bg-gradient-to-r from-yellow-50 to-amber-50 p-6 shadow-lg">
+                <div className="mb-4 flex items-center space-x-2">
+                  <span className="text-lg">🔑</span>
+                  <h4 className="text-xl font-semibold text-yellow-800 md:text-2xl">
                     Key Terms in This Section
                   </h4>
                 </div>
-                <div className='flex flex-wrap gap-3'>
+                <div className="flex flex-wrap gap-3">
                   {currentChunk.highlightedWords.map((keyword, index) => (
                     <span
                       key={index}
-                      className='px-4 py-2 bg-yellow-200 text-yellow-900 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-shadow'
+                      className="rounded-full bg-yellow-200 px-4 py-2 text-sm font-medium text-yellow-900 shadow-sm transition-shadow hover:shadow-md"
                     >
                       {keyword}
                     </span>
@@ -173,36 +193,34 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
         </div>
 
         {/* Controls */}
-        <div className='p-6 bg-white border-t border-gray-200'>
-          <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0'>
-            <div className='flex items-center space-x-3'>
-              <button
+        <div className="border-t border-gray-200 bg-white p-6">
+          <div className="flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
+            <div className="flex items-center space-x-3">
+              <Button
                 onClick={goToPreviousChunk}
                 disabled={currentChunkIndex === 0}
-                className='flex items-center space-x-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg'
+                variant="secondary"
+                size="md"
               >
                 <span>←</span>
                 <span>Previous</span>
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={toggleAutoScroll}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:shadow-lg ${
-                  isAutoScrolling
-                    ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : 'bg-green-500 hover:bg-green-600 text-white'
-                }`}
+                variant={isAutoScrolling ? 'danger' : 'success'}
+                size="md"
               >
                 <span>{isAutoScrolling ? '⏸' : '▶'}</span>
                 <span>{isAutoScrolling ? 'Pause' : 'Auto Play'}</span>
-              </button>
+              </Button>
 
-              <div className='flex items-center space-x-2'>
-                <span className='text-sm text-gray-600 hidden sm:block'>Speed:</span>
+              <div className="flex items-center space-x-2">
+                <span className="hidden text-sm text-gray-600 sm:block">Speed:</span>
                 <select
                   value={autoScrollSpeed}
                   onChange={(e) => setAutoScrollSpeed(Number(e.target.value))}
-                  className='px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm hover:shadow-md transition-shadow'
+                  className="w-full rounded-xl border-2 border-gray-200 px-4 py-2 text-sm transition-all duration-200 placeholder:text-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
                 >
                   <option value={2000}>⚡ Fast</option>
                   <option value={3000}>📖 Normal</option>
@@ -211,15 +229,17 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
               </div>
             </div>
 
-            <button
+            <Button
               onClick={goToNextChunk}
-              className='flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+              variant="primary"
+              size="lg"
+              className="transform hover:-translate-y-0.5"
             >
               <span>
                 {currentChunkIndex === chunks.length - 1 ? 'Complete Reading' : 'Next Chunk'}
               </span>
               <span>{currentChunkIndex === chunks.length - 1 ? '✓' : '→'}</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>

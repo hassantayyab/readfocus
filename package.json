@@ -8,9 +8,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write \"src/**/*.{js,ts,jsx,tsx,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,ts,jsx,tsx,css,md}\"",
     "type-check": "tsc --noEmit"
   },
-  "keywords": ["reading", "education", "focus", "student", "comprehension"],
+  "keywords": [
+    "reading",
+    "education",
+    "focus",
+    "student",
+    "comprehension"
+  ],
   "author": "Hassan Tayyab",
   "license": "MIT",
   "dependencies": {
@@ -22,7 +31,13 @@
     "next": "^15.5.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "tailwindcss": "^4.1.12",
     "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "tailwindcss": "^4.1.12"
   }
 }

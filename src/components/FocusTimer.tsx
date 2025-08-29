@@ -3,24 +3,33 @@
 import { useEffect, useRef, useState } from 'react';
 
 const FocusTimer: React.FC = () => {
-  const [seconds, setSeconds] = useState(0);
-  const [isActive, setIsActive] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const [currentSession, setCurrentSession] = useState(0);
   const [todayTotal, setTodayTotal] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Load today's total time from localStorage
-    const today = new Date().toDateString();
-    const savedTodayTotal = localStorage.getItem(`readfocus_daily_time_${today}`);
+    // Load today's total from localStorage
+    const savedTodayTotal = localStorage.getItem('readfocus-today-total');
     if (savedTodayTotal) {
-      setTodayTotal(parseInt(savedTodayTotal, 10));
+      setTodayTotal(parseInt(savedTodayTotal));
+    }
+
+    // Check if it's a new day and reset today's total
+    const lastDate = localStorage.getItem('readfocus-last-date');
+    const today = new Date().toDateString();
+
+    if (lastDate !== today) {
+      setTodayTotal(0);
+      localStorage.setItem('readfocus-today-total', '0');
+      localStorage.setItem('readfocus-last-date', today);
     }
   }, []);
 
   useEffect(() => {
-    if (isActive) {
+    if (isRunning) {
       intervalRef.current = setInterval(() => {
-        setSeconds((prev) => prev + 1);
+        setCurrentSession((prev) => prev + 1);
       }, 1000);
     } else {
       if (intervalRef.current) {
@@ -33,99 +42,71 @@ const FocusTimer: React.FC = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isActive]);
+  }, [isRunning]);
 
-  const startTimer = () => {
-    setIsActive(true);
-  };
-
-  const pauseTimer = () => {
-    setIsActive(false);
-  };
-
-  const stopTimer = () => {
-    setIsActive(false);
-
-    // Add session time to today's total
-    const newTodayTotal = todayTotal + seconds;
-    setTodayTotal(newTodayTotal);
-
-    // Save to localStorage
-    const today = new Date().toDateString();
-    localStorage.setItem(`readfocus_daily_time_${today}`, newTodayTotal.toString());
-
-    // Reset session timer
-    setSeconds(0);
-  };
-
-  const formatTime = (totalSeconds: number): string => {
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const secs = totalSeconds % 60;
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  const toggleTimer = () => {
+    if (isRunning) {
+      // Stop timer and add to today's total
+      const newTodayTotal = todayTotal + currentSession;
+      setTodayTotal(newTodayTotal);
+      localStorage.setItem('readfocus-today-total', newTodayTotal.toString());
+      setCurrentSession(0);
     }
-    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    setIsRunning(!isRunning);
   };
 
-  const formatTimeShort = (totalSeconds: number): string => {
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-    if (minutes > 0) {
-      return `${minutes}m`;
-    }
-    return '< 1m';
+  const formatDuration = (seconds: number): string => {
+    if (seconds < 60) return '< 1m';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${mins}m`;
   };
 
   return (
-    <div className='bg-white rounded-lg shadow-sm p-6'>
-      <div className='flex items-center justify-between mb-4'>
-        <h3 className='text-lg font-semibold text-gray-800'>Focus Timer</h3>
-        <span className='text-2xl'>⏰</span>
+    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-lg transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
+      <div className="mb-4 flex items-center space-x-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-600">
+          <span className="text-2xl text-white">⏰</span>
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 md:text-2xl">Focus Timer</h3>
+          <p className="text-sm text-gray-500">Track your reading sessions</p>
+        </div>
       </div>
 
-      <div className='space-y-4'>
-        <div className='text-center'>
-          <div className='text-3xl font-bold text-blue-600 mb-1 font-mono'>
-            {formatTime(seconds)}
+      <div className="space-y-4">
+        <div className="text-center">
+          <div className="mb-1 text-3xl font-bold text-blue-600">{formatTime(currentSession)}</div>
+          <div className="text-sm text-gray-600">Current session</div>
+        </div>
+
+        <button
+          onClick={toggleTimer}
+          className={`w-full rounded-xl px-4 py-3 font-medium transition-all duration-200 ${
+            isRunning
+              ? 'bg-red-500 text-white hover:bg-red-600'
+              : 'bg-green-500 text-white hover:bg-green-600'
+          }`}
+        >
+          {isRunning ? 'Stop' : 'Start'}
+        </button>
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-600">Current session:</span>
+            <span className="font-medium text-gray-800">{formatDuration(currentSession)}</span>
           </div>
-          <div className='text-sm text-gray-600'>Current session</div>
-        </div>
-
-        <div className='flex gap-2 justify-center'>
-          {!isActive ? (
-            <button
-              onClick={startTimer}
-              className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-smooth'
-            >
-              Start
-            </button>
-          ) : (
-            <button
-              onClick={pauseTimer}
-              className='bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-smooth'
-            >
-              Pause
-            </button>
-          )}
-
-          <button
-            onClick={stopTimer}
-            disabled={seconds === 0}
-            className='bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-smooth disabled:opacity-50 disabled:cursor-not-allowed'
-          >
-            Stop
-          </button>
-        </div>
-
-        <div className='text-center'>
-          <div className='text-lg font-semibold text-gray-700'>{formatTimeShort(todayTotal)}</div>
-          <div className='text-sm text-gray-500'>Today's total</div>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-600">Today&apos;s total:</span>
+            <span className="font-medium text-gray-800">{formatDuration(todayTotal)}</span>
+          </div>
         </div>
       </div>
     </div>

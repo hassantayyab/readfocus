@@ -1,89 +1,62 @@
 'use client';
 
-import { APP_CONFIG } from '@/lib/config';
+import { Button } from '@/components/ui';
 import { useEffect, useState } from 'react';
 
 const StreakCounter: React.FC = () => {
-  const [currentStreak, setCurrentStreak] = useState(0);
-  const [longestStreak, setLongestStreak] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [weeklyGoal, setWeeklyGoal] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
 
   useEffect(() => {
     // Load streak data from localStorage
-    const savedCurrentStreak = localStorage.getItem('readfocus_current_streak');
-    const savedLongestStreak = localStorage.getItem('readfocus_longest_streak');
+    const savedStreak = localStorage.getItem('readfocus-streak');
+    const savedWeeklyGoal = localStorage.getItem('readfocus-weekly-goal');
+    const savedBestStreak = localStorage.getItem('readfocus-best-streak');
 
-    if (savedCurrentStreak) {
-      setCurrentStreak(parseInt(savedCurrentStreak, 10));
-    }
-    if (savedLongestStreak) {
-      setLongestStreak(parseInt(savedLongestStreak, 10));
-    }
+    if (savedStreak) setStreak(parseInt(savedStreak));
+    if (savedWeeklyGoal) setWeeklyGoal(parseInt(savedWeeklyGoal));
+    if (savedBestStreak) setBestStreak(parseInt(savedBestStreak));
   }, []);
 
-  const incrementStreak = () => {
-    const newStreak = currentStreak + 1;
-    setCurrentStreak(newStreak);
-
-    if (newStreak > longestStreak) {
-      setLongestStreak(newStreak);
-      localStorage.setItem('readfocus_longest_streak', newStreak.toString());
-    }
-
-    localStorage.setItem('readfocus_current_streak', newStreak.toString());
-  };
-
   const resetStreak = () => {
-    setCurrentStreak(0);
-    localStorage.setItem('readfocus_current_streak', '0');
+    setStreak(0);
+    setWeeklyGoal(0);
+    localStorage.setItem('readfocus-streak', '0');
+    localStorage.setItem('readfocus-weekly-goal', '0');
   };
-
-  const streakPercentage = Math.min((currentStreak / APP_CONFIG.settings.streakGoal) * 100, 100);
 
   return (
-    <div className='bg-white rounded-lg shadow-sm p-6'>
-      <div className='flex items-center justify-between mb-4'>
-        <h3 className='text-lg font-semibold text-gray-800'>Focus Streak</h3>
-        <span className='text-2xl'>🔥</span>
+    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-lg transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
+      <div className="mb-4 flex items-center space-x-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-orange-400 to-red-500">
+          <span className="text-2xl text-white">🔥</span>
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 md:text-2xl">Focus Streak</h3>
+          <p className="text-sm leading-relaxed text-gray-500">Keep the momentum going!</p>
+        </div>
       </div>
 
-      <div className='space-y-4'>
-        <div className='text-center'>
-          <div className='text-3xl font-bold text-orange-600 mb-1'>{currentStreak}</div>
-          <div className='text-sm text-gray-600'>Current streak</div>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-gray-600">Current streak:</span>
+          <span className="text-3xl font-bold text-orange-600">{streak}</span>
         </div>
 
-        <div className='space-y-2'>
-          <div className='flex justify-between text-sm text-gray-600'>
-            <span>Weekly goal</span>
-            <span>
-              {currentStreak}/{APP_CONFIG.settings.streakGoal}
-            </span>
-          </div>
-          <div className='w-full bg-gray-200 rounded-full h-2'>
-            <div
-              className='bg-orange-500 h-2 rounded-full transition-smooth'
-              style={{ width: `${streakPercentage}%` }}
-            />
-          </div>
+        <div className="flex items-center justify-between">
+          <span className="text-gray-600">Weekly goal:</span>
+          <span className="text-lg font-semibold text-gray-800">{weeklyGoal}/7</span>
         </div>
 
-        <div className='text-center text-sm text-gray-500'>Best: {longestStreak} days</div>
-
-        {/* Hidden buttons for development/testing */}
-        <div className='flex gap-2 opacity-20 hover:opacity-100 transition-smooth'>
-          <button
-            onClick={incrementStreak}
-            className='text-xs bg-green-100 text-green-600 px-2 py-1 rounded'
-          >
-            +1
-          </button>
-          <button
-            onClick={resetStreak}
-            className='text-xs bg-red-100 text-red-600 px-2 py-1 rounded'
-          >
-            Reset
-          </button>
+        <div className="flex items-center justify-between">
+          <span className="text-gray-600">Best:</span>
+          <span className="text-lg font-semibold text-gray-800">{bestStreak} days</span>
         </div>
+
+        <Button onClick={resetStreak} variant="secondary" size="md" className="mt-4 w-full">
+          Reset Streak
+        </Button>
       </div>
     </div>
   );

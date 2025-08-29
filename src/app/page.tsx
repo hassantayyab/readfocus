@@ -4,7 +4,7 @@ import FileUpload from '@/components/FileUpload';
 import FocusTimer from '@/components/FocusTimer';
 import ReadingView from '@/components/ReadingView';
 import StreakCounter from '@/components/StreakCounter';
-import TextInput from '@/components/TextInput';
+import { Button } from '@/components/ui';
 import { useState } from 'react';
 
 export default function HomePage() {
@@ -19,7 +19,7 @@ export default function HomePage() {
 
   const handleCompleteReading = () => {
     setIsReading(false);
-    // TODO: Add to reading stats, increment streak, etc.
+    // TODO: Add completion logic
   };
 
   const handleCloseReading = () => {
@@ -35,32 +35,32 @@ export default function HomePage() {
           onClose={handleCloseReading}
         />
       )}
-      
-      <div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50'>
+
+      <div className="min-h-screen bg-blue-100 p-8">
         {/* Hero Section */}
-        <div className='text-center py-16 px-6'>
-          <div className='max-w-4xl mx-auto'>
-            <h1 className='text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-6'>
-              Transform Your Reading
+        <div className="px-6 py-20 text-center">
+          <div className="mx-auto max-w-5xl">
+            <h1 className="mb-6 text-6xl font-bold text-blue-600">
+              Transform Your Reading Experience
             </h1>
-            <p className='text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed mb-8'>
+            <p className="mx-auto mb-12 max-w-3xl text-xl leading-relaxed text-gray-600 md:text-2xl">
               Stay focused, improve comprehension, and build better reading habits with
-              <span className='font-semibold text-blue-600'> guided reading</span> and
-              <span className='font-semibold text-indigo-600'> active recall</span>
+              <span className="font-semibold text-blue-600"> guided reading</span> and
+              <span className="font-semibold text-indigo-600"> active recall</span>
             </p>
-            
+
             {/* Quick Stats */}
-            <div className='flex justify-center items-center space-x-8 text-sm text-gray-600 mb-12'>
-              <div className='flex items-center space-x-2'>
-                <span className='w-2 h-2 bg-green-500 rounded-full'></span>
+            <div className="mb-16 flex flex-wrap items-center justify-center gap-8 text-sm text-gray-600">
+              <div className="flex items-center space-x-2 rounded-full bg-white/60 px-4 py-2 backdrop-blur-sm">
+                <span className="h-2 w-2 rounded-full bg-green-500"></span>
                 <span>Chunk-based reading</span>
               </div>
-              <div className='flex items-center space-x-2'>
-                <span className='w-2 h-2 bg-blue-500 rounded-full'></span>
+              <div className="flex items-center space-x-2 rounded-full bg-white/60 px-4 py-2 backdrop-blur-sm">
+                <span className="h-2 w-2 rounded-full bg-blue-500"></span>
                 <span>Keyword highlighting</span>
               </div>
-              <div className='flex items-center space-x-2'>
-                <span className='w-2 h-2 bg-purple-500 rounded-full'></span>
+              <div className="flex items-center space-x-2 rounded-full bg-white/60 px-4 py-2 backdrop-blur-sm">
+                <span className="h-2 w-2 rounded-full bg-purple-500"></span>
                 <span>Progress tracking</span>
               </div>
             </div>
@@ -68,120 +68,145 @@ export default function HomePage() {
         </div>
 
         {/* Main Content */}
-        <div className='max-w-6xl mx-auto px-6 pb-16'>
+        <div className="mx-auto max-w-7xl px-6 pb-20">
           {/* Stats Row */}
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-12'>
+          <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-2">
             <StreakCounter />
             <FocusTimer />
           </div>
 
           {/* Reading Input Section */}
-          <div className='bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden'>
-            <div className='bg-gradient-to-r from-blue-500 to-indigo-500 px-8 py-6'>
-              <h2 className='text-2xl font-bold text-white mb-2'>Start Your Focused Reading Session</h2>
-              <p className='text-blue-100'>Paste your content below and let ReadFocus guide your reading journey</p>
+          <div className="mb-16 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-8">
+              <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">
+                Start Your Focused Reading Session
+              </h2>
+              <p className="text-lg text-blue-100">
+                Paste your content below and let ReadFocus guide your reading journey
+              </p>
             </div>
-            
-            <div className='p-8 space-y-8'>
+
+            <div className="space-y-8 p-8">
               {/* Enhanced Text Input */}
-              <div className='space-y-4'>
-                <div className='flex items-center justify-between'>
-                  <label className='text-lg font-semibold text-gray-800'>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-xl font-semibold text-gray-800 md:text-2xl">
                     📝 Your Reading Material
                   </label>
                   {inputText.trim() && (
-                    <div className='flex items-center space-x-4 text-sm'>
-                      <span className='text-gray-500'>
-                        {inputText.trim().split(/\s+/).filter(word => word.length > 0).length} words
+                    <div className="flex items-center space-x-4 text-sm">
+                      <span className="rounded-full bg-gray-100 px-3 py-1 text-gray-500">
+                        {
+                          inputText
+                            .trim()
+                            .split(/\s+/)
+                            .filter((word) => word.length > 0).length
+                        }{' '}
+                        words
                       </span>
-                      <span className='text-green-600 font-medium'>
+                      <span className="rounded-full bg-green-100 px-3 py-1 font-medium text-green-600">
                         ✓ Ready to read
                       </span>
                     </div>
                   )}
                 </div>
-                
-                <div className='relative'>
+
+                <div className="relative">
                   <textarea
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    placeholder='Paste your article, essay, research paper, or any text you want to read with focus...'
-                    className='w-full h-64 px-6 py-4 text-lg border-2 border-gray-200 rounded-xl resize-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400'
-                    aria-label='Text input for reading content'
+                    placeholder="Paste your article, essay, research paper, or any text you want to read with focus..."
+                    className="h-64 w-full resize-none rounded-xl border-2 border-gray-200 px-4 py-3 text-lg transition-all duration-200 placeholder:text-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
+                    aria-label="Text input for reading content"
                   />
                   {!inputText.trim() && (
-                    <div className='absolute bottom-4 left-6 text-sm text-gray-400'>
-                      💡 Tip: Try pasting a news article, research paper, or any text you want to focus on
+                    <div className="absolute bottom-4 left-6 rounded-lg bg-white/80 px-3 py-1 text-sm text-gray-400">
+                      💡 Tip: Try pasting a news article, research paper, or any text you want to
+                      focus on
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Divider */}
-              <div className='relative'>
-                <div className='absolute inset-0 flex items-center'>
-                  <div className='w-full border-t border-gray-200'></div>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
                 </div>
-                <div className='relative flex justify-center text-sm'>
-                  <span className='px-4 bg-white text-gray-500 font-medium'>or upload a file</span>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-white px-6 font-medium text-gray-500">or upload a file</span>
                 </div>
               </div>
 
               {/* Enhanced File Upload */}
-              <FileUpload onFileContent={setInputText} accept='.pdf,.txt' />
+              <FileUpload onFileContent={setInputText} accept=".pdf,.txt" />
 
               {/* Action Button */}
               {inputText.trim() && (
-                <div className='pt-6'>
-                  <button
+                <div className="pt-6">
+                  <Button
                     onClick={handleStartReading}
-                    className='w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200'
+                    variant="primary"
+                    size="lg"
+                    className="w-full transform px-8 py-4 hover:-translate-y-0.5"
                   >
                     🚀 Start Guided Reading
-                    <span className='block text-sm font-normal text-blue-100 mt-1'>
+                    <span className="mt-1 block text-sm font-normal text-blue-100">
                       Break into chunks • Highlight keywords • Track progress
                     </span>
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
           </div>
 
           {/* Features Preview */}
-          <div className='mt-16'>
-            <h3 className='text-3xl font-bold text-center text-gray-800 mb-4'>How ReadFocus Works</h3>
-            <p className='text-center text-gray-600 mb-12 max-w-2xl mx-auto'>
-              Experience a new way of reading that keeps you engaged and helps you retain more information
+          <div className="mt-20">
+            <h3 className="mb-4 text-center text-2xl font-bold text-gray-800 md:text-3xl">
+              How ReadFocus Works
+            </h3>
+            <p className="mx-auto mb-16 max-w-3xl text-center text-base leading-relaxed text-gray-600 md:text-lg">
+              Experience a new way of reading that keeps you engaged and helps you retain more
+              information
             </p>
-            
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-              <div className='bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100'>
-                <div className='w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg'>
-                  <span className='text-white text-2xl'>📖</span>
+
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-lg transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
+                  <span className="text-3xl text-white">📖</span>
                 </div>
-                <h4 className='text-xl font-bold text-gray-800 mb-3'>Guided Reading</h4>
-                <p className='text-gray-600 leading-relaxed'>
-                  Break text into digestible chunks with automatic keyword highlighting for better focus and comprehension
+                <h4 className="mb-4 text-xl font-semibold text-gray-800 md:text-2xl">
+                  Guided Reading
+                </h4>
+                <p className="text-base leading-relaxed text-gray-600 md:text-lg">
+                  Break text into digestible chunks with automatic keyword highlighting for better
+                  focus and comprehension
                 </p>
               </div>
 
-              <div className='bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100'>
-                <div className='w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg'>
-                  <span className='text-white text-2xl'>🧠</span>
+              <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-lg transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-green-600 shadow-lg">
+                  <span className="text-3xl text-white">🧠</span>
                 </div>
-                <h4 className='text-xl font-bold text-gray-800 mb-3'>Active Recall</h4>
-                <p className='text-gray-600 leading-relaxed'>
-                  Quick comprehension checks and interactive prompts keep you engaged and test your understanding
+                <h4 className="mb-4 text-xl font-semibold text-gray-800 md:text-2xl">
+                  Active Recall
+                </h4>
+                <p className="text-base leading-relaxed text-gray-600 md:text-lg">
+                  Quick comprehension checks and interactive prompts keep you engaged and test your
+                  understanding
                 </p>
               </div>
 
-              <div className='bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100'>
-                <div className='w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg'>
-                  <span className='text-white text-2xl'>🔥</span>
+              <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-lg transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 shadow-lg">
+                  <span className="text-3xl text-white">🔥</span>
                 </div>
-                <h4 className='text-xl font-bold text-gray-800 mb-3'>Focus Streaks</h4>
-                <p className='text-gray-600 leading-relaxed'>
-                  Build consistent reading habits with gamified progress tracking and daily streak challenges
+                <h4 className="mb-4 text-xl font-semibold text-gray-800 md:text-2xl">
+                  Focus Streaks
+                </h4>
+                <p className="text-base leading-relaxed text-gray-600 md:text-lg">
+                  Build consistent reading habits with gamified progress tracking and daily streak
+                  challenges
                 </p>
               </div>
             </div>

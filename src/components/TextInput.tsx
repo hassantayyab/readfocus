@@ -23,10 +23,10 @@ const TextInput: React.FC<TextInputProps> = ({
     .filter((word) => word.length > 0).length;
 
   return (
-    <div className='space-y-2'>
-      <div className='flex justify-between items-center'>
-        <label className='block text-sm font-medium text-gray-700'>Reading Text</label>
-        <span className='text-sm text-gray-500'>{wordCount} words</span>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="block text-sm font-medium text-gray-700">Reading Text</label>
+        <span className="text-sm text-gray-500">{wordCount} words</span>
       </div>
 
       <textarea
@@ -34,12 +34,12 @@ const TextInput: React.FC<TextInputProps> = ({
         onChange={handleTextChange}
         placeholder={placeholder}
         disabled={disabled}
-        className='w-full h-48 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-smooth disabled:bg-gray-50 disabled:cursor-not-allowed'
-        aria-label='Text input for reading content'
+        className="transition-smooth h-48 w-full resize-none rounded-lg border border-gray-300 px-4 py-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50"
+        aria-label="Text input for reading content"
       />
 
       {wordCount > 0 && (
-        <div className='text-xs text-gray-500'>
+        <div className="text-xs text-gray-500">
           Estimated reading time: {Math.ceil(wordCount / 200)} minutes
         </div>
       )}

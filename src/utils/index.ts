@@ -91,7 +91,7 @@ export const findKeywords = (text: string): string[] => {
 
   // Find longer, potentially important words
   const keywords = words.filter(
-    (word) => word.length > 5 && !commonWords.has(word) && /^[a-zA-Z]+$/.test(word),
+    (word) => word.length > 5 && !commonWords.has(word) && /^[a-zA-Z]+$/.test(word)
   );
 
   // Remove duplicates and return up to 3 keywords
