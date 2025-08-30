@@ -8,6 +8,9 @@ A student-focused reading companion app that helps users maintain attention and 
 - **🧠 Active Recall**: Quick comprehension checks to keep you engaged
 - **🔥 Focus Streaks**: Build consistent reading habits with gamified progress
 - **⏰ Session Tracking**: Monitor your reading time and daily progress
+- **📊 Stats Dashboard**: Comprehensive analytics with XP levels, weekly goals, and progress charts
+- **🏆 Gamification**: Level up with XP points, achievements, and performance metrics
+- **📈 Progress Visualization**: Daily charts showing reading time, focus scores, and trends
 - **📁 File Support**: Text file uploads (PDF support coming soon)
 
 ## 🚀 Getting Started
