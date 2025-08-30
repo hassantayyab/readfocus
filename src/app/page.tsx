@@ -3,6 +3,7 @@
 import FileUpload from '@/components/FileUpload';
 import FocusTimer from '@/components/FocusTimer';
 import ReadingView from '@/components/ReadingView';
+import StatsOverview from '@/components/StatsOverview';
 import StreakCounter from '@/components/StreakCounter';
 import { Button } from '@/components/ui';
 import { useState } from 'react';
@@ -10,6 +11,7 @@ import { useState } from 'react';
 export default function HomePage() {
   const [inputText, setInputText] = useState('');
   const [isReading, setIsReading] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
   const handleStartReading = () => {
     if (inputText.trim()) {
@@ -35,6 +37,8 @@ export default function HomePage() {
           onClose={handleCloseReading}
         />
       )}
+
+      {showStats && <StatsOverview onClose={() => setShowStats(false)} />}
 
       <div className="min-h-screen bg-blue-100 p-8">
         {/* Hero Section */}
@@ -70,9 +74,44 @@ export default function HomePage() {
         {/* Main Content */}
         <div className="mx-auto max-w-7xl px-6 pb-20">
           {/* Stats Row */}
-          <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <StreakCounter />
             <FocusTimer />
+
+            {/* Stats Dashboard Access */}
+            <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
+              <div className="p-6">
+                <div className="mb-4 flex items-center space-x-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-400 to-purple-600">
+                    <span className="text-2xl text-white">📊</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-800 md:text-2xl">
+                      Your Progress
+                    </h3>
+                    <p className="text-sm text-gray-500">Track your reading journey</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-purple-600">📈</div>
+                    <p className="mt-2 text-sm text-gray-600">
+                      View detailed analytics, XP progress, and achievements
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={() => setShowStats(true)}
+                    variant="secondary"
+                    size="md"
+                    className="w-full bg-purple-100 text-purple-700 hover:bg-purple-200"
+                  >
+                    View Stats Dashboard
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Reading Input Section */}
