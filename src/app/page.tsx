@@ -6,12 +6,54 @@ import ReadingView from '@/components/ReadingView';
 import StatsOverview from '@/components/StatsOverview';
 import StreakCounter from '@/components/StreakCounter';
 import { Button } from '@/components/ui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
   const [inputText, setInputText] = useState('');
   const [isReading, setIsReading] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [extensionData, setExtensionData] = useState<any>(null);
+
+  // Check for extension data on component mount
+  useEffect(() => {
+    const checkExtensionData = async () => {
+      try {
+        // Check URL parameters for extension source
+        const urlParams = new URLSearchParams(window.location.search);
+        const isFromExtension = urlParams.get('source') === 'extension';
+        const textId = urlParams.get('id');
+
+        if (isFromExtension && textId) {
+          // Try to get captured text from localStorage (Chrome extension stores it here)
+          const storedData = localStorage.getItem('readfocus_captured_text');
+          
+          if (storedData) {
+            const textData = JSON.parse(storedData);
+            
+            if (textData.id === textId && textData.text) {
+              setExtensionData(textData);
+              setInputText(textData.text);
+              
+              // Show success message
+              console.log('✅ Text loaded from extension:', textData.title);
+              
+              // Clear the stored data after loading
+              localStorage.removeItem('readfocus_captured_text');
+              
+              // Auto-start reading after a short delay
+              setTimeout(() => {
+                setIsReading(true);
+              }, 1000);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading extension data:', error);
+      }
+    };
+
+    checkExtensionData();
+  }, []);
 
   const handleStartReading = () => {
     if (inputText.trim()) {
@@ -114,14 +156,40 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Extension Success Banner */}
+          {extensionData && (
+            <div className="mb-8 overflow-hidden rounded-2xl border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg">
+              <div className="p-6">
+                <div className="flex items-center space-x-3">
+                  <div className="text-3xl">🎉</div>
+                  <div>
+                    <h3 className="text-xl font-bold text-green-800">
+                      Text Loaded from Extension!
+                    </h3>
+                    <p className="text-green-600">
+                      {extensionData.title} • {extensionData.text.length.toLocaleString()} characters
+                    </p>
+                    {extensionData.sourceUrl && (
+                      <p className="text-sm text-green-500 truncate max-w-md">
+                        From: {extensionData.sourceUrl}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Reading Input Section */}
           <div className="mb-16 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-8">
               <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">
-                Start Your Focused Reading Session
+                {extensionData ? 'Ready to Read!' : 'Start Your Focused Reading Session'}
               </h2>
               <p className="text-lg text-blue-100">
-                Paste your content below and let ReadFocus guide your reading journey
+                {extensionData 
+                  ? 'Your text has been loaded and is ready for guided reading.' 
+                  : 'Paste your content below and let ReadFocus guide your reading journey'}
               </p>
             </div>
 

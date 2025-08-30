@@ -65,7 +65,7 @@ Unlike distraction blockers (like Forest) or speed-reading tools (like Bionic Re
 
 **To-Dos:**
 
-- [ ] Add browser extension text capture.
+- [x] Add browser extension text capture.
 - [ ] Add share-to-app import for mobile.
 - [x] Implement stats tracking logic.
 - [x] Build stats dashboard UI.
