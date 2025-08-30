@@ -43,6 +43,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
       console.error('File upload error:', error);
     } finally {
       setIsUploading(false);
+      // Reset the input value to allow uploading the same file again
+      if (event.target) {
+        event.target.value = '';
+      }
     }
   };
 

@@ -3,8 +3,10 @@
 import { Button } from '@/components/ui';
 import { APP_CONFIG } from '@/lib/config';
 import { TextChunk } from '@/types';
-import { chunkText } from '@/utils';
+import { chunkText, findKeywords } from '@/utils';
 import { useEffect, useRef, useState } from 'react';
+import RecallPrompt, { type RecallQuestion } from './RecallPrompt';
+import { generateRecallQuestion, generateKeywordQuestion, shouldShowRecallPrompt } from '@/utils/questionGenerator';
 
 interface ReadingViewProps {
   text: string;
@@ -17,6 +19,9 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
   const [currentChunkIndex, setCurrentChunkIndex] = useState(0);
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
   const [autoScrollSpeed, setAutoScrollSpeed] = useState(3000); // in milliseconds
+  const [showRecallPrompt, setShowRecallPrompt] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState<RecallQuestion | null>(null);
+  const [comprehensionScore, setComprehensionScore] = useState({ correct: 0, total: 0 });
   const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -58,6 +63,12 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
   const progress = chunks.length > 0 ? ((currentChunkIndex + 1) / chunks.length) * 100 : 0;
 
   const goToNextChunk = () => {
+    // Check if we should show a recall prompt before moving to next chunk
+    if (shouldShowRecallPrompt(currentChunkIndex, chunks.length) && !showRecallPrompt) {
+      showRecallPromptForChunk();
+      return;
+    }
+    
     if (currentChunkIndex < chunks.length - 1) {
       setCurrentChunkIndex(currentChunkIndex + 1);
     } else {
@@ -90,6 +101,56 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
     return <span dangerouslySetInnerHTML={{ __html: highlightedContent }} />;
   };
 
+  // Recall prompt handlers
+  const handleRecallAnswer = (isCorrect: boolean) => {
+    setComprehensionScore(prev => ({
+      correct: prev.correct + (isCorrect ? 1 : 0),
+      total: prev.total + 1
+    }));
+    
+    // Continue to next chunk after answer
+    setTimeout(() => {
+      setShowRecallPrompt(false);
+      setCurrentQuestion(null);
+      
+      if (currentChunkIndex < chunks.length - 1) {
+        setCurrentChunkIndex(currentChunkIndex + 1);
+      } else {
+        onComplete();
+      }
+    }, 2000); // Show result for 2 seconds before continuing
+  };
+
+  const handleRecallSkip = () => {
+    setComprehensionScore(prev => ({
+      ...prev,
+      total: prev.total + 1
+    }));
+    setShowRecallPrompt(false);
+    setCurrentQuestion(null);
+    
+    // Continue to next chunk after skip
+    if (currentChunkIndex < chunks.length - 1) {
+      setCurrentChunkIndex(currentChunkIndex + 1);
+    } else {
+      onComplete();
+    }
+  };
+
+  const showRecallPromptForChunk = () => {
+    if (shouldShowRecallPrompt(currentChunkIndex, chunks.length)) {
+      const chunk = chunks[currentChunkIndex];
+      const keywords = findKeywords(chunk.content);
+      
+      const question = keywords.length > 0 
+        ? generateKeywordQuestion(chunk.content, keywords, currentChunkIndex)
+        : generateRecallQuestion(chunk.content, currentChunkIndex);
+      
+      setCurrentQuestion(question);
+      setShowRecallPrompt(true);
+    }
+  };
+
   if (!chunks.length) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
@@ -120,10 +181,19 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
                   Focus on one chunk at a time for better comprehension
                 </p>
               </div>
-              <div className="rounded-xl bg-white/20 px-4 py-2">
-                <span className="text-sm font-medium">
-                  Chunk {currentChunkIndex + 1} of {chunks.length}
-                </span>
+              <div className="flex space-x-3">
+                <div className="rounded-xl bg-white/20 px-4 py-2">
+                  <span className="text-sm font-medium">
+                    Chunk {currentChunkIndex + 1} of {chunks.length}
+                  </span>
+                </div>
+                {comprehensionScore.total > 0 && (
+                  <div className="rounded-xl bg-white/20 px-4 py-2">
+                    <span className="text-sm font-medium">
+                      🧠 {comprehensionScore.correct}/{comprehensionScore.total} ({Math.round((comprehensionScore.correct / comprehensionScore.total) * 100)}%)
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <button
@@ -243,6 +313,15 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
           </div>
         </div>
       </div>
+      
+      {/* Recall Prompt Modal */}
+      {showRecallPrompt && currentQuestion && (
+        <RecallPrompt
+          question={currentQuestion}
+          onAnswer={handleRecallAnswer}
+          onSkip={handleRecallSkip}
+        />
+      )}
     </div>
   );
 };

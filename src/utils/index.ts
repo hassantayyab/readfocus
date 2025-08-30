@@ -159,3 +159,6 @@ export const loadFromStorage = (key: string): any => {
     return null;
   }
 };
+
+// Re-export question generator functions
+export * from './questionGenerator';

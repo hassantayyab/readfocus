@@ -34,13 +34,21 @@ Unlike distraction blockers (like Forest) or speed-reading tools (like Bionic Re
 
 **To-Dos:**
 
-- [ ] Implement text input box and PDF upload handler.
-- [ ] Implement chunking function to split text.
-- [ ] Add keyword highlighting function.
-- [ ] Build guided reading view with navigation (tap/scroll).
-- [ ] Add basic recall prompt logic (MCQ or true/false).
-- [ ] Add streak counter component.
-- [ ] Add focus timer component.
+- [x] Implement text input box and PDF upload handler.
+- [x] Implement chunking function to split text.
+- [x] Add keyword highlighting function.
+- [x] Build guided reading view with navigation (tap/scroll).
+- [x] Add basic recall prompt logic (MCQ or true/false).
+- [x] Add streak counter component.
+- [x] Add focus timer component.
+
+**✅ Phase 1 Complete!**
+
+- Full MVP with text input, PDF upload, guided reading with chunks
+- Keyword highlighting and recall prompts (MCQ/True-False)
+- Streak tracking and focus timer
+- Comprehension scoring with real-time feedback
+- Reusable Button components following best practices
 
 ---
 
