@@ -26,12 +26,13 @@ ALWAYS start response with `🧰 RULES APPLIED`.
 - **Keep git commit messages very short**
 - **Never push changes to git**
 - **Always proceed with stuff without asking for my confirmation**
+- **After you are done with a task, always gives me summary of changes and how can i test it**
 - **For Tailwind CSS v4 the way of development has changed. There is now no longer tailwind.config file needed. Please refer to the docs for our framework setup and always follow the latest guideliens for tailwind CSS: [Framework Guides](https://tailwindcss.com/docs/installation/framework-guides)**
 - **Try to go with Supabase for our backend if it makes sense for the application needs**
 
 ### 📚 Documentation & Explainability
 
-- **Update `README.md`** when new features are added, dependencies change, or setup steps are modified.
+- **ALWAYS Update `README.md`** if anything changes that is worth mentioning in it.
 - **Comment non-obvious code** and ensure everything is understandable to a mid-level developer.
 - When writing complex logic, **add an inline `# Reason:` comment** explaining the why, not just the what.
 

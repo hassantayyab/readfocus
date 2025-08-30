@@ -2,11 +2,16 @@
 
 import { Button } from '@/components/ui';
 import { APP_CONFIG } from '@/lib/config';
-import { TextChunk } from '@/types';
+import { SessionStats, TextChunk } from '@/types';
 import { chunkText, findKeywords } from '@/utils';
+import {
+  generateKeywordQuestion,
+  generateRecallQuestion,
+  shouldShowRecallPrompt,
+} from '@/utils/questionGenerator';
+import { completeSession, startSession, updateSession } from '@/utils/statsManager';
 import { useEffect, useRef, useState } from 'react';
 import RecallPrompt, { type RecallQuestion } from './RecallPrompt';
-import { generateRecallQuestion, generateKeywordQuestion, shouldShowRecallPrompt } from '@/utils/questionGenerator';
 
 interface ReadingViewProps {
   text: string;
@@ -22,14 +27,36 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
   const [showRecallPrompt, setShowRecallPrompt] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<RecallQuestion | null>(null);
   const [comprehensionScore, setComprehensionScore] = useState({ correct: 0, total: 0 });
+  const [currentSession, setCurrentSession] = useState<SessionStats | null>(null);
   const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (text) {
-      setChunks(chunkText(text, APP_CONFIG.settings.defaultChunkSize));
+      const newChunks = chunkText(text, APP_CONFIG.settings.defaultChunkSize);
+      setChunks(newChunks);
       setCurrentChunkIndex(0);
+
+      // Start session tracking
+      const session = startSession(text, newChunks.length);
+      setCurrentSession(session);
     }
   }, [text]);
+
+  // Update session when comprehension score changes
+  useEffect(() => {
+    if (currentSession) {
+      updateSession({
+        chunksCompleted: currentChunkIndex,
+        comprehensionScore: {
+          ...comprehensionScore,
+          accuracy:
+            comprehensionScore.total > 0
+              ? Math.round((comprehensionScore.correct / comprehensionScore.total) * 100)
+              : 0,
+        },
+      });
+    }
+  }, [currentChunkIndex, comprehensionScore, currentSession]);
 
   useEffect(() => {
     if (isAutoScrolling) {
@@ -68,10 +95,24 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
       showRecallPromptForChunk();
       return;
     }
-    
+
     if (currentChunkIndex < chunks.length - 1) {
       setCurrentChunkIndex(currentChunkIndex + 1);
     } else {
+      // Complete the session and mark all chunks as completed
+      if (currentSession) {
+        updateSession({
+          chunksCompleted: chunks.length,
+          comprehensionScore: {
+            ...comprehensionScore,
+            accuracy:
+              comprehensionScore.total > 0
+                ? Math.round((comprehensionScore.correct / comprehensionScore.total) * 100)
+                : 0,
+          },
+        });
+        completeSession();
+      }
       onComplete();
     }
   };
@@ -103,16 +144,16 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
 
   // Recall prompt handlers
   const handleRecallAnswer = (isCorrect: boolean) => {
-    setComprehensionScore(prev => ({
+    setComprehensionScore((prev) => ({
       correct: prev.correct + (isCorrect ? 1 : 0),
-      total: prev.total + 1
+      total: prev.total + 1,
     }));
-    
+
     // Continue to next chunk after answer
     setTimeout(() => {
       setShowRecallPrompt(false);
       setCurrentQuestion(null);
-      
+
       if (currentChunkIndex < chunks.length - 1) {
         setCurrentChunkIndex(currentChunkIndex + 1);
       } else {
@@ -122,13 +163,13 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
   };
 
   const handleRecallSkip = () => {
-    setComprehensionScore(prev => ({
+    setComprehensionScore((prev) => ({
       ...prev,
-      total: prev.total + 1
+      total: prev.total + 1,
     }));
     setShowRecallPrompt(false);
     setCurrentQuestion(null);
-    
+
     // Continue to next chunk after skip
     if (currentChunkIndex < chunks.length - 1) {
       setCurrentChunkIndex(currentChunkIndex + 1);
@@ -141,14 +182,33 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
     if (shouldShowRecallPrompt(currentChunkIndex, chunks.length)) {
       const chunk = chunks[currentChunkIndex];
       const keywords = findKeywords(chunk.content);
-      
-      const question = keywords.length > 0 
-        ? generateKeywordQuestion(chunk.content, keywords, currentChunkIndex)
-        : generateRecallQuestion(chunk.content, currentChunkIndex);
-      
+
+      const question =
+        keywords.length > 0
+          ? generateKeywordQuestion(chunk.content, keywords, currentChunkIndex)
+          : generateRecallQuestion(chunk.content, currentChunkIndex);
+
       setCurrentQuestion(question);
       setShowRecallPrompt(true);
     }
+  };
+
+  const handleClose = () => {
+    // Save session progress before closing
+    if (currentSession) {
+      updateSession({
+        chunksCompleted: currentChunkIndex,
+        comprehensionScore: {
+          ...comprehensionScore,
+          accuracy:
+            comprehensionScore.total > 0
+              ? Math.round((comprehensionScore.correct / comprehensionScore.total) * 100)
+              : 0,
+        },
+      });
+      completeSession();
+    }
+    onClose();
   };
 
   if (!chunks.length) {
@@ -160,7 +220,7 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
           <p className="mb-6 text-base leading-relaxed text-gray-700 md:text-lg">
             Please provide some text to start your guided reading session.
           </p>
-          <Button onClick={onClose} variant="primary" size="lg">
+          <Button onClick={handleClose} variant="primary" size="lg">
             Go Back
           </Button>
         </div>
@@ -190,14 +250,15 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
                 {comprehensionScore.total > 0 && (
                   <div className="rounded-xl bg-white/20 px-4 py-2">
                     <span className="text-sm font-medium">
-                      🧠 {comprehensionScore.correct}/{comprehensionScore.total} ({Math.round((comprehensionScore.correct / comprehensionScore.total) * 100)}%)
+                      🧠 {comprehensionScore.correct}/{comprehensionScore.total} (
+                      {Math.round((comprehensionScore.correct / comprehensionScore.total) * 100)}%)
                     </span>
                   </div>
                 )}
               </div>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="flex h-10 w-10 items-center justify-center rounded-full text-3xl text-white/80 transition-all hover:bg-white/10 hover:text-white"
             >
               ×
@@ -313,7 +374,7 @@ const ReadingView: React.FC<ReadingViewProps> = ({ text, onComplete, onClose }) 
           </div>
         </div>
       </div>
-      
+
       {/* Recall Prompt Modal */}
       {showRecallPrompt && currentQuestion && (
         <RecallPrompt

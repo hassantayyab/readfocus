@@ -162,3 +162,6 @@ export const loadFromStorage = (key: string): any => {
 
 // Re-export question generator functions
 export * from './questionGenerator';
+
+// Re-export stats manager functions
+export * from './statsManager';

@@ -56,3 +56,6 @@ export interface AppState {
 // Utility types
 export type ReadingMode = 'guided' | 'freeflow' | 'timed';
 export type RecallType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'summary';
+
+// Re-export enhanced stats types from Phase 2
+export * from './stats';

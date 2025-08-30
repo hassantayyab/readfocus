@@ -61,50 +61,12 @@ src/
 └── utils/               # Helper functions
 ```
 
-## 📋 Roadmap
-
-### Phase 1 (MVP) ✅
-
-- [x] Text input and basic file upload
-- [x] Streak counter and focus timer
-- [x] Basic layout and responsive design
-- [ ] Text chunking and guided reading view
-- [ ] Recall prompts and comprehension checks
-
-### Phase 2
-
-- [ ] Browser extension for webpage text capture
-- [ ] Enhanced statistics dashboard
-- [ ] XP points and achievements system
-
-### Phase 3
-
-- [ ] OCR for textbook photos
-- [ ] AI-powered summaries
-- [ ] Adaptive focus adjustments
-
-### Phase 4
-
-- [ ] Premium features and subscriptions
-- [ ] Export to study apps (Quizlet, Notion)
-- [ ] Study groups functionality
-
-## 🎯 Target Users
-
-Perfect for students who struggle with:
-
-- Staying focused while reading
-- Zone-out episodes during study sessions
-- Poor comprehension retention
-- Building consistent reading habits
-- ADD/ADHD reading challenges
-
 ## 🔧 Tech Stack
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
-- **State**: React hooks + localStorage
+- **State**: Zustand for state management
 - **Deployment**: Ready for Vercel deployment
 
 ## 📄 License
