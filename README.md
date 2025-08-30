@@ -11,6 +11,7 @@ A student-focused reading companion app that helps users maintain attention and 
 - **📊 Stats Dashboard**: Comprehensive analytics with XP levels, weekly goals, and progress charts
 - **🏆 Gamification**: Level up with XP points, achievements, and performance metrics
 - **📈 Progress Visualization**: Daily charts showing reading time, focus scores, and trends
+- **🌐 Browser Extension**: Capture text from any webpage with Chrome extension
 - **📁 File Support**: Text file uploads (PDF support coming soon)
 
 ## 🚀 Getting Started
@@ -70,7 +71,25 @@ src/
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
 - **State**: Zustand for state management
-- **Deployment**: Ready for Vercel deployment
+- **Extension**: Chrome Browser Extension
+
+## 🌐 Browser Extension
+
+ReadFocus includes a Chrome browser extension for seamless text capture from any webpage:
+
+### Installation
+1. Navigate to `chrome://extensions/` in Chrome
+2. Enable "Developer mode" (toggle in top-right)
+3. Click "Load unpacked" and select the `browser-extension` folder
+4. Pin the extension to your toolbar
+
+### Usage
+- **Select text** on any webpage and click the extension icon
+- **Right-click** selected text and choose "Send to ReadFocus"
+- **Smart article extraction** automatically detects main content
+- **Full page capture** grabs all readable text
+
+See `browser-extension/README.md` for detailed installation and usage instructions.
 
 ## 📄 License
 
