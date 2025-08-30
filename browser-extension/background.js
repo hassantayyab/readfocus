@@ -186,45 +186,17 @@ class ReadFocusBackground {
   }
 
   showWelcomeNotification() {
-    try {
-      if (chrome.notifications) {
-        chrome.notifications.create('readfocus-welcome', {
-          type: 'basic',
-          title: 'ReadFocus Extension Installed!',
-          message: 'Right-click on any text to send it to ReadFocus for guided reading.',
-        });
-      }
-    } catch (error) {
-      console.log('ReadFocus extension installed successfully');
-    }
+    console.log(
+      'ReadFocus extension installed successfully! Right-click on any text to send it to ReadFocus for guided reading.'
+    );
   }
 
   showSuccessNotification(message) {
-    try {
-      if (chrome.notifications) {
-        chrome.notifications.create('readfocus-success', {
-          type: 'basic',
-          title: 'ReadFocus',
-          message: message,
-        });
-      }
-    } catch (error) {
-      console.log('ReadFocus:', message);
-    }
+    console.log('ReadFocus:', message);
   }
 
   showErrorNotification(message) {
-    try {
-      if (chrome.notifications) {
-        chrome.notifications.create('readfocus-error', {
-          type: 'basic',
-          title: 'ReadFocus Error',
-          message: message,
-        });
-      }
-    } catch (error) {
-      console.error('ReadFocus Error:', message);
-    }
+    console.error('ReadFocus Error:', message);
   }
 
   async getSettings() {

@@ -58,8 +58,9 @@ _(Coming soon - extension will be published after testing)_
 
 - **No text captured**: Try refreshing the webpage first
 - **ReadFocus doesn't open**: Check if app is running on localhost:3000
-- **Extension errors**: Check Chrome DevTools console (F12)
+- **Extension errors**: Check Chrome DevTools console (F12) for error messages
 - **Extension not working**: Go to `chrome://extensions/` and click reload (🔄) on ReadFocus extension
+- **Success messages**: Check browser console (F12) for "ReadFocus:" success logs
 
 ## 📖 How to Use
 

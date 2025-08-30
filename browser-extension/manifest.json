@@ -3,14 +3,9 @@
   "name": "ReadFocus Text Capture",
   "version": "1.0.0",
   "description": "Capture text from any webpage and send it to ReadFocus for guided reading",
-  
-  "permissions": [
-    "activeTab",
-    "storage",
-    "contextMenus",
-    "notifications"
-  ],
-  
+
+  "permissions": ["activeTab", "storage", "contextMenus"],
+
   "action": {
     "default_popup": "popup.html",
     "default_title": "ReadFocus Text Capture",
@@ -21,7 +16,7 @@
       "128": "icons/icon128.png"
     }
   },
-  
+
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -29,18 +24,18 @@
       "css": ["content.css"]
     }
   ],
-  
+
   "background": {
     "service_worker": "background.js"
   },
-  
+
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  
+
   "web_accessible_resources": [
     {
       "resources": ["icons/*"],
