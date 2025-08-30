@@ -133,9 +133,9 @@ npm run dev
 
 ## 🌐 **Browser Extension Status**
 
-### 📋 **Current Extension (v1 - Basic)**
+### 🚀 **Current Extension (v2 - Enhanced Auto Focus Mode)**
 
-The existing extension provides basic text capture functionality:
+The enhanced extension provides **dual reading modes** with in-page overlay:
 
 #### Installation
 
@@ -144,27 +144,58 @@ The existing extension provides basic text capture functionality:
 3. Click "Load unpacked" and select the `browser-extension` folder
 4. Pin the extension to your toolbar
 
-#### Current Features
+#### 🎯 **Two Reading Modes Available**
 
-- **Select text** on any webpage and click the extension icon
-- **Right-click** selected text and choose "Send to ReadFocus"
-- **Smart article extraction** automatically detects main content
-- **Full page capture** grabs all readable text
-- Opens ReadFocus web app for guided reading
+**1. Focus Mode (Full Overlay)**
 
-See `browser-extension/README.md` for detailed installation and usage instructions.
+- **Complete distraction-free experience** with clean overlay
+- **Immersive reading environment** hiding the original page
+- **Perfect for deep focus** and long-form articles
 
-### 🚀 **Future Extension (v2 - Enhanced Auto Focus Mode)**
+**2. Reading Helper Mode (Keyword Highlighting)** ⭐ _NEW_
 
-The enhanced extension will provide **in-page reading overlay** with:
+- **Highlights important words** across the entire article instantly
+- **Preserves original page layout** with enhanced keyword emphasis
+- **Smart keyword detection** using frequency analysis and filtering
+- **Floating control panel** for settings and refresh
+- **Maintains page context** (images, links, sidebars)
+- **Ideal for research** and quick comprehension scanning
 
-- **Direct page transformation** (no external app needed)
-- **Instant Focus Mode** with one-click activation
-- **Advanced content extraction** with article detection
-- **Full reading experience** directly on the webpage
-- **Comprehensive settings** and personalization options
+#### 🧪 **Testing Both Modes**
 
-> See `PLAN.md` for complete development roadmap and feature specifications.
+1. **Visit any article page** (Medium, blog, Wikipedia, news site)
+2. **Click the extension icon** in your toolbar
+3. **Select your preferred mode:**
+   - 📖 **Reading Helper** - Highlight keywords across entire article
+   - 🎯 **Focus Mode** - Clean overlay experience
+4. **Click "Start [Mode]"** to activate
+
+#### ⌨️ **Keyboard Shortcuts**
+
+- `Cmd/Ctrl + Shift + F` - Toggle reading mode (uses your preferred setting)
+- `Cmd/Ctrl + R` - Refresh keyword highlighting (Reading Helper only)
+- `Arrow Keys` or `Space` - Navigate chunks (Focus Mode only)
+- `Escape` - Exit any active mode
+- `Q` - Show quiz (Focus Mode only)
+
+#### 🎛️ **Reading Helper Controls**
+
+- **📊 Status** - Shows current highlighting state
+- **🎯 Focus** - Displays keyword emphasis mode
+- **🔄 Refresh** - Re-analyze and highlight keywords
+- **⚙️ Settings** - Customize reading experience
+- **✕ Exit** - Return to normal browsing
+
+#### 🔧 **Customization**
+
+- **Typography settings** - Font size, line height, themes
+- **Chunk size preferences** - Small, medium, or large (Focus Mode only)
+- **Keyword highlighting** - Smart frequency-based word detection
+- **Default mode selection** - Focus vs Helper preference
+
+See `browser-extension/README.md` for detailed features and troubleshooting.
+
+> **Current Status**: Core functionality complete! Phase 2 features active with both reading modes operational.
 
 ## 📄 License
 

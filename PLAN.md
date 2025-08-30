@@ -37,11 +37,19 @@ Deliver a Chrome extension that **automatically converts any readable webpage** 
 
 **To-Do List**
 
-- [ ] Define user journeys (Activate mode, Exit mode, Adjust settings, Quiz flow).
-- [ ] Specify minimal permissions and privacy policy copy.
-- [ ] Create wireframes for: Popup, Overlay Reader, Control Panel, Quiz Modal, Settings.
-- [ ] Set up extension structure (background/service worker, content scripts, options page, popup page).
-- [ ] Implement settings persistence (font size, line height, theme, chunk length, pacing).
+- [x] Define user journeys (Activate mode, Exit mode, Adjust settings, Quiz flow).
+- [x] Specify minimal permissions and privacy policy copy.
+- [x] Create wireframes for: Popup, Overlay Reader, Control Panel, Quiz Modal, Settings.
+- [x] Set up extension structure (background/service worker, content scripts, options page, popup page).
+- [x] Implement settings persistence (font size, line height, theme, chunk length, pacing).
+
+**✅ Phase 0 Complete!**
+
+- Comprehensive user journeys and wireframes documented
+- Privacy-first permissions and policy established
+- Complete extension structure with organized directories
+- Full settings system with persistence and sync
+- Enhanced popup and options page interfaces
 
 ---
 
@@ -60,20 +68,30 @@ Deliver a Chrome extension that **automatically converts any readable webpage** 
 
 **To-Do List**
 
-- [ ] Implement content detection & extraction (main body, title, author, publish date if present).
-- [ ] Build overlay reader container (responsive, accessible tab flow, escape to exit).
-- [ ] Implement chunking logic (by sentence/paragraph with safe boundaries).
-- [ ] Add keyword highlighting strategy (frequency/importance based; toggleable).
-- [ ] Add controls: Start, Pause, Next, Previous, Exit, Speed slider.
-- [ ] Add recall prompt modal with small question bank per chunk.
-- [ ] Track session progress (chunks completed, time in session, answers correct).
-- [ ] Handle edge cases: images with captions, lists, code blocks, blockquotes.
+- [x] Implement content detection & extraction (main body, title, author, publish date if present).
+- [x] Build overlay reader container (responsive, accessible tab flow, escape to exit).
+- [x] Implement chunking logic (by sentence/paragraph with safe boundaries).
+- [x] Add keyword highlighting strategy (frequency/importance based; toggleable).
+- [x] Add controls: Start, Pause, Next, Previous, Exit, Speed slider.
+- [x] Add recall prompt modal with small question bank per chunk.
+- [x] Track session progress (chunks completed, time in session, answers correct).
+- [x] Handle edge cases: images with captions, lists, code blocks, blockquotes.
+
+**✅ Phase 1 Complete!**
+
+- Full MVP Auto Focus Reading Mode with smart content extraction
+- Complete overlay reader with distraction-free interface
+- Intelligent text chunking with keyword highlighting
+- Comprehensive navigation controls and auto-advance
+- Interactive quiz system with multiple question types
+- Session tracking with progress visualization
+- Robust content detection for 90%+ of article pages
 
 ---
 
 ### Phase 2 — Usability & Control Surface
 
-**Goal:** Reduce friction and give users quick access and personalization.
+**Goal:** Reduce friction and give users quick access and personalization with flexible reading modes.
 
 **Features**
 
@@ -82,14 +100,119 @@ Deliver a Chrome extension that **automatically converts any readable webpage** 
 - **Auto-Detect & Auto-Start (optional):** Detect articles and auto-offer Focus Mode.
 - **Per-Site Preferences:** Whitelist/blacklist, default start as Focus Mode.
 - **Typography & Layout Controls:** Font size, typeface, line height, margins, theme (light/dark/sepia), column width.
+- **Reading Helper Mode:** Alternative to full overlay - highlights text in-place on original page with floating controls.
 
 **To-Do List**
 
-- [ ] Build toolbar popup with status (Detected article? Yes/No).
-- [ ] Implement keyboard shortcuts and in-UI hints.
+- [x] Build toolbar popup with status (Detected article? Yes/No).
+- [x] Implement keyboard shortcuts and in-UI hints.
 - [ ] Add auto-detect banner ("Start Focus Mode?") and per-site remember setting.
-- [ ] Add per-user typography panel with live preview.
-- [ ] Persist preferences per site and globally.
+- [x] Add per-user typography panel with live preview.
+- [x] Persist preferences per site and globally.
+- [ ] **NEW:** Implement Reading Helper Mode with in-place highlighting and floating controls.
+- [ ] **NEW:** Add mode selection in popup (Focus Mode vs Reading Helper Mode).
+
+**🚀 Phase 2 Active Development!**
+
+- Enhanced toolbar popup with real-time article detection
+- Complete keyboard shortcut system (Cmd+Shift+F, arrows, space, escape)
+- Comprehensive typography controls (font, size, line height, themes)
+- Full settings persistence with Chrome sync support
+- **In Progress:** Reading Helper Mode implementation
+- **Remaining:** Auto-detect banner for seamless activation
+
+---
+
+## 📖 Reading Helper Mode (Alternative Reading Experience)
+
+**Goal:** Provide a less disruptive reading mode that enhances the original webpage without hiding it.
+
+### 🎯 **Mode Comparison:**
+
+| Feature              | Full Focus Mode                       | Reading Helper Mode                            |
+| -------------------- | ------------------------------------- | ---------------------------------------------- |
+| **Page Layout**      | Complete overlay hiding original page | Original page preserved                        |
+| **Content Display**  | Clean, distraction-free environment   | In-place text highlighting                     |
+| **Navigation**       | Built-in controls in overlay          | Floating control panel                         |
+| **Context**          | Immersive, isolated reading           | Maintains page context (images, links, layout) |
+| **Disruption Level** | High (transforms entire experience)   | Low (enhances existing page)                   |
+| **Best For**         | Deep focus, long articles             | Research, browsing, quick reading              |
+
+### 🛠️ **Technical Implementation:**
+
+**1. Content Detection:** ✅ (Reuses existing system)
+
+- Same smart content extraction as Focus Mode
+- Identify readable text elements and chunks
+
+**2. In-Place Highlighting:**
+
+- Inject CSS to highlight current reading chunk
+- Use subtle but visible highlighting (background, border, or glow)
+- Progressive highlighting as user advances through content
+- Smooth scroll to current chunk
+
+**3. Floating Control Panel:**
+
+- Small, unobtrusive floating toolbar
+- Position: Top-right or bottom-center of viewport
+- Controls: Previous/Next chunk, Auto-advance toggle, Settings, Exit
+- Minimal design to preserve original page aesthetics
+
+**4. Chunk Navigation:**
+
+- Same intelligent chunking logic as Focus Mode
+- Auto-scroll to bring current chunk into view
+- Clear visual indication of active chunk
+- Maintain reading progress across chunks
+
+**5. Quiz Integration:**
+
+- Same quiz system as Focus Mode
+- Display in floating modal that doesn't hide page content
+- Optional and configurable frequency
+
+### 🎨 **UI/UX Design:**
+
+**Highlighting Styles:**
+
+- **Subtle:** Light background color with soft border
+- **Emphasized:** Gentle glow or shadow effect
+- **High Contrast:** Bold border for accessibility
+- **Customizable:** User can adjust highlighting intensity
+
+**Floating Controls:**
+
+```
+┌─ ReadFocus Helper ─┐
+│ ⏮️ ⏸️ ⏭️  ⚙️  ❌  │
+│ Progress: 3/15    │
+└───────────────────┘
+```
+
+**Responsive Behavior:**
+
+- Control panel adapts to screen size
+- Mobile-friendly touch targets
+- Preserves original page responsive design
+
+### 🚀 **Implementation Plan:**
+
+**Phase 2A: Core Reading Helper**
+
+1. Add mode selection to popup UI
+2. Create floating control panel component
+3. Implement in-place chunk highlighting
+4. Add smooth scrolling to active chunks
+5. Integrate with existing settings system
+
+**Phase 2B: Polish & Integration**
+
+1. Add highlighting style customization
+2. Implement floating quiz modals
+3. Add keyboard shortcuts (same as Focus Mode)
+4. Ensure compatibility with various website layouts
+5. Add user preference for default mode
 
 ---
 
@@ -115,16 +238,155 @@ Deliver a Chrome extension that **automatically converts any readable webpage** 
 
 ---
 
-### Phase 4 — Learning Boosters (AI-Assist)
+### Phase 4 — AI-Powered Smart Highlighting & Learning Boosters
 
-**Goal:** Move beyond formatting into comprehension support.
+**Goal:** Replace frequency-based highlighting with intelligent AI analysis for optimal learning focus.
 
 **Features**
 
-- **Auto Key Points:** Generate 3–5 bullets per section.
-- **Concept Glossary:** Detect key terms with short, simple definitions.
-- **Smart Quizzes:** Better question generation tied to key points.
-- **Section Summaries:** End-of-section short summary and "review all" mode.
+- **🤖 AI Smart Highlighting:** Claude Sonnet 4 analyzes full article to identify key sentences, words, and phrases with 3-tier importance system.
+- **📊 Multi-Level Visual Hierarchy:** Different colors/styles for High/Medium/Low importance highlights.
+- **🎯 Context-Aware Analysis:** AI considers entire article context, not just word frequency.
+- **⚡ Real-Time Processing:** Seamless integration with existing Reading Helper Mode.
+- **🔧 Customizable Styles:** User can adjust highlight colors and intensity per importance level.
+
+---
+
+## 🤖 **AI Smart Highlighting System (Phase 4A - Priority Implementation)**
+
+### **📋 Implementation Breakdown:**
+
+#### **Phase 4A.1: AI Integration Foundation**
+
+- [ ] **Set up Claude Sonnet 4 API integration**
+  - Add API key management to extension settings
+  - Create secure API client with error handling
+  - Implement rate limiting and usage tracking
+  - Add user consent UI for AI processing
+
+#### **Phase 4A.2: Content Analysis Pipeline**
+
+- [ ] **Prepare article content for AI analysis**
+  - Extract clean text content (reuse existing content detection)
+  - Remove HTML markup, ads, navigation elements
+  - Preserve paragraph structure and sentence boundaries
+  - Add content length validation (API limits)
+
+#### **Phase 4A.3: AI Prompt Engineering**
+
+- [ ] **Design optimal prompts for highlighting analysis**
+  - Create prompt template for importance classification
+  - Define clear criteria for High/Medium/Low importance
+  - Include context about reading comprehension goals
+  - Test and refine prompts for consistent results
+
+#### **Phase 4A.4: Response Processing**
+
+- [ ] **Parse and validate AI responses**
+  - Define JSON schema for AI response format
+  - Implement response validation and error handling
+  - Map AI selections back to original DOM elements
+  - Handle edge cases (partial matches, overlapping selections)
+
+#### **Phase 4A.5: Visual Highlighting System**
+
+- [ ] **Implement 3-tier highlight styling**
+  - **High Importance:** Bold yellow background, dark text, subtle border
+  - **Medium Importance:** Light yellow background, regular weight
+  - **Low Importance:** Pale yellow background, lighter text
+  - **Not Important:** No highlighting (original text)
+  - Add smooth transitions and hover effects
+
+#### **Phase 4A.6: Integration & Performance**
+
+- [ ] **Integrate with existing Reading Helper Mode**
+  - Replace frequency-based word extraction with AI analysis
+  - Maintain existing control panel and user interactions
+  - Add loading states during AI processing
+  - Implement caching to avoid re-analyzing same content
+
+#### **Phase 4A.7: User Experience Enhancements**
+
+- [ ] **Add AI highlighting controls**
+  - Toggle between AI and frequency-based highlighting
+  - Adjust highlight intensity/opacity per importance level
+  - Show highlight legend explaining importance levels
+  - Add "Analyze Again" option for updated results
+
+#### **Phase 4A.8: Settings & Customization**
+
+- [ ] **Extend settings panel for AI features**
+  - API key configuration with secure storage
+  - Highlight color customization per importance tier
+  - Toggle AI vs frequency-based highlighting
+  - Privacy controls and data handling preferences
+
+---
+
+### **🎨 Highlight Styling Specifications:**
+
+```css
+/* High Importance - Key concepts, main ideas */
+.rf-highlight-high {
+  background: linear-gradient(120deg, #fde047 0%, #facc15 100%);
+  color: #92400e;
+  font-weight: 700;
+  border-bottom: 2px solid #f59e0b;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* Medium Importance - Supporting details, explanations */
+.rf-highlight-medium {
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 600;
+  padding: 1px 3px;
+  border-radius: 2px;
+}
+
+/* Low Importance - Context, examples */
+.rf-highlight-low {
+  background: #fffbeb;
+  color: #a16207;
+  font-weight: 500;
+  padding: 1px 2px;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+```
+
+### **🤖 AI Prompt Template:**
+
+```
+Analyze this article and identify important content for student reading comprehension.
+
+Article: [ARTICLE_TEXT]
+
+Please categorize sentences, phrases, and key terms into 3 importance levels:
+
+HIGH IMPORTANCE (🔴): Core concepts, main arguments, key facts, definitions
+MEDIUM IMPORTANCE (🟡): Supporting details, explanations, examples, context
+LOW IMPORTANCE (🟢): Minor details, transitions, basic background
+
+Return a JSON response with exact text selections:
+{
+  "high": ["exact text 1", "exact text 2"],
+  "medium": ["exact text 3", "exact text 4"],
+  "low": ["exact text 5", "exact text 6"]
+}
+
+Focus on helping students identify the most critical information for comprehension.
+```
+
+---
+
+## **🚀 Legacy Phase 4 Features (Lower Priority)**
+
+**Auto Key Points:** Generate 3–5 bullets per section.
+**Concept Glossary:** Detect key terms with short, simple definitions.
+**Smart Quizzes:** Better question generation tied to key points.
+**Section Summaries:** End-of-section short summary and "review all" mode.
 
 **To-Do List**
 

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReadFocus Settings</title>
+    <link rel="stylesheet" href="styles/options.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <img src="icons/icon48.png" alt="ReadFocus" class="logo" />
+          <div>
+            <h1>ReadFocus Settings</h1>
+            <p>Customize your Focus Reading Mode experience</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Settings Sections -->
+      <main class="settings-main">
+        <!-- Reading Preferences -->
+        <section class="settings-section">
+          <h2>📖 Reading Preferences</h2>
+          <div class="setting-group">
+            <label for="chunk-size">Chunk Size (words per segment)</label>
+            <input type="range" id="chunk-size" min="50" max="300" value="150" />
+            <span class="setting-value" id="chunk-size-value">150</span>
+          </div>
+
+          <div class="setting-group">
+            <label for="reading-speed">Auto-advance Speed (seconds)</label>
+            <input type="range" id="reading-speed" min="2" max="15" value="5" />
+            <span class="setting-value" id="reading-speed-value">5</span>
+          </div>
+
+          <div class="setting-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="auto-start-reading" />
+              Auto-start reading when Focus Mode opens
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="keyword-highlighting" checked />
+              Enable keyword highlighting
+            </label>
+          </div>
+        </section>
+
+        <!-- Typography -->
+        <section class="settings-section">
+          <h2>🎨 Typography & Display</h2>
+          <div class="setting-group">
+            <label for="font-family">Font Family</label>
+            <select id="font-family">
+              <option value="system">System Default</option>
+              <option value="serif">Serif (Times)</option>
+              <option value="sans-serif">Sans-serif (Arial)</option>
+              <option value="dyslexic">OpenDyslexic</option>
+            </select>
+          </div>
+
+          <div class="setting-group">
+            <label for="font-size">Font Size</label>
+            <input type="range" id="font-size" min="14" max="24" value="18" />
+            <span class="setting-value" id="font-size-value">18px</span>
+          </div>
+
+          <div class="setting-group">
+            <label for="line-height">Line Height</label>
+            <input type="range" id="line-height" min="1.2" max="2.0" step="0.1" value="1.6" />
+            <span class="setting-value" id="line-height-value">1.6</span>
+          </div>
+
+          <div class="setting-group">
+            <label for="theme">Theme</label>
+            <select id="theme">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="sepia">Sepia</option>
+              <option value="high-contrast">High Contrast</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Quiz & Comprehension -->
+        <section class="settings-section">
+          <h2>🧠 Quiz & Comprehension</h2>
+          <div class="setting-group">
+            <label for="quiz-frequency">Quiz Frequency (chunks between quizzes)</label>
+            <input type="range" id="quiz-frequency" min="2" max="10" value="5" />
+            <span class="setting-value" id="quiz-frequency-value">5</span>
+          </div>
+
+          <div class="setting-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-quiz-hints" checked />
+              Show hints for quiz questions
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="track-comprehension" checked />
+              Track comprehension accuracy
+            </label>
+          </div>
+        </section>
+
+        <!-- Site Preferences -->
+        <section class="settings-section">
+          <h2>🌍 Site Preferences</h2>
+          <div class="setting-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="auto-detect-articles" checked />
+              Auto-detect articles and show Focus Mode prompt
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <label for="whitelist">Auto-start Sites (one per line)</label>
+            <textarea
+              id="whitelist"
+              placeholder="example.com&#10;news.ycombinator.com&#10;wikipedia.org"
+            ></textarea>
+          </div>
+
+          <div class="setting-group">
+            <label for="blacklist">Blocked Sites (one per line)</label>
+            <textarea
+              id="blacklist"
+              placeholder="social-media.com&#10;distracting-site.com"
+            ></textarea>
+          </div>
+        </section>
+
+        <!-- Privacy & Data -->
+        <section class="settings-section">
+          <h2>🔒 Privacy & Data</h2>
+          <div class="setting-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="store-reading-history" />
+              Store reading history locally
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="collect-analytics" />
+              Help improve ReadFocus (anonymous usage data)
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <button type="button" id="clear-data-btn" class="secondary-button">
+              Clear All Stored Data
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer Actions -->
+      <footer class="footer">
+        <div class="footer-actions">
+          <button type="button" id="reset-defaults-btn" class="secondary-button">
+            Reset to Defaults
+          </button>
+          <button type="button" id="save-settings-btn" class="primary-button">Save Settings</button>
+        </div>
+        <div class="footer-info">
+          <p>ReadFocus v2.0.0 - Built for focused learning</p>
+        </div>
+      </footer>
+    </div>
+
+    <script src="js/options.js"></script>
+  </body>
+</html>

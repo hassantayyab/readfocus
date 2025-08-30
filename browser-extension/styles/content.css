@@ -1,0 +1,313 @@
+/* ReadFocus Content Script Styles */
+
+/* Focus Mode Overlay Base Styles */
+.readfocus-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483647 !important; /* Maximum z-index */
+  background: var(--rf-bg-color, #ffffff) !important;
+  color: var(--rf-text-color, #333333) !important;
+  font-family: var(--rf-font-family, 'Georgia', serif) !important;
+  font-size: var(--rf-font-size, 18px) !important;
+  line-height: var(--rf-line-height, 1.6) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Hide page content when overlay is active */
+.readfocus-page-hidden {
+  overflow: hidden !important;
+}
+
+.readfocus-page-hidden > *:not(.readfocus-overlay) {
+  display: none !important;
+}
+
+/* Overlay Header */
+.readfocus-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 16px 24px !important;
+  background: var(--rf-header-bg, #f8f9fa) !important;
+  border-bottom: 1px solid var(--rf-border-color, #e9ecef) !important;
+}
+
+.readfocus-title {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+  color: var(--rf-primary-color, #2c3e50) !important;
+}
+
+.readfocus-progress {
+  font-size: 14px !important;
+  color: var(--rf-secondary-color, #6c757d) !important;
+}
+
+/* Reading Area */
+.readfocus-reading-area {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 40px !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  overflow-y: auto !important;
+}
+
+.readfocus-chunk {
+  margin-bottom: 32px !important;
+  text-align: left !important;
+  width: 100% !important;
+}
+
+.readfocus-chunk p {
+  margin-bottom: 16px !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* Keyword Highlighting */
+.readfocus-keyword {
+  background: var(--rf-highlight-bg, #fff3cd) !important;
+  color: var(--rf-highlight-color, #856404) !important;
+  padding: 2px 4px !important;
+  border-radius: 3px !important;
+  font-weight: 500 !important;
+}
+
+/* Controls */
+.readfocus-controls {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 24px !important;
+  background: var(--rf-controls-bg, #f8f9fa) !important;
+  border-top: 1px solid var(--rf-border-color, #e9ecef) !important;
+}
+
+.readfocus-btn {
+  background: var(--rf-primary-color, #2c3e50) !important;
+  color: white !important;
+  border: none !important;
+  padding: 12px 24px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.readfocus-btn:hover {
+  background: var(--rf-primary-hover, #34495e) !important;
+  transform: translateY(-1px) !important;
+}
+
+.readfocus-btn:disabled {
+  background: #6c757d !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.readfocus-btn-secondary {
+  background: transparent !important;
+  color: var(--rf-primary-color, #2c3e50) !important;
+  border: 2px solid var(--rf-primary-color, #2c3e50) !important;
+}
+
+.readfocus-btn-secondary:hover {
+  background: var(--rf-primary-color, #2c3e50) !important;
+  color: white !important;
+}
+
+/* Exit Button */
+.readfocus-exit {
+  position: absolute !important;
+  top: 16px !important;
+  right: 24px !important;
+  background: #dc3545 !important;
+  color: white !important;
+  border: none !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.readfocus-exit:hover {
+  background: #c82333 !important;
+  transform: scale(1.1) !important;
+}
+
+/* Progress Bar */
+.readfocus-progress-bar {
+  width: 100% !important;
+  height: 4px !important;
+  background: var(--rf-progress-bg, #e9ecef) !important;
+  border-radius: 2px !important;
+  overflow: hidden !important;
+  margin: 0 16px !important;
+}
+
+.readfocus-progress-fill {
+  height: 100% !important;
+  background: var(--rf-primary-color, #2c3e50) !important;
+  transition: width 0.3s ease !important;
+  border-radius: 2px !important;
+}
+
+/* Quiz Modal */
+.readfocus-quiz-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  background: white !important;
+  border-radius: 12px !important;
+  padding: 32px !important;
+  max-width: 500px !important;
+  width: 90% !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+  z-index: 2147483648 !important;
+}
+
+.readfocus-quiz-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 2147483647 !important;
+}
+
+/* Theme Variants */
+.readfocus-theme-dark {
+  --rf-bg-color: #1a1a1a;
+  --rf-text-color: #e9ecef;
+  --rf-header-bg: #2d3748;
+  --rf-controls-bg: #2d3748;
+  --rf-border-color: #4a5568;
+  --rf-primary-color: #3182ce;
+  --rf-primary-hover: #2c5aa0;
+  --rf-highlight-bg: #2d3748;
+  --rf-highlight-color: #90cdf4;
+  --rf-progress-bg: #4a5568;
+}
+
+.readfocus-theme-sepia {
+  --rf-bg-color: #f4f1ea;
+  --rf-text-color: #5c4b37;
+  --rf-header-bg: #ede5d3;
+  --rf-controls-bg: #ede5d3;
+  --rf-border-color: #d4c5a9;
+  --rf-primary-color: #8b4513;
+  --rf-primary-hover: #a0522d;
+  --rf-highlight-bg: #e6d7c3;
+  --rf-highlight-color: #5c4b37;
+  --rf-progress-bg: #d4c5a9;
+}
+
+/* Notification */
+.readfocus-notification {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  background: #28a745 !important;
+  color: white !important;
+  padding: 16px 24px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  z-index: 2147483649 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  max-width: 300px !important;
+  animation: slideInFromRight 0.3s ease !important;
+}
+
+.readfocus-notification.error {
+  background: #dc3545 !important;
+}
+
+.readfocus-notification.warning {
+  background: #ffc107 !important;
+  color: #212529 !important;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%) !important;
+    opacity: 0 !important;
+  }
+  to {
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .readfocus-reading-area {
+    padding: 20px !important;
+  }
+
+  .readfocus-controls {
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+
+  .readfocus-btn {
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+  }
+
+  .readfocus-header {
+    padding: 12px 16px !important;
+  }
+
+  .readfocus-title {
+    font-size: 18px !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .readfocus-overlay {
+    --rf-border-color: #000000;
+  }
+
+  .readfocus-btn {
+    border: 2px solid currentColor !important;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .readfocus-btn,
+  .readfocus-exit,
+  .readfocus-progress-fill,
+  .readfocus-notification {
+    transition: none !important;
+  }
+
+  .readfocus-exit:hover {
+    transform: none !important;
+  }
+
+  .readfocus-btn:hover {
+    transform: none !important;
+  }
+}

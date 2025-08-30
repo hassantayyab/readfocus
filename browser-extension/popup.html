@@ -1,81 +1,160 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ReadFocus Text Capture</title>
-  <link rel="stylesheet" href="popup.css">
-</head>
-<body>
-  <div class="popup-container">
-    <!-- Header -->
-    <div class="header">
-      <div class="logo">
-        <img src="icons/icon32.png" alt="ReadFocus" class="logo-icon">
-        <h1 class="logo-text">ReadFocus</h1>
-      </div>
-      <div class="subtitle">Capture & Read Smart</div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="content">
-      <!-- Selection Info -->
-      <div id="selection-info" class="selection-info hidden">
-        <div class="info-icon">📄</div>
-        <div class="info-text">
-          <span id="selection-length">0</span> characters selected
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReadFocus - Auto Focus Mode</title>
+    <link rel="stylesheet" href="styles/popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <img src="icons/icon32.png" alt="ReadFocus" class="logo" />
+        <div class="header-text">
+          <h1>ReadFocus</h1>
+          <p class="tagline">Auto Focus Mode</p>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="actions">
-        <button id="capture-selection" class="btn btn-primary" disabled>
-          <span class="btn-icon">✂️</span>
-          <span class="btn-text">Capture Selection</span>
-        </button>
-        
-        <button id="capture-article" class="btn btn-secondary">
-          <span class="btn-icon">📰</span>
-          <span class="btn-text">Smart Article Extract</span>
-        </button>
-        
-        <button id="capture-page" class="btn btn-secondary">
-          <span class="btn-icon">📄</span>
-          <span class="btn-text">Full Page Text</span>
+      <!-- Page Status -->
+      <div class="status-section">
+        <div class="page-status" id="page-status">
+          <div class="status-icon" id="status-icon">🔍</div>
+          <div class="status-content" id="status-content">
+            <div class="status-title" id="status-title">Analyzing page...</div>
+            <div class="status-description" id="status-description">
+              Checking for readable content
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode Selection -->
+      <div class="mode-selection" id="mode-selection">
+        <h3>Reading Mode</h3>
+        <div class="mode-toggle">
+          <label class="mode-option" for="focus-mode-radio">
+            <input type="radio" id="focus-mode-radio" name="reading-mode" value="focus" checked />
+            <div class="mode-card">
+              <div class="mode-icon">🎯</div>
+              <div class="mode-info">
+                <div class="mode-title">Focus Mode</div>
+                <div class="mode-description">Clean overlay, distraction-free</div>
+              </div>
+            </div>
+          </label>
+
+          <label class="mode-option" for="helper-mode-radio">
+            <input type="radio" id="helper-mode-radio" name="reading-mode" value="helper" />
+            <div class="mode-card">
+              <div class="mode-icon">📖</div>
+              <div class="mode-info">
+                <div class="mode-title">Reading Helper</div>
+                <div class="mode-description">Highlight text on original page</div>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Primary Action -->
+      <div class="primary-action" id="primary-action">
+        <button class="focus-button" id="start-reading-mode" disabled>
+          <div class="focus-button-content">
+            <span class="focus-icon" id="mode-icon">🎯</span>
+            <div class="focus-text">
+              <div class="focus-title" id="mode-title">Start Focus Mode</div>
+              <div class="focus-subtitle" id="mode-subtitle">
+                Transform this page for focused reading
+              </div>
+            </div>
+          </div>
         </button>
       </div>
 
-      <!-- Instructions -->
-      <div class="instructions">
-        <h3>How to use:</h3>
-        <ol>
-          <li>Select text on the page, then click "Capture Selection"</li>
-          <li>Or use "Smart Article Extract" for automatic content detection</li>
-          <li>Text will open in ReadFocus for guided reading</li>
-        </ol>
+      <!-- Quick Settings -->
+      <div class="quick-settings" id="quick-settings">
+        <h3>Current Settings</h3>
+        <div class="settings-grid">
+          <div class="setting-item">
+            <span class="setting-label">Theme</span>
+            <span class="setting-value" id="current-theme">Light</span>
+          </div>
+          <div class="setting-item">
+            <span class="setting-label">Speed</span>
+            <span class="setting-value" id="current-speed">5s auto</span>
+          </div>
+          <div class="setting-item">
+            <span class="setting-label">Quizzes</span>
+            <span class="setting-value" id="current-quiz">Every 5 chunks</span>
+          </div>
+          <div class="setting-item">
+            <span class="setting-label">Font Size</span>
+            <span class="setting-value" id="current-font">18px</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Actions -->
+      <div class="secondary-actions">
+        <div class="action-row">
+          <button class="secondary-button" id="open-settings">
+            <span class="button-icon">⚙️</span>
+            Settings
+          </button>
+          <button class="secondary-button" id="reading-stats">
+            <span class="button-icon">📊</span>
+            Stats
+          </button>
+        </div>
+      </div>
+
+      <!-- Alternative Text Capture (Fallback) -->
+      <div class="fallback-section" id="fallback-section">
+        <details class="fallback-details">
+          <summary>Alternative Text Capture</summary>
+          <div class="fallback-actions">
+            <button class="action-button" id="capture-selection">
+              <span class="button-icon">✂️</span>
+              <div class="button-content">
+                <div class="button-title">Selected Text</div>
+                <div class="button-description">Send to ReadFocus web app</div>
+              </div>
+            </button>
+
+            <button class="action-button" id="capture-article">
+              <span class="button-icon">📄</span>
+              <div class="button-content">
+                <div class="button-title">Smart Article</div>
+                <div class="button-description">Extract main content</div>
+              </div>
+            </button>
+          </div>
+        </details>
+      </div>
+
+      <!-- Quick Tips -->
+      <div class="tips-section">
+        <h4>⚡ Quick Tips</h4>
+        <ul class="tips-list">
+          <li><kbd>Cmd+Shift+F</kbd> Toggle Focus Mode</li>
+          <li><kbd>←/→</kbd> Navigate chunks</li>
+          <li><kbd>Space</kbd> Pause auto-advance</li>
+          <li><kbd>Esc</kbd> Exit Focus Mode</li>
+        </ul>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div class="version-info">ReadFocus v2.0.0</div>
       </div>
 
       <!-- Status Messages -->
-      <div id="status-message" class="status-message hidden">
-        <div class="status-icon">✅</div>
-        <div class="status-text">Text sent to ReadFocus!</div>
-      </div>
-
-      <!-- Error Messages -->
-      <div id="error-message" class="error-message hidden">
-        <div class="error-icon">❌</div>
-        <div class="error-text">Failed to capture text. Please try again.</div>
-      </div>
+      <div class="status-message" id="status-message"></div>
+      <div class="error-message" id="error-message"></div>
     </div>
 
-    <!-- Footer -->
-    <div class="footer">
-      <button id="open-readfocus" class="link-btn">
-        🚀 Open ReadFocus App
-      </button>
-    </div>
-  </div>
-
-  <script src="popup.js"></script>
-</body>
+    <script src="js/popup.js"></script>
+  </body>
 </html>

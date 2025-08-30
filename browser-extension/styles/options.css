@@ -1,0 +1,325 @@
+/* ReadFocus Options Page Styles */
+
+:root {
+  --rf-primary: #2563eb;
+  --rf-primary-hover: #1d4ed8;
+  --rf-secondary: #64748b;
+  --rf-background: #ffffff;
+  --rf-surface: #f8fafc;
+  --rf-border: #e2e8f0;
+  --rf-text: #0f172a;
+  --rf-text-muted: #64748b;
+  --rf-success: #10b981;
+  --rf-warning: #f59e0b;
+  --rf-radius: 8px;
+  --rf-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--rf-surface);
+  color: var(--rf-text);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--rf-background);
+  min-height: 100vh;
+  box-shadow: var(--rf-shadow);
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, var(--rf-primary), #3b82f6);
+  color: white;
+  padding: 2rem;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rf-radius);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.header p {
+  margin: 0.25rem 0 0 0;
+  opacity: 0.9;
+  font-size: 0.95rem;
+}
+
+/* Main Content */
+.settings-main {
+  padding: 2rem;
+}
+
+.settings-section {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background-color: var(--rf-background);
+  border: 1px solid var(--rf-border);
+  border-radius: var(--rf-radius);
+  box-shadow: var(--rf-shadow);
+}
+
+.settings-section h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--rf-text);
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--rf-border);
+}
+
+.setting-group {
+  margin-bottom: 1.5rem;
+}
+
+.setting-group:last-child {
+  margin-bottom: 0;
+}
+
+.setting-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--rf-text);
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 0 !important;
+}
+
+.checkbox-label input[type='checkbox'] {
+  margin-right: 0.75rem;
+}
+
+/* Form Controls */
+input[type='range'] {
+  width: 100%;
+  height: 6px;
+  background: var(--rf-border);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--rf-primary);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--rf-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--rf-primary);
+}
+
+select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--rf-border);
+  border-radius: var(--rf-radius);
+  background-color: var(--rf-background);
+  color: var(--rf-text);
+  font-size: 0.95rem;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--rf-primary);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.75rem;
+  border: 1px solid var(--rf-border);
+  border-radius: var(--rf-radius);
+  background-color: var(--rf-background);
+  color: var(--rf-text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--rf-primary);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+}
+
+.setting-value {
+  display: inline-block;
+  margin-left: 1rem;
+  padding: 0.25rem 0.5rem;
+  background-color: var(--rf-surface);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--rf-primary);
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Buttons */
+.primary-button,
+.secondary-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--rf-radius);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.primary-button {
+  background-color: var(--rf-primary);
+  color: white;
+  border-color: var(--rf-primary);
+}
+
+.primary-button:hover {
+  background-color: var(--rf-primary-hover);
+  border-color: var(--rf-primary-hover);
+}
+
+.secondary-button {
+  background-color: var(--rf-background);
+  color: var(--rf-text);
+  border-color: var(--rf-border);
+}
+
+.secondary-button:hover {
+  background-color: var(--rf-surface);
+  border-color: var(--rf-secondary);
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--rf-border);
+  padding: 2rem;
+  background-color: var(--rf-surface);
+}
+
+.footer-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.footer-info {
+  text-align: center;
+}
+
+.footer-info p {
+  margin: 0;
+  color: var(--rf-text-muted);
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    margin: 0;
+    box-shadow: none;
+  }
+
+  .header {
+    padding: 1.5rem;
+  }
+
+  .settings-main {
+    padding: 1rem;
+  }
+
+  .settings-section {
+    padding: 1rem;
+  }
+
+  .footer {
+    padding: 1.5rem;
+  }
+
+  .footer-actions {
+    flex-direction: column;
+  }
+}
+
+/* Success/Error States */
+.save-success {
+  background-color: var(--rf-success);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--rf-radius);
+  margin-bottom: 1rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.save-success.show {
+  opacity: 1;
+}
+
+/* Focus States */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: 2px solid var(--rf-primary);
+  outline-offset: 2px;
+}
+
+/* Animation for settings changes */
+.setting-group {
+  transition: background-color 0.2s;
+}
+
+.setting-group.changed {
+  background-color: var(--rf-surface);
+  border-radius: var(--rf-radius);
+  padding: 0.5rem;
+  margin: -0.5rem;
+  margin-bottom: 1rem;
+}

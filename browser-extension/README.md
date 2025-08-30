@@ -40,29 +40,65 @@ _(Coming soon - extension will be published after testing)_
 4. **ReadFocus should open** in a new tab with the article content loaded
 5. **Reading session starts automatically** after 1 second
 
-### Testing All Features
+### Testing Focus Mode (v2 Enhanced)
+
+The extension now includes an enhanced **Focus Mode** that works directly on the page:
+
+#### **🎯 Recommended Test Sites:**
+
+- **Medium articles** (excellent compatibility)
+- **Wikipedia articles** (semantic HTML structure)
+- **News sites** (BBC, CNN, New York Times)
+- **Blog platforms** (WordPress, Substack)
+- **Documentation** (GitHub README files)
+
+#### **🔄 Testing Steps:**
+
+1. **Visit any article page** from the recommended sites
+2. **Click the ReadFocus extension icon**
+3. **Check page status** - should show "✅ Article detected"
+4. **Click "Start Focus Mode"** button
+5. **Focus Mode overlay should appear** directly on the page
+
+#### **📊 Debugging with Console Logs:**
+
+Open Developer Tools (F12) → Console tab to see detailed logs:
+
+- 🔍 **Content detection**: `[ContentScript] Starting content detection strategies...`
+- 📊 **Page analysis**: `[ContentScript] Analysis complete: isArticle: true`
+- 🎯 **Focus Mode**: `[FocusMode] Focus Mode activated successfully!`
+- ❌ **Errors**: Detailed error messages with specific failure points
+
+#### **✅ Expected Results (Focus Mode):**
+
+- Page content is hidden
+- Clean reading overlay appears
+- Article content is divided into readable chunks
+- Navigation controls (Previous/Next/Auto-advance) work
+- Exit button returns to normal page
+
+#### **🔧 Legacy Features (v1):**
 
 - **Text Selection**: Select text → Click extension → "Capture Selection"
 - **Context Menu**: Select text → Right-click → "Send to ReadFocus"
 - **Article Extract**: Click extension → "Smart Article Extract"
 - **Full Page**: Click extension → "Full Page Text"
 
-### Expected Results
-
-✅ ReadFocus opens in new tab  
-✅ Green banner shows "Text Loaded from Extension!"  
-✅ Text appears in the reading area  
-✅ Guided reading session begins automatically (after 1 second)  
-✅ Console shows "✅ Text loaded from URL parameters" message
-
 ### Troubleshooting
+
+#### **Focus Mode Issues:**
+
+- **"Failed to start Focus Mode"**: Check console logs for specific error details
+- **No content detected**: Try the emergency fallback or different content selectors
+- **Empty overlay**: The page may have unusual content structure
+- **Console errors**: Look for emoji-prefixed log messages for debugging
+
+#### **Legacy Mode Issues:**
 
 - **No text captured**: Try refreshing the webpage first
 - **ReadFocus doesn't open**: Check if app is running on localhost:3000
 - **Extension errors**: Check Chrome DevTools console (F12) for error messages
 - **Extension not working**: Go to `chrome://extensions/` and click reload (🔄) on ReadFocus extension
-- **Text not loading**: Check browser console (F12) for "✅ Text loaded" or "❌ No text data found" messages
-- **Success logs**: Extension success appears as "ReadFocus: Text sent to ReadFocus!" in console
 
 ## 📖 How to Use
 

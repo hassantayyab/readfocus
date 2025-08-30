@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "ReadFocus Text Capture",
-  "version": "1.0.0",
-  "description": "Capture text from any webpage and send it to ReadFocus for guided reading",
+  "name": "ReadFocus - Auto Focus Mode",
+  "version": "2.3.4",
+  "description": "Transform any webpage into a distraction-free Focus Reading Mode with guided pacing and comprehension checks",
 
-  "permissions": ["activeTab", "storage", "contextMenus"],
+  "permissions": ["activeTab", "storage", "contextMenus", "scripting"],
 
   "action": {
     "default_popup": "popup.html",
-    "default_title": "ReadFocus Text Capture",
+    "default_title": "ReadFocus - Auto Focus Mode",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
@@ -17,11 +17,38 @@
     }
   },
 
+  "options_page": "options.html",
+
+  "commands": {
+    "toggle-focus-mode": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F",
+        "mac": "Command+Shift+F"
+      },
+      "description": "Toggle Focus Reading Mode"
+    },
+    "next-chunk": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Right",
+        "mac": "Command+Shift+Right"
+      },
+      "description": "Next reading chunk"
+    },
+    "prev-chunk": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Left",
+        "mac": "Command+Shift+Left"
+      },
+      "description": "Previous reading chunk"
+    }
+  },
+
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["content.css"]
+      "js": ["js/focus-mode-overlay.js", "js/reading-helper-overlay.js", "js/content.js"],
+      "css": ["styles/content.css"],
+      "run_at": "document_end"
     }
   ],
 
