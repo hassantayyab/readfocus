@@ -187,30 +187,48 @@ class ReadFocusBackground {
   }
 
   showWelcomeNotification() {
-    chrome.notifications.create('readfocus-welcome', {
-      type: 'basic',
-      iconUrl: 'icons/icon48.png',
-      title: 'ReadFocus Extension Installed!',
-      message: 'Right-click on any text to send it to ReadFocus for guided reading.'
-    });
+    try {
+      if (chrome.notifications) {
+        chrome.notifications.create('readfocus-welcome', {
+          type: 'basic',
+          iconUrl: 'icons/icon48.png',
+          title: 'ReadFocus Extension Installed!',
+          message: 'Right-click on any text to send it to ReadFocus for guided reading.'
+        });
+      }
+    } catch (error) {
+      console.log('ReadFocus extension installed successfully');
+    }
   }
 
   showSuccessNotification(message) {
-    chrome.notifications.create('readfocus-success', {
-      type: 'basic',
-      iconUrl: 'icons/icon48.png',
-      title: 'ReadFocus',
-      message: message
-    });
+    try {
+      if (chrome.notifications) {
+        chrome.notifications.create('readfocus-success', {
+          type: 'basic',
+          iconUrl: 'icons/icon48.png',
+          title: 'ReadFocus',
+          message: message
+        });
+      }
+    } catch (error) {
+      console.log('ReadFocus:', message);
+    }
   }
 
   showErrorNotification(message) {
-    chrome.notifications.create('readfocus-error', {
-      type: 'basic',
-      iconUrl: 'icons/icon48.png',
-      title: 'ReadFocus Error',
-      message: message
-    });
+    try {
+      if (chrome.notifications) {
+        chrome.notifications.create('readfocus-error', {
+          type: 'basic',
+          iconUrl: 'icons/icon48.png',
+          title: 'ReadFocus Error',
+          message: message
+        });
+      }
+    } catch (error) {
+      console.error('ReadFocus Error:', message);
+    }
   }
 
   async getSettings() {

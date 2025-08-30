@@ -22,29 +22,70 @@ A Chrome browser extension that allows you to capture text from any webpage and 
 5. **Pin the extension** to your toolbar for easy access
 
 ### From Chrome Web Store
-*(Coming soon - extension will be published after testing)*
+
+_(Coming soon - extension will be published after testing)_
+
+## 🧪 Testing the Extension
+
+### Prerequisites
+
+1. **Make sure ReadFocus app is running** on `http://localhost:3000`
+2. **Extension is loaded and pinned** to your Chrome toolbar
+
+### Quick Test Steps
+
+1. **Go to any article webpage** (try Wikipedia, Medium, or a news site)
+2. **Click the ReadFocus extension icon** in your toolbar
+3. **Click "Smart Article Extract"** in the popup
+4. **ReadFocus should open** in a new tab with the article content loaded
+5. **Reading session starts automatically** after 1 second
+
+### Testing All Features
+
+- **Text Selection**: Select text → Click extension → "Capture Selection"
+- **Context Menu**: Select text → Right-click → "Send to ReadFocus"
+- **Article Extract**: Click extension → "Smart Article Extract"
+- **Full Page**: Click extension → "Full Page Text"
+
+### Expected Results
+
+✅ ReadFocus opens in new tab  
+✅ Green banner shows "Text Loaded from Extension!"  
+✅ Text appears in the reading area  
+✅ Guided reading session begins automatically
+
+### Troubleshooting
+
+- **No text captured**: Try refreshing the webpage first
+- **ReadFocus doesn't open**: Check if app is running on localhost:3000
+- **Extension errors**: Check Chrome DevTools console (F12)
+- **Extension not working**: Go to `chrome://extensions/` and click reload (🔄) on ReadFocus extension
 
 ## 📖 How to Use
 
 ### Method 1: Text Selection
+
 1. **Select text** on any webpage that you want to read in ReadFocus
 2. **Click the ReadFocus extension icon** in your toolbar
 3. **Click "Capture Selection"** button
 4. **ReadFocus opens automatically** with your selected text ready for guided reading
 
 ### Method 2: Right-Click Context Menu
+
 1. **Select text** on any webpage
 2. **Right-click** on the selected text
 3. **Choose "Send to ReadFocus"** from the context menu
 4. **ReadFocus opens** with the text loaded
 
 ### Method 3: Smart Article Extraction
+
 1. **Navigate to any article** or blog post
 2. **Click the ReadFocus extension icon**
 3. **Click "Smart Article Extract"** button
 4. **The extension automatically detects and captures the main content**
 
 ### Method 4: Full Page Text
+
 1. **Visit any webpage** with readable content
 2. **Click the ReadFocus extension icon**
 3. **Click "Full Page Text"** button
@@ -53,6 +94,7 @@ A Chrome browser extension that allows you to capture text from any webpage and 
 ## 🔧 Configuration
 
 ### Setting ReadFocus App URL
+
 If your ReadFocus app runs on a different port or domain:
 
 1. **Open extension popup**
@@ -61,7 +103,9 @@ If your ReadFocus app runs on a different port or domain:
 4. **Save settings**
 
 ### Permissions Explained
+
 The extension requires these permissions:
+
 - **activeTab**: To access content of the current webpage
 - **storage**: To save captured text and user preferences
 - **contextMenus**: To add right-click menu options
@@ -77,6 +121,7 @@ The extension requires these permissions:
 ## 🛠️ Development
 
 ### Project Structure
+
 ```
 browser-extension/
 ├── manifest.json          # Extension configuration
@@ -95,12 +140,14 @@ browser-extension/
 ```
 
 ### Testing Locally
+
 1. Make sure ReadFocus app is running on `http://localhost:3000`
 2. Load the extension in Chrome (see Installation above)
 3. Visit any webpage and test text capture features
 4. Check Chrome DevTools console for any errors
 
 ### Building for Production
+
 1. Update manifest version number
 2. Test all functionality thoroughly
 3. Create extension package: `zip -r readfocus-extension.zip browser-extension/`
@@ -109,20 +156,24 @@ browser-extension/
 ## 🐛 Troubleshooting
 
 ### Extension Icon Not Visible
+
 - Make sure extension is enabled in `chrome://extensions/`
 - Pin the extension to toolbar by clicking the puzzle piece icon
 
 ### Text Capture Not Working
+
 - Check if ReadFocus app is running on the correct URL
 - Verify extension permissions are granted
 - Try refreshing the webpage and extension
 
 ### ReadFocus Doesn't Open
+
 - Confirm ReadFocus app URL in extension settings
 - Check if popup blocker is preventing new tab
 - Make sure ReadFocus app is accessible
 
 ### Smart Article Extraction Issues
+
 - Try selecting text manually if auto-detection fails
 - Some websites may have complex layouts that are harder to parse
 - Use "Full Page Text" as a fallback option
@@ -149,6 +200,7 @@ This extension is part of the ReadFocus project and follows the same MIT license
 ## 📞 Support
 
 If you encounter issues:
+
 1. Check this README for troubleshooting tips
 2. Open an issue on the ReadFocus GitHub repository
 3. Include your Chrome version and extension version
