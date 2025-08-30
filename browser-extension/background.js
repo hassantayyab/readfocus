@@ -51,14 +51,14 @@ class ReadFocusBackground {
       id: 'readfocus-send-text',
       title: 'Send to ReadFocus',
       contexts: ['selection'],
-      documentUrlPatterns: ['http://*/*', 'https://*/*']
+      documentUrlPatterns: ['http://*/*', 'https://*/*'],
     });
 
     chrome.contextMenus.create({
       id: 'readfocus-capture-article',
       title: 'Capture Article in ReadFocus',
       contexts: ['page'],
-      documentUrlPatterns: ['http://*/*', 'https://*/*']
+      documentUrlPatterns: ['http://*/*', 'https://*/*'],
     });
   }
 
@@ -73,10 +73,10 @@ class ReadFocusBackground {
 
         case 'readfocus-capture-article':
           // Request article extraction from content script
-          const response = await chrome.tabs.sendMessage(tab.id, { 
-            action: 'extractArticle' 
+          const response = await chrome.tabs.sendMessage(tab.id, {
+            action: 'extractArticle',
           });
-          
+
           if (response && response.text) {
             await this.sendTextToReadFocus(response.text, response.title, tab.url);
           }
@@ -96,7 +96,7 @@ class ReadFocusBackground {
         break;
 
       case 'getSettings':
-        this.getSettings().then(settings => {
+        this.getSettings().then((settings) => {
           sendResponse(settings);
         });
         return true; // Keep message channel open
@@ -134,11 +134,11 @@ class ReadFocusBackground {
         title: title || 'Captured Text',
         sourceUrl: sourceUrl,
         timestamp: Date.now(),
-        id: this.generateId()
+        id: this.generateId(),
       };
 
-      await chrome.storage.local.set({ 
-        'readfocus_captured_text': textData 
+      await chrome.storage.local.set({
+        readfocus_captured_text: textData,
       });
 
       // Open ReadFocus with the captured text
@@ -146,7 +146,6 @@ class ReadFocusBackground {
       await chrome.tabs.create({ url: readfocusUrl });
 
       this.showSuccessNotification('Text sent to ReadFocus!');
-
     } catch (error) {
       console.error('Error sending text to ReadFocus:', error);
       this.showErrorNotification('Failed to send text to ReadFocus');
@@ -156,17 +155,17 @@ class ReadFocusBackground {
   async openReadFocus(text = '', title = '') {
     try {
       let url = this.readfocusUrl;
-      
+
       if (text) {
         const textData = {
           text: text,
           title: title || 'Extension Text',
           timestamp: Date.now(),
-          id: this.generateId()
+          id: this.generateId(),
         };
 
-        await chrome.storage.local.set({ 
-          'readfocus_captured_text': textData 
+        await chrome.storage.local.set({
+          readfocus_captured_text: textData,
         });
 
         url += `?source=extension&id=${textData.id}`;
@@ -191,9 +190,8 @@ class ReadFocusBackground {
       if (chrome.notifications) {
         chrome.notifications.create('readfocus-welcome', {
           type: 'basic',
-          iconUrl: 'icons/icon48.png',
           title: 'ReadFocus Extension Installed!',
-          message: 'Right-click on any text to send it to ReadFocus for guided reading.'
+          message: 'Right-click on any text to send it to ReadFocus for guided reading.',
         });
       }
     } catch (error) {
@@ -206,9 +204,8 @@ class ReadFocusBackground {
       if (chrome.notifications) {
         chrome.notifications.create('readfocus-success', {
           type: 'basic',
-          iconUrl: 'icons/icon48.png',
           title: 'ReadFocus',
-          message: message
+          message: message,
         });
       }
     } catch (error) {
@@ -221,9 +218,8 @@ class ReadFocusBackground {
       if (chrome.notifications) {
         chrome.notifications.create('readfocus-error', {
           type: 'basic',
-          iconUrl: 'icons/icon48.png',
           title: 'ReadFocus Error',
-          message: message
+          message: message,
         });
       }
     } catch (error) {
@@ -236,7 +232,7 @@ class ReadFocusBackground {
       const result = await chrome.storage.sync.get({
         readfocusUrl: this.readfocusUrl,
         autoCapture: false,
-        minTextLength: 50
+        minTextLength: 50,
       });
       return result;
     } catch (error) {
@@ -244,7 +240,7 @@ class ReadFocusBackground {
       return {
         readfocusUrl: this.readfocusUrl,
         autoCapture: false,
-        minTextLength: 50
+        minTextLength: 50,
       };
     }
   }
@@ -252,7 +248,7 @@ class ReadFocusBackground {
   async saveSettings(settings) {
     try {
       await chrome.storage.sync.set(settings);
-      
+
       // Update local URL if changed
       if (settings.readfocusUrl) {
         this.readfocusUrl = settings.readfocusUrl;
