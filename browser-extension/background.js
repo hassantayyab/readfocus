@@ -137,12 +137,16 @@ class ReadFocusBackground {
         id: this.generateId(),
       };
 
+      // Store in chrome.storage.local first
       await chrome.storage.local.set({
         readfocus_captured_text: textData,
       });
 
-      // Open ReadFocus with the captured text
-      const readfocusUrl = `${this.readfocusUrl}?source=extension&id=${textData.id}`;
+      // Create ReadFocus URL with text data as URL parameters (as backup)
+      const encodedText = encodeURIComponent(textData.text.substring(0, 2000)); // Limit URL length
+      const encodedTitle = encodeURIComponent(textData.title);
+      const readfocusUrl = `${this.readfocusUrl}?source=extension&id=${textData.id}&text=${encodedText}&title=${encodedTitle}`;
+
       await chrome.tabs.create({ url: readfocusUrl });
 
       this.showSuccessNotification('Text sent to ReadFocus!');
@@ -168,7 +172,10 @@ class ReadFocusBackground {
           readfocus_captured_text: textData,
         });
 
-        url += `?source=extension&id=${textData.id}`;
+        // Add text data to URL parameters
+        const encodedText = encodeURIComponent(textData.text.substring(0, 2000));
+        const encodedTitle = encodeURIComponent(textData.title);
+        url += `?source=extension&id=${textData.id}&text=${encodedText}&title=${encodedTitle}`;
       }
 
       await chrome.tabs.create({ url: url });

@@ -24,28 +24,70 @@ export default function HomePage() {
         const textId = urlParams.get('id');
 
         if (isFromExtension && textId) {
-          // Try to get captured text from localStorage (Chrome extension stores it here)
-          const storedData = localStorage.getItem('readfocus_captured_text');
-          
-          if (storedData) {
-            const textData = JSON.parse(storedData);
-            
-            if (textData.id === textId && textData.text) {
-              setExtensionData(textData);
-              setInputText(textData.text);
-              
-              // Show success message
-              console.log('✅ Text loaded from extension:', textData.title);
-              
-              // Clear the stored data after loading
-              localStorage.removeItem('readfocus_captured_text');
-              
-              // Auto-start reading after a short delay
-              setTimeout(() => {
-                setIsReading(true);
-              }, 1000);
+          let textData = null;
+
+          // Method 1: Try to get text directly from URL parameters
+          const urlText = urlParams.get('text');
+          const urlTitle = urlParams.get('title');
+
+          if (urlText) {
+            textData = {
+              id: textId,
+              text: decodeURIComponent(urlText),
+              title: urlTitle ? decodeURIComponent(urlTitle) : 'Captured Text',
+              sourceUrl: document.referrer || 'Unknown',
+              timestamp: Date.now(),
+            };
+
+            console.log('✅ Text loaded from URL parameters:', textData.title);
+          }
+
+          // Method 2: Fallback - try to access chrome.storage.local if available
+          if (!textData && typeof window !== 'undefined' && (window as any).chrome?.storage) {
+            try {
+              const chromeStorage = (window as any).chrome.storage;
+              const result = await chromeStorage.local.get(['readfocus_captured_text']);
+              if (result.readfocus_captured_text && result.readfocus_captured_text.id === textId) {
+                textData = result.readfocus_captured_text;
+
+                // Clear the stored data after loading
+                await chromeStorage.local.remove(['readfocus_captured_text']);
+                console.log('✅ Text loaded from chrome storage:', textData.title);
+              }
+            } catch {
+              console.log('Chrome storage not accessible, using URL parameters');
             }
           }
+
+          // Method 3: Last fallback - try regular localStorage
+          if (!textData) {
+            const storedData = localStorage.getItem('readfocus_captured_text');
+            if (storedData) {
+              const parsedData = JSON.parse(storedData);
+              if (parsedData.id === textId && parsedData.text) {
+                textData = parsedData;
+                localStorage.removeItem('readfocus_captured_text');
+                console.log('✅ Text loaded from localStorage:', textData.title);
+              }
+            }
+          }
+
+          // Load the text if we found it
+          if (textData && textData.text) {
+            setExtensionData(textData);
+            setInputText(textData.text);
+
+            // Auto-start reading after a short delay
+            setTimeout(() => {
+              setIsReading(true);
+            }, 1000);
+          } else {
+            console.warn('❌ No text data found for extension ID:', textId);
+          }
+
+          // Clean up URL parameters
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
         }
       } catch (error) {
         console.error('Error loading extension data:', error);
@@ -167,10 +209,11 @@ export default function HomePage() {
                       Text Loaded from Extension!
                     </h3>
                     <p className="text-green-600">
-                      {extensionData.title} • {extensionData.text.length.toLocaleString()} characters
+                      {extensionData.title} • {extensionData.text.length.toLocaleString()}{' '}
+                      characters
                     </p>
                     {extensionData.sourceUrl && (
-                      <p className="text-sm text-green-500 truncate max-w-md">
+                      <p className="max-w-md truncate text-sm text-green-500">
                         From: {extensionData.sourceUrl}
                       </p>
                     )}
@@ -187,8 +230,8 @@ export default function HomePage() {
                 {extensionData ? 'Ready to Read!' : 'Start Your Focused Reading Session'}
               </h2>
               <p className="text-lg text-blue-100">
-                {extensionData 
-                  ? 'Your text has been loaded and is ready for guided reading.' 
+                {extensionData
+                  ? 'Your text has been loaded and is ready for guided reading.'
                   : 'Paste your content below and let ReadFocus guide your reading journey'}
               </p>
             </div>

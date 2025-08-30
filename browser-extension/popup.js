@@ -18,7 +18,7 @@ class ReadFocusPopup {
         selectionInfo: document.getElementById('selection-info'),
         selectionLength: document.getElementById('selection-length'),
         statusMessage: document.getElementById('status-message'),
-        errorMessage: document.getElementById('error-message')
+        errorMessage: document.getElementById('error-message'),
       };
 
       // Bind event listeners
@@ -40,7 +40,7 @@ class ReadFocusPopup {
     this.elements.captureSelection.addEventListener('click', () => this.captureSelection());
     this.elements.captureArticle.addEventListener('click', () => this.captureArticle());
     this.elements.capturePage.addEventListener('click', () => this.capturePageText());
-    
+
     // Open ReadFocus app
     this.elements.openReadfocus.addEventListener('click', () => this.openReadFocus());
   }
@@ -48,10 +48,10 @@ class ReadFocusPopup {
   async checkSelection() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
+
       // Get selected text from content script
-      const response = await chrome.tabs.sendMessage(tab.id, { 
-        action: 'getSelection' 
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'getSelection',
       });
 
       if (response && response.text) {
@@ -84,11 +84,11 @@ class ReadFocusPopup {
   async captureArticle() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
+
       this.showLoading('Extracting article...');
 
-      const response = await chrome.tabs.sendMessage(tab.id, { 
-        action: 'extractArticle' 
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'extractArticle',
       });
 
       this.hideLoading();
@@ -108,11 +108,11 @@ class ReadFocusPopup {
   async capturePageText() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
+
       this.showLoading('Extracting page text...');
 
-      const response = await chrome.tabs.sendMessage(tab.id, { 
-        action: 'getPageText' 
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'getPageText',
       });
 
       this.hideLoading();
@@ -144,15 +144,17 @@ class ReadFocusPopup {
         title: title,
         url: await this.getCurrentUrl(),
         timestamp: Date.now(),
-        id: this.generateId()
+        id: this.generateId(),
       };
 
-      await chrome.storage.local.set({ 
-        'readfocus_captured_text': textData 
+      await chrome.storage.local.set({
+        readfocus_captured_text: textData,
       });
 
-      // Open ReadFocus with a special parameter
-      const readfocusUrl = `${this.readfocusUrl}?source=extension&id=${textData.id}`;
+      // Open ReadFocus with text data in URL parameters
+      const encodedText = encodeURIComponent(textData.text.substring(0, 2000)); // Limit URL length
+      const encodedTitle = encodeURIComponent(textData.title);
+      const readfocusUrl = `${this.readfocusUrl}?source=extension&id=${textData.id}&text=${encodedText}&title=${encodedTitle}`;
       await chrome.tabs.create({ url: readfocusUrl });
 
       this.hideLoading();
@@ -162,7 +164,6 @@ class ReadFocusPopup {
       setTimeout(() => {
         window.close();
       }, 1500);
-
     } catch (error) {
       this.hideLoading();
       console.error('Error sending to ReadFocus:', error);
@@ -195,7 +196,7 @@ class ReadFocusPopup {
 
   updateSelectionInfo(length) {
     this.elements.selectionLength.textContent = length.toLocaleString();
-    
+
     if (length > 0) {
       this.elements.selectionInfo.classList.remove('hidden');
     } else {
@@ -217,7 +218,7 @@ class ReadFocusPopup {
 
   showLoading(message) {
     // Disable all buttons during loading
-    Object.values(this.elements).forEach(el => {
+    Object.values(this.elements).forEach((el) => {
       if (el.tagName === 'BUTTON') {
         el.disabled = true;
       }
@@ -228,7 +229,7 @@ class ReadFocusPopup {
 
   hideLoading() {
     // Re-enable buttons
-    Object.values(this.elements).forEach(el => {
+    Object.values(this.elements).forEach((el) => {
       if (el.tagName === 'BUTTON') {
         el.disabled = false;
       }

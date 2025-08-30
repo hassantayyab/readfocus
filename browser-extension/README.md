@@ -52,7 +52,8 @@ _(Coming soon - extension will be published after testing)_
 ✅ ReadFocus opens in new tab  
 ✅ Green banner shows "Text Loaded from Extension!"  
 ✅ Text appears in the reading area  
-✅ Guided reading session begins automatically
+✅ Guided reading session begins automatically (after 1 second)  
+✅ Console shows "✅ Text loaded from URL parameters" message
 
 ### Troubleshooting
 
@@ -60,7 +61,8 @@ _(Coming soon - extension will be published after testing)_
 - **ReadFocus doesn't open**: Check if app is running on localhost:3000
 - **Extension errors**: Check Chrome DevTools console (F12) for error messages
 - **Extension not working**: Go to `chrome://extensions/` and click reload (🔄) on ReadFocus extension
-- **Success messages**: Check browser console (F12) for "ReadFocus:" success logs
+- **Text not loading**: Check browser console (F12) for "✅ Text loaded" or "❌ No text data found" messages
+- **Success logs**: Extension success appears as "ReadFocus: Text sent to ReadFocus!" in console
 
 ## 📖 How to Use
 
