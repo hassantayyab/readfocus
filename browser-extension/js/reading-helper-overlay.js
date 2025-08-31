@@ -281,6 +281,70 @@ try {
       }
     }
 
+    // Clear AI highlights cache
+    async clearCache() {
+      try {
+        // Clear in-memory cache
+        this.aiCache = {};
+
+        // Clear from chrome.storage
+        await chrome.storage.local.remove('aiHighlightsCache');
+
+        console.log('🗑️ [ReadingHelper] AI highlights cache cleared');
+
+        // Show feedback to user
+        this.showCacheClearedMessage();
+
+        return { success: true, message: 'Cache cleared successfully' };
+      } catch (error) {
+        console.error('❌ [ReadingHelper] Error clearing cache:', error);
+        return { success: false, message: 'Failed to clear cache' };
+      }
+    }
+
+    // Show cache cleared feedback message
+    showCacheClearedMessage() {
+      // Create a temporary notification
+      const notification = document.createElement('div');
+      notification.className = 'rf-cache-notification';
+      notification.textContent = '🗑️ Cache cleared! AI will re-analyze content on next use.';
+
+      // Style the notification
+      Object.assign(notification.style, {
+        position: 'fixed',
+        top: '80px',
+        right: '20px',
+        background: '#10b981',
+        color: 'white',
+        padding: '8px 16px',
+        borderRadius: '8px',
+        fontSize: '14px',
+        fontWeight: '500',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        zIndex: '100000',
+        opacity: '0',
+        transition: 'opacity 0.3s ease',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      });
+
+      document.body.appendChild(notification);
+
+      // Fade in
+      setTimeout(() => {
+        notification.style.opacity = '1';
+      }, 10);
+
+      // Fade out and remove after 3 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
     // Process content and apply appropriate highlighting method
     async processAndHighlight() {
       const content = this.pageAnalysis?.mainContent;
@@ -474,10 +538,10 @@ try {
         wordCount[word] = (wordCount[word] || 0) + 1;
       });
 
-      // Sort by frequency and take top 15
+      // Sort by frequency and take top 25 (increased from 15)
       return Object.entries(wordCount)
         .sort(([, a], [, b]) => b - a)
-        .slice(0, 15)
+        .slice(0, 25)
         .map(([word]) => word);
     }
 
@@ -608,6 +672,15 @@ try {
           </div>
         </div>
         <div class="rf-panel-controls">
+          ${
+            isAIMode
+              ? `
+            <button class="rf-panel-btn rf-cache-btn" id="rf-clear-cache">
+              🗑️ Clear Cache
+            </button>
+          `
+              : ''
+          }
           <button class="rf-panel-btn rf-exit-btn" id="rf-exit-reading-helper">
             ✕ Turn Off
           </button>
@@ -615,11 +688,26 @@ try {
       `;
 
       // Add event listeners
-      this.controlPanel.addEventListener('click', (e) => {
+      this.controlPanel.addEventListener('click', async (e) => {
         e.stopPropagation();
 
         if (e.target.id === 'rf-exit-reading-helper') {
           this.deactivate();
+        } else if (e.target.id === 'rf-clear-cache') {
+          // Disable button temporarily to prevent double clicks
+          const button = e.target;
+          button.disabled = true;
+          button.textContent = 'Clearing...';
+
+          try {
+            await this.clearCache();
+          } catch (error) {
+            console.error('❌ [ReadingHelper] Failed to clear cache:', error);
+          }
+
+          // Re-enable button
+          button.disabled = false;
+          button.innerHTML = '🗑️ Clear Cache';
         }
       });
 
@@ -778,7 +866,7 @@ try {
         }
 
         .rf-highlight-low {
-          background: #10b981 !important;
+          background: #eab308 !important;
           color: #ffffff !important;
           font-weight: 500 !important;
           border-radius: 3px !important;
@@ -790,7 +878,7 @@ try {
           z-index: 9999 !important;
           opacity: 1 !important;
           visibility: visible !important;
-          box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2) !important;
+          box-shadow: 0 1px 2px rgba(234, 179, 8, 0.3) !important;
         }
 
         .rf-highlight-high:hover {
@@ -806,9 +894,9 @@ try {
         }
 
         .rf-highlight-low:hover {
-          background: #059669 !important;
+          background: #ca8a04 !important;
           transform: translateY(-0.5px) !important;
-          box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3) !important;
+          box-shadow: 0 2px 4px rgba(234, 179, 8, 0.4) !important;
         }        /* Control Panel */
         .rf-reading-helper-panel {
           position: fixed !important;
@@ -850,6 +938,7 @@ try {
           padding: 12px 16px !important;
           display: flex !important;
           gap: 8px !important;
+          flex-wrap: wrap !important;
         }
 
         .rf-panel-btn {
@@ -879,6 +968,22 @@ try {
         .rf-exit-btn:hover {
           background: #fecaca !important;
           border-color: #f87171 !important;
+        }
+
+        .rf-cache-btn {
+          background: #fef3c7 !important;
+          color: #92400e !important;
+          border-color: #fbbf24 !important;
+        }
+
+        .rf-cache-btn:hover {
+          background: #fde68a !important;
+          border-color: #f59e0b !important;
+        }
+
+        .rf-cache-btn:disabled {
+          opacity: 0.6 !important;
+          cursor: not-allowed !important;
         }
 
 

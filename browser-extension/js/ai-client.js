@@ -174,23 +174,24 @@ class AIClient {
 Article Text:
 ${content}
 
-Please categorize sentences, phrases, and key terms into 3 importance levels:
+Please categorize sentences, phrases, and key terms into 3 importance levels. Provide MORE highlights than usual to help students get a comprehensive understanding:
 
-HIGH IMPORTANCE (🔴): Core concepts, main arguments, key facts, definitions, crucial conclusions
-MEDIUM IMPORTANCE (🟡): Supporting details, explanations, examples, important context
-LOW IMPORTANCE (🟢): Minor details, transitions, background information, less critical examples
+HIGH IMPORTANCE (🔴): Core concepts, main arguments, key facts, definitions, crucial conclusions - aim for 8-12 selections
+MEDIUM IMPORTANCE (🟡): Supporting details, explanations, examples, important context - aim for 12-18 selections
+LOW IMPORTANCE (🟢): Minor details, transitions, background information, less critical examples - aim for 15-25 selections
 
 Instructions:
 1. Select text that helps students understand the main ideas and key concepts
 2. Prioritize information that would likely appear in a summary or exam
 3. Return exact text selections that appear in the article
 4. Focus on helping students identify the most critical information for comprehension
+5. Provide more selections per category to ensure comprehensive coverage
 
 Return your response as a JSON object with this exact format:
 {
-  "high": ["exact text selection 1", "exact text selection 2"],
-  "medium": ["exact text selection 3", "exact text selection 4"],
-  "low": ["exact text selection 5", "exact text selection 6"]
+  "high": ["exact text selection 1", "exact text selection 2", "exact text selection 3", ...],
+  "medium": ["exact text selection 1", "exact text selection 2", "exact text selection 3", ...],
+  "low": ["exact text selection 1", "exact text selection 2", "exact text selection 3", ...]
 }
 
 Important: Only return the JSON object, no additional text or explanation.`;
