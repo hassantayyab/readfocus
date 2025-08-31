@@ -19,6 +19,15 @@ try {
       this.aiCache = null; // Will be loaded from chrome.storage
       this.currentContentHash = null;
 
+      // Manual highlighting system
+      this.manualHighlights = new Map(); // Store manual highlights
+      this.selectionTooltip = null;
+      this.currentSelection = null;
+      
+      // Bind event handlers to maintain 'this' context
+      this.boundHandleTextSelection = this.handleTextSelection.bind(this);
+      this.boundHideSelectionTooltip = this.hideSelectionTooltip.bind(this);
+
       // Purely AI-dependent highlighting system
     }
 
@@ -56,6 +65,9 @@ try {
 
       // Create floating control panel
       await this.createControlPanel();
+
+      // Set up manual highlighting listeners
+      this.setupManualHighlighting();
 
       console.log(`✅ [ReadingHelper] Reading Helper Mode activated successfully`);
 
@@ -547,6 +559,268 @@ try {
       );
     }
 
+    // Setup manual highlighting functionality
+    setupManualHighlighting() {
+      console.log('🖱️ [ReadingHelper] Setting up manual highlighting...');
+      
+      // Listen for text selection
+      document.addEventListener('mouseup', this.boundHandleTextSelection);
+      document.addEventListener('keyup', this.boundHandleTextSelection);
+      
+      // Hide tooltip when clicking elsewhere  
+      document.addEventListener('click', this.boundHideSelectionTooltip);
+      
+      console.log('✅ [ReadingHelper] Manual highlighting event listeners added');
+    }
+
+    // Handle text selection events
+    handleTextSelection(event) {
+      console.log('🖱️ [ReadingHelper] Text selection event triggered', event.type);
+      
+      // Small delay to ensure selection is complete
+      setTimeout(() => {
+        const selection = window.getSelection();
+        const selectedText = selection.toString().trim();
+        
+        console.log('📝 [ReadingHelper] Selected text:', selectedText ? `"${selectedText.substring(0, 50)}..."` : 'none');
+        
+        if (selectedText && selectedText.length > 0) {
+          // Don't show tooltip if selection is within our own elements
+          try {
+            const range = selection.getRangeAt(0);
+            const container = range.commonAncestorContainer;
+            const element = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
+            
+            if (this.isOurElement(element)) {
+              console.log('⚠️ [ReadingHelper] Selection is within our own elements, ignoring');
+              return;
+            }
+            
+            this.currentSelection = {
+              text: selectedText,
+              range: range.cloneRange(),
+              rect: range.getBoundingClientRect()
+            };
+            
+            console.log('✨ [ReadingHelper] Showing selection tooltip at', event.pageX, event.pageY);
+            this.showSelectionTooltip(event.pageX, event.pageY);
+          } catch (error) {
+            console.warn('⚠️ [ReadingHelper] Error processing selection:', error);
+          }
+        } else {
+          this.hideSelectionTooltip();
+        }
+      }, 10);
+    }
+
+    // Check if element is part of our extension UI
+    isOurElement(element) {
+      return element.closest('.rf-reading-helper-panel') || 
+             element.closest('.rf-selection-tooltip') ||
+             element.classList.contains('rf-highlight-manual');
+    }
+
+    // Show tooltip near selection
+    showSelectionTooltip(x, y) {
+      this.hideSelectionTooltip(); // Remove existing tooltip
+      
+      this.selectionTooltip = document.createElement('div');
+      this.selectionTooltip.className = 'rf-selection-tooltip';
+      this.selectionTooltip.innerHTML = `
+        <button class="rf-highlight-btn" id="rf-highlight-selection">
+          ✨ Highlight
+        </button>
+      `;
+      
+      // Position tooltip near cursor, but ensure it stays on screen
+      const tooltipX = Math.min(x + 10, window.innerWidth - 120);
+      const tooltipY = Math.max(y - 50, 10);
+      
+      this.selectionTooltip.style.position = 'fixed';
+      this.selectionTooltip.style.left = tooltipX + 'px';
+      this.selectionTooltip.style.top = tooltipY + 'px';
+      this.selectionTooltip.style.zIndex = '100000';
+      
+      // Add click handler
+      this.selectionTooltip.querySelector('#rf-highlight-selection').addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('🎯 [ReadingHelper] Highlight button clicked');
+        this.highlightSelection();
+      });
+      
+      document.body.appendChild(this.selectionTooltip);
+      console.log('📌 [ReadingHelper] Selection tooltip added to DOM');
+    }
+
+    // Hide selection tooltip
+    hideSelectionTooltip() {
+      if (this.selectionTooltip && this.selectionTooltip.parentNode) {
+        this.selectionTooltip.parentNode.removeChild(this.selectionTooltip);
+        this.selectionTooltip = null;
+      }
+    }
+
+    // Highlight the currently selected text
+    highlightSelection() {
+      if (!this.currentSelection) return;
+      
+      try {
+        const { text, range } = this.currentSelection;
+        const highlightId = this.generateHighlightId(text);
+        
+        // Create highlight span
+        const highlightSpan = document.createElement('span');
+        highlightSpan.className = 'rf-highlight-manual';
+        highlightSpan.dataset.highlightId = highlightId;
+        highlightSpan.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.removeManualHighlight(highlightId);
+        });
+        
+        // Wrap the selected text
+        try {
+          range.surroundContents(highlightSpan);
+          
+          // Store highlight info
+          this.manualHighlights.set(highlightId, {
+            text,
+            element: highlightSpan,
+            timestamp: Date.now()
+          });
+          
+          console.log('✨ [ReadingHelper] Manual highlight added:', text.substring(0, 50));
+          
+          // Update control panel stats
+          this.updateManualHighlightStats();
+          
+        } catch (error) {
+          console.warn('⚠️ [ReadingHelper] Could not wrap selection, using fallback method');
+          this.fallbackHighlightSelection(text, highlightId);
+        }
+        
+        this.hideSelectionTooltip();
+        window.getSelection().removeAllRanges();
+        
+      } catch (error) {
+        console.error('❌ [ReadingHelper] Error highlighting selection:', error);
+      }
+    }
+
+    // Fallback method for complex selections
+    fallbackHighlightSelection(text, highlightId) {
+      // Find and highlight text using the same method as AI highlights
+      const content = this.pageAnalysis?.mainContent;
+      if (!content) return;
+      
+      const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b${escapedText}\\b`, 'gi');
+      
+      let elementHTML = content.innerHTML;
+      const matches = (elementHTML.match(regex) || []).length;
+      
+      if (matches > 0) {
+        elementHTML = elementHTML.replace(regex, (match) => {
+          return `<span class="rf-highlight-manual" data-highlight-id="${highlightId}">${match}</span>`;
+        });
+        
+        content.innerHTML = elementHTML;
+        
+        // Add click handlers to remove highlights
+        const highlightElements = content.querySelectorAll(`[data-highlight-id="${highlightId}"]`);
+        highlightElements.forEach(el => {
+          el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.removeManualHighlight(highlightId);
+          });
+        });
+        
+        // Store highlight info
+        this.manualHighlights.set(highlightId, {
+          text,
+          elements: Array.from(highlightElements),
+          timestamp: Date.now()
+        });
+      }
+    }
+
+    // Generate unique ID for highlight
+    generateHighlightId(text) {
+      return 'manual_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
+    }
+
+    // Remove manual highlight
+    removeManualHighlight(highlightId) {
+      const highlight = this.manualHighlights.get(highlightId);
+      if (!highlight) return;
+      
+      if (highlight.element) {
+        // Single element highlight
+        const parent = highlight.element.parentNode;
+        parent.replaceChild(document.createTextNode(highlight.element.textContent), highlight.element);
+        parent.normalize();
+      } else if (highlight.elements) {
+        // Multiple elements highlight
+        highlight.elements.forEach(element => {
+          if (element.parentNode) {
+            const parent = element.parentNode;
+            parent.replaceChild(document.createTextNode(element.textContent), element);
+            parent.normalize();
+          }
+        });
+      }
+      
+      this.manualHighlights.delete(highlightId);
+      this.updateManualHighlightStats();
+      
+      console.log('🗑️ [ReadingHelper] Manual highlight removed');
+    }
+
+    // Update manual highlight stats in control panel
+    updateManualHighlightStats() {
+      const count = this.manualHighlights.size;
+      const manualCountElement = this.controlPanel?.querySelector('.rf-manual-count');
+      const clearButton = this.controlPanel?.querySelector('#rf-clear-manual');
+      
+      if (manualCountElement) {
+        manualCountElement.textContent = count > 0 ? `✨ Manual: ${count}` : '';
+        manualCountElement.style.display = count > 0 ? 'block' : 'none';
+      }
+      
+      if (clearButton) {
+        clearButton.style.display = count > 0 ? 'block' : 'none';
+      }
+    }
+
+    // Clear all manual highlights
+    clearAllManualHighlights() {
+      const highlightIds = Array.from(this.manualHighlights.keys());
+      highlightIds.forEach(id => this.removeManualHighlight(id));
+      console.log('🗑️ [ReadingHelper] All manual highlights cleared');
+    }
+
+    // Debug method to check manual highlighting status
+    debugManualHighlighting() {
+      console.log('🔍 [ReadingHelper] Manual Highlighting Debug Info:');
+      console.log('- Reading Helper Active:', this.isActive);
+      console.log('- Manual highlights count:', this.manualHighlights.size);
+      console.log('- Selection tooltip present:', !!this.selectionTooltip);
+      console.log('- Current selection:', this.currentSelection);
+      console.log('- Event listeners bound:', !!this.boundHandleTextSelection);
+      
+      // Test selection
+      const selection = window.getSelection();
+      const selectedText = selection.toString().trim();
+      console.log('- Current browser selection:', selectedText ? `"${selectedText}"` : 'none');
+      
+      return {
+        active: this.isActive,
+        manualCount: this.manualHighlights.size,
+        hasTooltip: !!this.selectionTooltip,
+        hasSelection: !!this.currentSelection,
+        browserSelection: selectedText
+      };
+    }
+
     // Removed frequency-based highlighting methods - now purely AI-dependent
 
     // Check if element is primarily image/figure content
@@ -582,6 +856,7 @@ try {
           <div class="rf-highlight-count">
             ${highlightInfo}
           </div>
+          <div class="rf-manual-count" style="display: none; font-size: 12px; color: #8b5cf6; margin-top: 2px;"></div>
         </div>
         <div class="rf-panel-controls">
           ${
@@ -593,6 +868,9 @@ try {
           `
               : ''
           }
+          <button class="rf-panel-btn rf-clear-manual-btn" id="rf-clear-manual" style="display: none;">
+            ✨ Clear Manual
+          </button>
           <button class="rf-panel-btn rf-exit-btn" id="rf-exit-reading-helper">
             ✕ Turn Off
           </button>
@@ -620,6 +898,8 @@ try {
           // Re-enable button
           button.disabled = false;
           button.innerHTML = '🗑️ Clear Cache';
+        } else if (e.target.id === 'rf-clear-manual') {
+          this.clearAllManualHighlights();
         }
       });
 
@@ -638,12 +918,18 @@ try {
 
     // Remove all highlights and clean up any broken HTML
     removeHighlighting() {
-      const highlights = document.querySelectorAll('.rf-keyword-highlight, .rf-nuclear-highlight');
+      // Remove AI highlights
+      const highlights = document.querySelectorAll('.rf-keyword-highlight, .rf-nuclear-highlight, [class*="rf-highlight-"]');
       highlights.forEach((highlight) => {
         const parent = highlight.parentNode;
-        parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
-        parent.normalize();
+        if (parent) {
+          parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+          parent.normalize();
+        }
       });
+
+      // Clear manual highlights data
+      this.manualHighlights.clear();
 
       // Clean up any broken HTML that might have been left from previous highlighting
       const brokenSpans = document.querySelectorAll('span:not([class]):not([id]):not([style])');
@@ -689,6 +975,9 @@ try {
       // Remove highlights
       this.removeHighlighting();
 
+      // Clean up manual highlighting listeners
+      this.cleanupManualHighlighting();
+
       // Remove control panel
       if (this.controlPanel && this.controlPanel.parentNode) {
         this.controlPanel.parentNode.removeChild(this.controlPanel);
@@ -707,6 +996,18 @@ try {
       if (window.postMessage) {
         window.postMessage({ type: 'READING_HELPER_DEACTIVATED' }, '*');
       }
+    }
+
+    // Clean up manual highlighting event listeners
+    cleanupManualHighlighting() {
+      console.log('🧹 [ReadingHelper] Cleaning up manual highlighting listeners');
+      
+      document.removeEventListener('mouseup', this.boundHandleTextSelection);
+      document.removeEventListener('keyup', this.boundHandleTextSelection);
+      document.removeEventListener('click', this.boundHideSelectionTooltip);
+      
+      // Hide any open tooltip
+      this.hideSelectionTooltip();
     }
 
     // Exit method (alias for deactivate)
@@ -934,7 +1235,79 @@ try {
           background: #ca8a04 !important;
           transform: translateY(-0.5px) !important;
           box-shadow: 0 2px 4px rgba(234, 179, 8, 0.4) !important;
-        }        /* Control Panel */
+        }
+
+        /* Manual Highlights - Purple theme to distinguish from AI */
+        .rf-highlight-manual {
+          background: #8b5cf6 !important;
+          color: #ffffff !important;
+          font-weight: 600 !important;
+          border-radius: 4px !important;
+          padding: 2px 5px !important;
+          transition: all 0.2s !important;
+          display: inline !important;
+          text-decoration: none !important;
+          position: relative !important;
+          z-index: 9999 !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          cursor: pointer !important;
+          box-shadow: 0 1px 3px rgba(139, 92, 246, 0.3) !important;
+          border: 1px solid rgba(139, 92, 246, 0.2) !important;
+        }
+
+        .rf-highlight-manual:hover {
+          background: #7c3aed !important;
+          transform: translateY(-0.5px) !important;
+          box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4) !important;
+          border-color: rgba(139, 92, 246, 0.4) !important;
+        }
+
+        /* Selection Tooltip */
+        .rf-selection-tooltip {
+          position: absolute !important;
+          background: white !important;
+          border: 2px solid #8b5cf6 !important;
+          border-radius: 8px !important;
+          padding: 8px !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+          z-index: 100001 !important;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          font-size: 14px !important;
+          backdrop-filter: blur(10px) !important;
+        }
+
+        .rf-highlight-btn {
+          background: #8b5cf6 !important;
+          color: white !important;
+          border: none !important;
+          border-radius: 6px !important;
+          padding: 6px 12px !important;
+          font-size: 12px !important;
+          font-weight: 600 !important;
+          cursor: pointer !important;
+          transition: all 0.2s !important;
+        }
+
+        .rf-highlight-btn:hover {
+          background: #7c3aed !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3) !important;
+        }
+
+        /* Clear Manual Button */
+        .rf-clear-manual-btn {
+          background: #f3e8ff !important;
+          color: #8b5cf6 !important;
+          border-color: #c4b5fd !important;
+        }
+
+        .rf-clear-manual-btn:hover {
+          background: #e9d5ff !important;
+          border-color: #8b5cf6 !important;
+        }
+
+        /* Control Panel */
         .rf-reading-helper-panel {
           position: fixed !important;
           top: 20px !important;

@@ -53,6 +53,7 @@
         "js/content-analyzer.js",
         "js/focus-mode-overlay.js",
         "js/reading-helper-overlay.js",
+        "js/standalone-highlighting.js",
         "js/content.js"
       ],
       "css": ["styles/content.css"],

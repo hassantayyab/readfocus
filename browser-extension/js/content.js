@@ -42,6 +42,11 @@ class ReadFocusContentScript {
     this.init();
   }
 
+  // Make content script accessible to standalone highlighting
+  static getInstance() {
+    return window.readFocusContentScriptInstance;
+  }
+
   async init() {
     console.log('🔧 [ContentScript] Initializing content script...');
 
@@ -1771,10 +1776,10 @@ class ReadFocusContentScript {
 // Initialize content script
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    new ReadFocusContentScript();
+    window.readFocusContentScriptInstance = new ReadFocusContentScript();
   });
 } else {
-  new ReadFocusContentScript();
+  window.readFocusContentScriptInstance = new ReadFocusContentScript();
 }
 
 // Export for testing
