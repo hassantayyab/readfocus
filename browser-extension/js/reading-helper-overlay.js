@@ -390,20 +390,20 @@ try {
                 analysisResult.processedContent
               );
 
-              if (
-                aiHighlights &&
-                (aiHighlights.high.length > 0 || aiHighlights.medium.length > 0)
-              ) {
+              if (aiHighlights && this.hasValidHighlights(aiHighlights)) {
                 // Cache the successful result
                 this.cacheAIHighlights(this.currentContentHash, aiSettings, aiHighlights);
               }
             }
 
-            if (aiHighlights && (aiHighlights.high.length > 0 || aiHighlights.medium.length > 0)) {
+            if (aiHighlights && this.hasValidHighlights(aiHighlights)) {
               console.log('🎯 [ReadingHelper] Applying AI smart highlights:', {
-                high: aiHighlights.high.length,
-                medium: aiHighlights.medium.length,
-                low: aiHighlights.low.length,
+                critical: aiHighlights.critical?.length || 0,
+                high: aiHighlights.high?.length || 0,
+                medium_high: aiHighlights.medium_high?.length || 0,
+                medium: aiHighlights.medium?.length || 0,
+                supporting: aiHighlights.supporting?.length || 0,
+                total: this.getTotalHighlights(aiHighlights),
               });
 
               this.applyAIHighlights(aiHighlights);
@@ -413,6 +413,13 @@ try {
             }
           } catch (error) {
             console.warn('⚠️ [ReadingHelper] AI highlighting failed:', error.message);
+            console.error('❌ [ReadingHelper] AI Error details:', error);
+
+            // If AI fails consistently, clear cache to force fresh analysis
+            if (error.message.includes('API') || error.message.includes('network')) {
+              console.log('🔄 [ReadingHelper] Clearing AI cache due to API/network error');
+              await this.clearCache();
+            }
           }
         }
 
@@ -427,22 +434,39 @@ try {
       }
     }
 
-    // Apply AI-generated highlights with 3-tier importance
+    // Apply AI-generated highlights with comprehensive 5-tier system
     applyAIHighlights(aiHighlights) {
       const content = this.pageAnalysis.mainContent;
       const allHighlights = [];
 
       // Debug: Log what AI returned
       console.log('🔍 [ReadingHelper] AI Highlights received:', {
-        high: aiHighlights.high,
-        medium: aiHighlights.medium,
-        low: aiHighlights.low,
+        critical: aiHighlights.critical?.length || 0,
+        high: aiHighlights.high?.length || 0,
+        medium_high: aiHighlights.medium_high?.length || 0,
+        medium: aiHighlights.medium?.length || 0,
+        supporting: aiHighlights.supporting?.length || 0,
+        total: this.getTotalHighlights(aiHighlights),
       });
 
-      // Combine all highlights with their importance levels
-      aiHighlights.high.forEach((text) => allHighlights.push({ text, level: 'high' }));
-      aiHighlights.medium.forEach((text) => allHighlights.push({ text, level: 'medium' }));
-      aiHighlights.low.forEach((text) => allHighlights.push({ text, level: 'low' }));
+      // Handle both new 5-tier and old 3-tier systems
+      if (aiHighlights.critical || aiHighlights.medium_high || aiHighlights.supporting) {
+        // New 5-tier system
+        aiHighlights.critical?.forEach((text) => allHighlights.push({ text, level: 'critical' }));
+        aiHighlights.high?.forEach((text) => allHighlights.push({ text, level: 'high' }));
+        aiHighlights.medium_high?.forEach((text) =>
+          allHighlights.push({ text, level: 'medium_high' })
+        );
+        aiHighlights.medium?.forEach((text) => allHighlights.push({ text, level: 'medium' }));
+        aiHighlights.supporting?.forEach((text) =>
+          allHighlights.push({ text, level: 'supporting' })
+        );
+      } else {
+        // Fallback to old 3-tier system
+        aiHighlights.high?.forEach((text) => allHighlights.push({ text, level: 'high' }));
+        aiHighlights.medium?.forEach((text) => allHighlights.push({ text, level: 'medium' }));
+        aiHighlights.low?.forEach((text) => allHighlights.push({ text, level: 'low' }));
+      }
 
       // Sort by length (longest first) to avoid partial replacements
       allHighlights.sort((a, b) => b.text.length - a.text.length);
@@ -452,7 +476,98 @@ try {
       // Apply highlights using nuclear approach for guaranteed visibility
       this.applyTieredHighlights(content, allHighlights);
 
-      console.log(`✅ [ReadingHelper] Applied ${allHighlights.length} AI smart highlights`);
+      const totalHighlights = allHighlights.length;
+      console.log(`✅ [ReadingHelper] Applied ${totalHighlights} comprehensive AI highlights`);
+
+      // Update UI to show comprehensive coverage
+      this.updateHighlightStats(totalHighlights);
+    }
+
+    // Helper method to count total highlights
+    getTotalHighlights(aiHighlights) {
+      let total = 0;
+      if (aiHighlights.critical) total += aiHighlights.critical.length;
+      if (aiHighlights.high) total += aiHighlights.high.length;
+      if (aiHighlights.medium_high) total += aiHighlights.medium_high.length;
+      if (aiHighlights.medium) total += aiHighlights.medium.length;
+      if (aiHighlights.supporting) total += aiHighlights.supporting.length;
+      return total;
+    }
+
+    // Check if AI highlights contain valid data
+    hasValidHighlights(aiHighlights) {
+      if (!aiHighlights) return false;
+
+      // Check new 5-tier system
+      if (
+        aiHighlights.critical?.length > 0 ||
+        aiHighlights.high?.length > 0 ||
+        aiHighlights.medium_high?.length > 0 ||
+        aiHighlights.medium?.length > 0 ||
+        aiHighlights.supporting?.length > 0
+      ) {
+        return true;
+      }
+
+      // Check old 3-tier system (fallback)
+      if (
+        aiHighlights.high?.length > 0 ||
+        aiHighlights.medium?.length > 0 ||
+        aiHighlights.low?.length > 0
+      ) {
+        return true;
+      }
+
+      return false;
+    }
+
+    // Update the control panel to show comprehensive highlighting stats
+    updateHighlightStats(totalHighlights) {
+      const highlightCountElement = this.controlPanel?.querySelector('.rf-highlight-count');
+      if (highlightCountElement) {
+        highlightCountElement.innerHTML = `Comprehensive AI Highlights (${totalHighlights} selections)`;
+      }
+    }
+
+    // Debug method to force fresh AI analysis (for troubleshooting)
+    async forceFreshAnalysis() {
+      try {
+        console.log('🔄 [ReadingHelper] Forcing fresh AI analysis...');
+
+        // Clear cache first
+        await this.clearCache();
+
+        // Remove existing highlights
+        this.removeHighlighting();
+
+        // Force re-analysis without cache
+        const content = this.pageAnalysis?.mainContent;
+        if (!content?.textContent) {
+          console.warn('⚠️ [ReadingHelper] No content available for re-analysis');
+          return;
+        }
+
+        const analysisResult = this.contentAnalyzer.analyzeContent(content);
+        if (!analysisResult.success) {
+          console.warn('⚠️ [ReadingHelper] Content analysis failed');
+          return;
+        }
+
+        // Make fresh AI call (bypass cache)
+        console.log('🤖 [ReadingHelper] Making fresh AI analysis call...');
+        const aiHighlights = await this.aiClient.analyzeForHighlighting(
+          analysisResult.processedContent
+        );
+
+        if (aiHighlights && this.hasValidHighlights(aiHighlights)) {
+          console.log('✅ [ReadingHelper] Fresh AI analysis successful');
+          this.applyAIHighlights(aiHighlights);
+        } else {
+          console.warn('⚠️ [ReadingHelper] Fresh AI analysis returned no valid highlights');
+        }
+      } catch (error) {
+        console.error('❌ [ReadingHelper] Force fresh analysis failed:', error);
+      }
     }
 
     // Apply tiered highlights with different styling (using proven nuclear approach)
@@ -523,26 +638,81 @@ try {
       }
     }
 
-    // Extract important words using frequency analysis
+    // Extract important words using enhanced frequency analysis
     extractImportantWords(text) {
-      // Clean and split text
+      // Clean and split text with better filtering
       const words = text
         .toLowerCase()
         .replace(/[^\w\s]/g, ' ')
         .split(/\s+/)
-        .filter((word) => word.length >= 4 && !this.stopWords.has(word));
+        .filter((word) => {
+          // More comprehensive filtering
+          const isValidLength = word.length >= 3 && word.length <= 20; // Reasonable word length
+          const isNotStopWord = !this.stopWords.has(word);
+          const hasLetters = /[a-z]/.test(word); // Must contain letters
+          const notNumber = !/^\d+$/.test(word); // Not pure numbers
+          const notCommonWeb = !['http', 'https', 'www', 'com', 'org', 'net'].includes(word); // Not web artifacts
 
-      // Count frequency
+          return isValidLength && isNotStopWord && hasLetters && notNumber && notCommonWeb;
+        });
+
+      // Count frequency with additional scoring
       const wordCount = {};
-      words.forEach((word) => {
-        wordCount[word] = (wordCount[word] || 0) + 1;
+      const wordPositions = {};
+      const sentences = text.split(/[.!?]+/);
+
+      words.forEach((word, index) => {
+        if (!wordCount[word]) {
+          wordCount[word] = 0;
+          wordPositions[word] = [];
+        }
+        wordCount[word]++;
+        wordPositions[word].push(index);
       });
 
-      // Sort by frequency and take top 25 (increased from 15)
-      return Object.entries(wordCount)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 25)
-        .map(([word]) => word);
+      // Calculate importance score for each word
+      const wordScores = Object.entries(wordCount).map(([word, count]) => {
+        let score = count; // Base frequency score
+
+        // Bonus for words appearing in different sentences (distribution)
+        const uniqueSentences = new Set();
+        wordPositions[word].forEach((pos) => {
+          // Estimate which sentence this position is in
+          const sentenceIndex = Math.floor(pos / 15); // Rough estimate
+          uniqueSentences.add(sentenceIndex);
+        });
+        score += uniqueSentences.size * 0.5; // Distribution bonus
+
+        // Bonus for academic/technical words
+        const academicWords = [
+          'theory',
+          'method',
+          'process',
+          'system',
+          'analysis',
+          'approach',
+          'concept',
+          'framework',
+          'model',
+          'study',
+        ];
+        if (academicWords.some((academic) => word.includes(academic))) {
+          score += 2;
+        }
+
+        // Length bonus (slightly longer words tend to be more important)
+        if (word.length >= 6 && word.length <= 12) {
+          score += 0.3;
+        }
+
+        return { word, score, count };
+      });
+
+      // Sort by score and take top 40 (increased from 25)
+      return wordScores
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 40)
+        .map((item) => item.word);
     }
 
     // Apply highlights directly to live document elements
@@ -761,6 +931,13 @@ try {
         event.preventDefault();
         this.refreshHighlighting();
       }
+
+      // Cmd/Ctrl + Shift + R - Force fresh AI analysis (debug)
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'R') {
+        event.preventDefault();
+        console.log('🔧 [ReadingHelper] Debug: Forcing fresh AI analysis');
+        this.forceFreshAnalysis();
+      }
     } // Deactivate Reading Helper Mode
     deactivate() {
       console.log(`📖 [ReadingHelper] Deactivating Reading Helper Mode...`);
@@ -865,6 +1042,93 @@ try {
           box-shadow: 0 1px 2px rgba(245, 158, 11, 0.3) !important;
         }
 
+        /* Critical highlights - Red (highest importance) */
+        .rf-highlight-critical {
+          background: #dc2626 !important;
+          color: #ffffff !important;
+          font-weight: 700 !important;
+          border-radius: 4px !important;
+          padding: 3px 6px !important;
+          transition: all 0.2s !important;
+          display: inline !important;
+          text-decoration: none !important;
+          position: relative !important;
+          z-index: 9999 !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          box-shadow: 0 1px 3px rgba(220, 38, 38, 0.4) !important;
+          border: 1px solid rgba(220, 38, 38, 0.3) !important;
+        }
+
+        /* High importance - Red-orange */
+        .rf-highlight-high {
+          background: #dc2626 !important;
+          color: #ffffff !important;
+          font-weight: 700 !important;
+          border-radius: 4px !important;
+          padding: 3px 6px !important;
+          transition: all 0.2s !important;
+          display: inline !important;
+          text-decoration: none !important;
+          position: relative !important;
+          z-index: 9999 !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          box-shadow: 0 1px 3px rgba(220, 38, 38, 0.3) !important;
+        }
+
+        /* Medium-high importance - Orange */
+        .rf-highlight-medium_high {
+          background: #ea580c !important;
+          color: #ffffff !important;
+          font-weight: 600 !important;
+          border-radius: 3px !important;
+          padding: 2px 5px !important;
+          transition: all 0.2s !important;
+          display: inline !important;
+          text-decoration: none !important;
+          position: relative !important;
+          z-index: 9999 !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          box-shadow: 0 1px 2px rgba(234, 88, 12, 0.3) !important;
+        }
+
+        /* Medium importance - Yellow-orange */
+        .rf-highlight-medium {
+          background: #d97706 !important;
+          color: #ffffff !important;
+          font-weight: 600 !important;
+          border-radius: 3px !important;
+          padding: 2px 5px !important;
+          transition: all 0.2s !important;
+          display: inline !important;
+          text-decoration: none !important;
+          position: relative !important;
+          z-index: 9999 !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          box-shadow: 0 1px 2px rgba(217, 119, 6, 0.3) !important;
+        }
+
+        /* Supporting information - Yellow */
+        .rf-highlight-supporting {
+          background: #eab308 !important;
+          color: #ffffff !important;
+          font-weight: 500 !important;
+          border-radius: 3px !important;
+          padding: 1px 4px !important;
+          transition: all 0.2s !important;
+          display: inline !important;
+          text-decoration: none !important;
+          position: relative !important;
+          z-index: 9999 !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          box-shadow: 0 1px 2px rgba(234, 179, 8, 0.3) !important;
+        }
+
+        /* Legacy low importance (for backward compatibility) */
         .rf-highlight-low {
           background: #eab308 !important;
           color: #ffffff !important;
@@ -891,6 +1155,37 @@ try {
           background: #d97706 !important;
           transform: translateY(-0.5px) !important;
           box-shadow: 0 2px 4px rgba(245, 158, 11, 0.4) !important;
+        }
+
+        .rf-highlight-critical:hover {
+          background: #b91c1c !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 2px 6px rgba(220, 38, 38, 0.5) !important;
+          border-color: rgba(220, 38, 38, 0.5) !important;
+        }
+
+        .rf-highlight-high:hover {
+          background: #b91c1c !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4) !important;
+        }
+
+        .rf-highlight-medium_high:hover {
+          background: #c2410c !important;
+          transform: translateY(-0.5px) !important;
+          box-shadow: 0 2px 4px rgba(234, 88, 12, 0.4) !important;
+        }
+
+        .rf-highlight-medium:hover {
+          background: #b45309 !important;
+          transform: translateY(-0.5px) !important;
+          box-shadow: 0 2px 4px rgba(217, 119, 6, 0.4) !important;
+        }
+
+        .rf-highlight-supporting:hover {
+          background: #ca8a04 !important;
+          transform: translateY(-0.5px) !important;
+          box-shadow: 0 2px 4px rgba(234, 179, 8, 0.4) !important;
         }
 
         .rf-highlight-low:hover {

@@ -161,40 +161,87 @@ class AIClient {
       throw new Error('Article text is too short for analysis (minimum 100 characters)');
     }
 
-    // Limit content length to avoid API limits
-    const maxContentLength = 15000; // Approximately 3000-4000 tokens
+    // Increase content length for more comprehensive analysis
+    const maxContentLength = 25000; // Approximately 5000-6000 tokens for better analysis
     let content = articleText.trim();
     if (content.length > maxContentLength) {
-      content = content.substring(0, maxContentLength) + '...';
-      console.log('📝 [AIClient] Content truncated for analysis');
+      // Try to cut at paragraph boundary for better content integrity
+      const truncateAt = maxContentLength;
+      const lastParagraph = content.lastIndexOf('\n\n', truncateAt);
+      const lastSentence = content.lastIndexOf('.', truncateAt);
+
+      let cutPoint = Math.max(lastParagraph, lastSentence);
+      if (cutPoint < maxContentLength * 0.8) {
+        cutPoint = truncateAt; // Fallback to hard cut
+      }
+
+      content = content.substring(0, cutPoint) + '\n\n[CONTENT_TRUNCATED_FOR_ANALYSIS]';
+      console.log(
+        '📝 [AIClient] Content truncated at paragraph boundary for comprehensive analysis'
+      );
     }
 
-    const prompt = `Analyze this article and identify important content for student reading comprehension.
+    const prompt = `You are an expert educational content analyst. Analyze this article with deep understanding and provide COMPREHENSIVE highlighting for student learning.
 
 Article Text:
 ${content}
 
-Please categorize sentences, phrases, and key terms into 3 importance levels. Provide MORE highlights than usual to help students get a comprehensive understanding:
+INSTRUCTIONS FOR COMPREHENSIVE ANALYSIS:
+You must highlight AT LEAST 70% of the article content by selecting extensive text selections that capture the complete educational value.
 
-HIGH IMPORTANCE (🔴): Core concepts, main arguments, key facts, definitions, crucial conclusions - aim for 8-12 selections
-MEDIUM IMPORTANCE (🟡): Supporting details, explanations, examples, important context - aim for 12-18 selections
-LOW IMPORTANCE (🟢): Minor details, transitions, background information, less critical examples - aim for 15-25 selections
+STRATEGY:
+1. First, identify the MAIN TOPIC and LEARNING OBJECTIVES of this article
+2. Understand the target AUDIENCE (students, level of expertise)
+3. Determine what KEY CONCEPTS and SKILLS students should learn
+4. Map out the ARTICLE STRUCTURE and logical flow
+5. Select text that covers the complete learning journey
 
-Instructions:
-1. Select text that helps students understand the main ideas and key concepts
-2. Prioritize information that would likely appear in a summary or exam
-3. Return exact text selections that appear in the article
-4. Focus on helping students identify the most critical information for comprehension
-5. Provide more selections per category to ensure comprehensive coverage
+CATEGORIZATION SYSTEM (5 levels for comprehensive coverage):
+
+🚨 CRITICAL (Red): Foundational concepts, definitions, core principles, main thesis statements, key conclusions, essential facts that form the backbone of understanding - SELECT 15-25+ items
+
+🔴 HIGH (Red-Orange): Major arguments, important theories, significant examples, key relationships, supporting evidence for main points, methodology explanations - SELECT 25-35+ items
+
+🟠 MEDIUM-HIGH (Orange): Detailed explanations, important examples, data interpretations, procedural steps, comparative analysis, contextual information - SELECT 30-40+ items
+
+🟡 MEDIUM (Yellow): Supporting details, additional examples, clarifications, transitions between major ideas, practical applications - SELECT 35-45+ items
+
+🟢 SUPPORTING (Green): Background context, minor examples, supplementary information, connective phrases that maintain flow - SELECT 25-35+ items
+
+COMPREHENSIVE SELECTION CRITERIA:
+✅ Include complete sentences and phrases (not just keywords)
+✅ Select text that teaches concepts, not just mentions them
+✅ Cover the entire article's learning objectives
+✅ Include examples, explanations, and applications
+✅ Select text that would appear in study guides or summaries
+✅ Ensure logical flow and conceptual progression
+✅ Cover different perspectives and implications
+✅ Include practical applications and real-world connections
+
+TARGET: Achieve 70%+ content coverage through extensive, meaningful selections that provide complete educational value.
 
 Return your response as a JSON object with this exact format:
 {
-  "high": ["exact text selection 1", "exact text selection 2", "exact text selection 3", ...],
-  "medium": ["exact text selection 1", "exact text selection 2", "exact text selection 3", ...],
-  "low": ["exact text selection 1", "exact text selection 2", "exact text selection 3", ...]
+  "critical": ["complete sentence or phrase 1", "complete sentence or phrase 2", ...],
+  "high": ["complete sentence or phrase 1", "complete sentence or phrase 2", ...],
+  "medium_high": ["complete sentence or phrase 1", "complete sentence or phrase 2", ...],
+  "medium": ["complete sentence or phrase 1", "complete sentence or phrase 2", ...],
+  "supporting": ["complete sentence or phrase 1", "complete sentence or phrase 2", ...],
+  "analysis_summary": {
+    "main_topic": "brief description",
+    "learning_objectives": ["objective 1", "objective 2"],
+    "target_audience": "description",
+    "coverage_percentage": "estimated percentage",
+    "total_selections": 150
+  }
 }
 
-Important: Only return the JSON object, no additional text or explanation.`;
+IMPORTANT:
+- Select extensive, meaningful text selections (full sentences/phrases)
+- Ensure comprehensive coverage across the entire article
+- Focus on educational value and learning outcomes
+- Target 150+ total selections for 70%+ coverage
+- Only return the JSON object, no additional text`;
 
     try {
       const response = await this.makeRequest(prompt, {
@@ -204,11 +251,26 @@ Important: Only return the JSON object, no additional text or explanation.`;
       // Parse the JSON response
       const highlights = this.parseHighlightResponse(response);
 
-      console.log('🎯 [AIClient] Analysis complete:', {
-        high: highlights.high.length,
-        medium: highlights.medium.length,
-        low: highlights.low.length,
-      });
+      // Log highlights based on system type
+      const logData = {};
+      if (highlights.critical || highlights.medium_high || highlights.supporting) {
+        // New 5-tier system
+        logData.critical = highlights.critical?.length || 0;
+        logData.high = highlights.high?.length || 0;
+        logData.medium_high = highlights.medium_high?.length || 0;
+        logData.medium = highlights.medium?.length || 0;
+        logData.supporting = highlights.supporting?.length || 0;
+      } else {
+        // Old 3-tier system
+        logData.high = highlights.high?.length || 0;
+        logData.medium = highlights.medium?.length || 0;
+        logData.low = highlights.low?.length || 0;
+      }
+
+      const totalHighlights = Object.values(logData).reduce((sum, count) => sum + count, 0);
+      logData.total = totalHighlights;
+
+      console.log('🎯 [AIClient] Analysis complete:', logData);
 
       return highlights;
     } catch (error) {
@@ -241,21 +303,35 @@ Important: Only return the JSON object, no additional text or explanation.`;
         throw new Error('Invalid response structure');
       }
 
-      // Ensure all required arrays exist
-      const result = {
-        high: Array.isArray(highlights.high) ? highlights.high : [],
-        medium: Array.isArray(highlights.medium) ? highlights.medium : [],
-        low: Array.isArray(highlights.low) ? highlights.low : [],
-      };
+      // Handle both new 5-tier system and fallback to old 3-tier system
+      const result = {};
+
+      if (
+        highlights.critical ||
+        highlights.high ||
+        highlights.medium_high ||
+        highlights.medium ||
+        highlights.supporting
+      ) {
+        // New 5-tier system
+        result.critical = Array.isArray(highlights.critical) ? highlights.critical : [];
+        result.high = Array.isArray(highlights.high) ? highlights.high : [];
+        result.medium_high = Array.isArray(highlights.medium_high) ? highlights.medium_high : [];
+        result.medium = Array.isArray(highlights.medium) ? highlights.medium : [];
+        result.supporting = Array.isArray(highlights.supporting) ? highlights.supporting : [];
+      } else {
+        // Fallback to old 3-tier system
+        result.high = Array.isArray(highlights.high) ? highlights.high : [];
+        result.medium = Array.isArray(highlights.medium) ? highlights.medium : [];
+        result.low = Array.isArray(highlights.low) ? highlights.low : [];
+      }
 
       // Filter out empty or invalid selections
-      result.high = result.high.filter(
-        (text) => typeof text === 'string' && text.trim().length > 2
-      );
-      result.medium = result.medium.filter(
-        (text) => typeof text === 'string' && text.trim().length > 2
-      );
-      result.low = result.low.filter((text) => typeof text === 'string' && text.trim().length > 2);
+      Object.keys(result).forEach((key) => {
+        result[key] = result[key].filter(
+          (text) => typeof text === 'string' && text.trim().length > 2
+        );
+      });
 
       return result;
     } catch (error) {

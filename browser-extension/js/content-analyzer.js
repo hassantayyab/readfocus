@@ -6,7 +6,7 @@
 class ContentAnalyzer {
   constructor() {
     this.minContentLength = 100;
-    this.maxContentLength = 15000; // ~3000-4000 tokens for AI
+    this.maxContentLength = 25000; // Increased for comprehensive AI analysis (~5000-6000 tokens)
     this.cleaningRules = {
       removeElements: [
         'script',
@@ -270,8 +270,8 @@ class ContentAnalyzer {
       );
     }
 
-    // Add structure markers for better AI understanding
-    prepared = this.addStructureMarkers(prepared);
+    // Add enhanced structure markers for better AI understanding
+    prepared = this.addEnhancedStructureMarkers(prepared);
 
     return prepared;
   }
@@ -308,6 +308,93 @@ class ContentAnalyzer {
         return `[CONCLUSION] ${trimmed}`;
       }
 
+      return `[CONTENT] ${trimmed}`;
+    });
+
+    return markedParagraphs.join('\n\n');
+  }
+
+  /**
+   * Add enhanced structure markers to help AI understand content hierarchy and educational value
+   * @param {string} text - Text to enhance
+   * @returns {string} - Text with enhanced structure markers
+   */
+  addEnhancedStructureMarkers(text) {
+    // Split into paragraphs and identify different types
+    const paragraphs = text.split('\n\n').filter((p) => p.trim());
+
+    if (paragraphs.length <= 1) {
+      return text;
+    }
+
+    const markedParagraphs = paragraphs.map((paragraph, index) => {
+      const trimmed = paragraph.trim();
+
+      // Skip very short paragraphs (likely not content)
+      if (trimmed.length < 20) {
+        return trimmed;
+      }
+
+      // Identify headings (short, no periods, often capitalized)
+      if (
+        trimmed.length < 100 &&
+        !trimmed.includes('.') &&
+        (trimmed === trimmed.toUpperCase() || /^[A-Z][^.!?]*$/.test(trimmed))
+      ) {
+        return `[SECTION_HEADER] ${trimmed}`;
+      }
+
+      // First paragraph - often introduction
+      if (index === 0) {
+        return `[INTRODUCTION] ${trimmed}`;
+      }
+
+      // Last paragraph - often conclusion
+      if (index === paragraphs.length - 1) {
+        return `[CONCLUSION] ${trimmed}`;
+      }
+
+      // Identify key educational content patterns
+      if (
+        trimmed.includes('definition') ||
+        trimmed.includes('Definition') ||
+        trimmed.includes('means') ||
+        /^\s*\d+\.\s/.test(trimmed)
+      ) {
+        return `[KEY_CONCEPT] ${trimmed}`;
+      }
+
+      // Identify examples
+      if (
+        trimmed.includes('example') ||
+        trimmed.includes('Example') ||
+        trimmed.includes('instance') ||
+        trimmed.includes('case')
+      ) {
+        return `[EXAMPLE] ${trimmed}`;
+      }
+
+      // Identify important relationships or explanations
+      if (
+        trimmed.includes('because') ||
+        trimmed.includes('therefore') ||
+        trimmed.includes('however') ||
+        trimmed.includes('important')
+      ) {
+        return `[EXPLANATION] ${trimmed}`;
+      }
+
+      // Identify practical applications
+      if (
+        trimmed.includes('application') ||
+        trimmed.includes('practice') ||
+        trimmed.includes('implementation') ||
+        trimmed.includes('used')
+      ) {
+        return `[APPLICATION] ${trimmed}`;
+      }
+
+      // Default content marker
       return `[CONTENT] ${trimmed}`;
     });
 
