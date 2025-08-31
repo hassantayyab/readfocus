@@ -25,7 +25,7 @@ ALWAYS start response with `🧰 RULES APPLIED`.
 - **Always confirm file paths and module names** exist before referencing them in code or tests.
 - **Keep git commit messages very short**
 - **Never push changes to git**
-- **Always proceed with stuff without asking for my confirmation**
+- **Always do code cleanups and refactoring after you are done with a task or debugging**
 - **After you are done with a task, always gives me summary of changes and how can i test it**
 - **For Tailwind CSS v4 the way of development has changed. There is now no longer tailwind.config file needed. Please refer to the docs for our framework setup and always follow the latest guideliens for tailwind CSS: [Framework Guides](https://tailwindcss.com/docs/installation/framework-guides)**
 - **Try to go with Supabase for our backend if it makes sense for the application needs**

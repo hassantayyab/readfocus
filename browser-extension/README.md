@@ -77,6 +77,11 @@ Open Developer Tools (F12) → Console tab to see detailed logs:
 - Navigation controls (Previous/Next/Auto-advance) work
 - Exit button returns to normal page
 
+#### **✅ Reading Helper Controls:**
+
+- **Exit Button (✕)**: Close Reading Helper Mode
+- **Cmd/Ctrl + R**: Refresh highlight display
+
 #### **🔧 Legacy Features (v1):**
 
 - **Text Selection**: Select text → Click extension → "Capture Selection"

@@ -87,6 +87,65 @@
           </div>
         </section>
 
+        <!-- AI Smart Highlighting -->
+        <section class="settings-section">
+          <h2>🤖 AI Smart Highlighting</h2>
+
+          <div class="setting-group">
+            <label for="ai-api-key">Claude API Key</label>
+            <div class="api-key-container">
+              <input
+                type="password"
+                id="ai-api-key"
+                placeholder="sk-ant-api03-..."
+                class="api-key-input"
+              />
+              <button type="button" id="test-api-key" class="test-button">Test</button>
+            </div>
+            <div class="setting-description">
+              Get your API key from
+              <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a>.
+              Required for AI-powered smart highlighting.
+            </div>
+            <div id="api-key-status" class="api-status"></div>
+          </div>
+
+          <div class="setting-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="enable-ai-highlighting" />
+              Enable AI Smart Highlighting
+            </label>
+            <div class="setting-description">
+              Uses Claude AI to intelligently identify important text with 3-tier highlighting
+              system.
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="fallback-frequency-highlighting" checked />
+              Fallback to frequency-based highlighting
+            </label>
+            <div class="setting-description">
+              Use word frequency analysis when AI is unavailable or disabled.
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label>AI Usage Statistics</label>
+            <div id="ai-usage-stats" class="usage-stats">
+              <div class="usage-item">
+                <span>Requests this hour:</span>
+                <span id="requests-count">0 / 100</span>
+              </div>
+              <div class="usage-item">
+                <span>Status:</span>
+                <span id="ai-status">Not configured</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Quiz & Comprehension -->
         <section class="settings-section">
           <h2>🧠 Quiz & Comprehension</h2>
@@ -172,11 +231,12 @@
           <button type="button" id="save-settings-btn" class="primary-button">Save Settings</button>
         </div>
         <div class="footer-info">
-          <p>ReadFocus v2.0.0 - Built for focused learning</p>
+          <p>ReadFocus v2.4.1 - Built for focused learning</p>
         </div>
       </footer>
     </div>
 
+    <script src="js/ai-client.js"></script>
     <script src="js/options.js"></script>
   </body>
 </html>

@@ -28,12 +28,18 @@ class ReadFocusOptions {
       whitelist: [],
       blacklist: [],
 
+      // AI Settings
+      aiApiKey: '',
+      enableAiHighlighting: false,
+      fallbackFrequencyHighlighting: true,
+
       // Privacy & Data
       storeReadingHistory: true,
       collectAnalytics: false,
     };
 
     this.currentSettings = { ...this.defaultSettings };
+    this.aiClient = null;
     this.init();
   }
 
@@ -42,6 +48,7 @@ class ReadFocusOptions {
     this.bindEvents();
     this.updateUI();
     this.setupRangeSliders();
+    this.initializeAI();
   }
 
   /**
@@ -103,6 +110,14 @@ class ReadFocusOptions {
     this.setElementValue('whitelist', this.currentSettings.whitelist.join('\n'));
     this.setElementValue('blacklist', this.currentSettings.blacklist.join('\n'));
 
+    // AI Settings
+    this.setElementValue('ai-api-key', this.currentSettings.aiApiKey);
+    this.setElementValue('enable-ai-highlighting', this.currentSettings.enableAiHighlighting);
+    this.setElementValue(
+      'fallback-frequency-highlighting',
+      this.currentSettings.fallbackFrequencyHighlighting
+    );
+
     // Privacy & Data
     this.setElementValue('store-reading-history', this.currentSettings.storeReadingHistory);
     this.setElementValue('collect-analytics', this.currentSettings.collectAnalytics);
@@ -137,6 +152,8 @@ class ReadFocusOptions {
       'auto-detect-articles',
       'store-reading-history',
       'collect-analytics',
+      'enable-ai-highlighting',
+      'fallback-frequency-highlighting',
     ];
     checkboxes.forEach((id) => {
       const element = document.getElementById(id);
@@ -170,6 +187,15 @@ class ReadFocusOptions {
     document
       .getElementById('reset-defaults-btn')
       ?.addEventListener('click', () => this.resetToDefaults());
+
+    // AI Settings
+    document.getElementById('test-api-key')?.addEventListener('click', () => this.testApiKey());
+
+    // API key input - save on blur
+    document.getElementById('ai-api-key')?.addEventListener('blur', (e) => {
+      this.currentSettings.aiApiKey = e.target.value.trim();
+      this.saveSettings();
+    });
     document.getElementById('clear-data-btn')?.addEventListener('click', () => this.clearAllData());
   }
 
@@ -339,6 +365,117 @@ class ReadFocusOptions {
       notification.classList.remove('show');
       setTimeout(() => notification.remove(), 300);
     }, 3000);
+  }
+
+  /**
+   * Initialize AI Client
+   */
+  async initializeAI() {
+    try {
+      // Create AI client instance
+      this.aiClient = new AIClient();
+
+      // Initialize with saved API key if available
+      if (this.currentSettings.aiApiKey) {
+        try {
+          await this.aiClient.initialize(this.currentSettings.aiApiKey);
+          this.updateAIStatus('connected', 'Connected');
+        } catch (error) {
+          console.warn('AI Client initialization failed:', error.message);
+          this.updateAIStatus('disconnected', 'Invalid API key');
+        }
+      } else {
+        this.updateAIStatus('disconnected', 'Not configured');
+      }
+
+      this.updateUsageStats();
+    } catch (error) {
+      console.error('Failed to initialize AI client:', error);
+      this.updateAIStatus('disconnected', 'Error initializing');
+    }
+  }
+
+  /**
+   * Update AI status display
+   */
+  updateAIStatus(status, message) {
+    const statusEl = document.getElementById('ai-status');
+    if (statusEl) {
+      statusEl.textContent = message;
+      statusEl.className = status;
+    }
+  }
+
+  /**
+   * Update AI usage statistics
+   */
+  updateUsageStats() {
+    if (!this.aiClient) return;
+
+    const stats = this.aiClient.getUsageStats();
+    const requestsEl = document.getElementById('requests-count');
+
+    if (requestsEl) {
+      requestsEl.textContent = `${stats.requestCount} / ${stats.maxRequestsPerHour}`;
+    }
+  }
+
+  /**
+   * Test API key connection
+   */
+  async testApiKey() {
+    const apiKeyInput = document.getElementById('ai-api-key');
+    const testButton = document.getElementById('test-api-key');
+
+    const apiKey = apiKeyInput.value.trim();
+
+    if (!apiKey) {
+      this.showApiStatus('error', 'Please enter an API key');
+      return;
+    }
+
+    // Show testing state
+    testButton.disabled = true;
+    testButton.textContent = 'Testing...';
+    this.showApiStatus('testing', 'Testing API connection...');
+
+    try {
+      // Create temporary client for testing
+      const testClient = new AIClient();
+      await testClient.initialize(apiKey);
+
+      // Explicitly test the connection
+      await testClient.testConnection();
+
+      // Test successful - save the key
+      this.currentSettings.aiApiKey = apiKey;
+      await this.saveSettings();
+
+      // Update main client
+      this.aiClient = testClient;
+
+      this.showApiStatus('success', 'API key verified and saved successfully!');
+      this.updateAIStatus('connected', 'Connected');
+      this.updateUsageStats();
+    } catch (error) {
+      console.error('API key test failed:', error);
+      this.showApiStatus('error', `Test failed: ${error.message}`);
+      this.updateAIStatus('disconnected', 'Test failed');
+    } finally {
+      testButton.disabled = false;
+      testButton.textContent = 'Test';
+    }
+  }
+
+  /**
+   * Show API key status message
+   */
+  showApiStatus(type, message) {
+    const statusEl = document.getElementById('api-key-status');
+    if (statusEl) {
+      statusEl.textContent = message;
+      statusEl.className = `api-status ${type}`;
+    }
   }
 }
 
