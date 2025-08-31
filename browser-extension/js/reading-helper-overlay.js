@@ -12,7 +12,6 @@ try {
       this.settings = {};
       this.pageAnalysis = null;
       this.controlPanel = null;
-      this.highlightedWords = [];
       this.contentAnalyzer = null;
       this.aiClient = null;
 
@@ -20,128 +19,7 @@ try {
       this.aiCache = null; // Will be loaded from chrome.storage
       this.currentContentHash = null;
 
-      this.stopWords = new Set([
-        'the',
-        'a',
-        'an',
-        'and',
-        'or',
-        'but',
-        'in',
-        'on',
-        'at',
-        'to',
-        'for',
-        'of',
-        'with',
-        'by',
-        'is',
-        'are',
-        'was',
-        'were',
-        'be',
-        'been',
-        'being',
-        'have',
-        'has',
-        'had',
-        'do',
-        'does',
-        'did',
-        'will',
-        'would',
-        'could',
-        'should',
-        'may',
-        'might',
-        'can',
-        'shall',
-        'must',
-        'ought',
-        'this',
-        'that',
-        'these',
-        'those',
-        'i',
-        'you',
-        'he',
-        'she',
-        'it',
-        'we',
-        'they',
-        'me',
-        'him',
-        'her',
-        'us',
-        'them',
-        'my',
-        'your',
-        'his',
-        'its',
-        'our',
-        'their',
-        'myself',
-        'yourself',
-        'himself',
-        'herself',
-        'itself',
-        'ourselves',
-        'themselves',
-        'what',
-        'which',
-        'who',
-        'whom',
-        'whose',
-        'where',
-        'when',
-        'why',
-        'how',
-        'all',
-        'any',
-        'both',
-        'each',
-        'few',
-        'more',
-        'most',
-        'other',
-        'some',
-        'such',
-        'no',
-        'nor',
-        'not',
-        'only',
-        'own',
-        'same',
-        'so',
-        'than',
-        'too',
-        'very',
-        'just',
-        'now',
-        'then',
-        'here',
-        'there',
-        'up',
-        'down',
-        'out',
-        'off',
-        'over',
-        'under',
-        'again',
-        'further',
-        'once',
-        'because',
-        'if',
-        'until',
-        'while',
-        'during',
-        'before',
-        'after',
-        'above',
-        'below',
-        'between',
-        'through',
-      ]);
+      // Purely AI-dependent highlighting system
     }
 
     // Main activation method
@@ -345,6 +223,53 @@ try {
       }, 3000);
     }
 
+    // Show AI error message when highlighting fails
+    showAIErrorMessage() {
+      // Create error notification
+      const notification = document.createElement('div');
+      notification.className = 'rf-ai-error-notification';
+      notification.innerHTML = `
+        <div style="font-weight: 600; margin-bottom: 4px;">🤖 AI Highlighting Failed</div>
+        <div style="font-size: 12px;">Check your API key and network connection</div>
+      `;
+
+      // Style the notification
+      Object.assign(notification.style, {
+        position: 'fixed',
+        top: '80px',
+        right: '20px',
+        background: '#ef4444',
+        color: 'white',
+        padding: '12px 16px',
+        borderRadius: '8px',
+        fontSize: '14px',
+        fontWeight: '500',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        zIndex: '100000',
+        opacity: '0',
+        transition: 'opacity 0.3s ease',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        maxWidth: '280px',
+      });
+
+      document.body.appendChild(notification);
+
+      // Fade in
+      setTimeout(() => {
+        notification.style.opacity = '1';
+      }, 10);
+
+      // Fade out and remove after 5 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 5000);
+    }
+
     // Process content and apply appropriate highlighting method
     async processAndHighlight() {
       const content = this.pageAnalysis?.mainContent;
@@ -423,14 +348,14 @@ try {
           }
         }
 
-        // Fall back to frequency-based highlighting
-        if (this.settings.fallbackFrequencyHighlighting !== false) {
-          console.log('📊 [ReadingHelper] Using frequency-based highlighting fallback');
-          this.fallbackToFrequencyHighlighting(content);
-        }
+        // No fallback - purely AI-dependent highlighting
+        console.error('❌ [ReadingHelper] AI highlighting failed - no fallback available');
+        console.error('💡 [ReadingHelper] Try: Check API key, network connection, or clear cache');
+        this.showAIErrorMessage();
       } catch (error) {
         console.error('❌ [ReadingHelper] Error in processAndHighlight:', error);
-        this.fallbackToFrequencyHighlighting(content);
+        console.error('💡 [ReadingHelper] Pure AI mode - no fallback available');
+        this.showAIErrorMessage();
       }
     }
 
@@ -622,188 +547,7 @@ try {
       );
     }
 
-    // Fallback to original frequency-based highlighting
-    fallbackToFrequencyHighlighting(content) {
-      console.log(`🎯 [ReadingHelper] Using frequency-based highlighting...`);
-
-      const importantWords = this.extractImportantWords(content.textContent);
-      console.log(
-        `🔍 [ReadingHelper] Found ${importantWords.length} important words:`,
-        importantWords
-      );
-
-      if (importantWords.length > 0) {
-        this.applyHighlightsToDocument(importantWords);
-        this.highlightedWords = importantWords;
-      }
-    }
-
-    // Extract important words using enhanced frequency analysis
-    extractImportantWords(text) {
-      // Clean and split text with better filtering
-      const words = text
-        .toLowerCase()
-        .replace(/[^\w\s]/g, ' ')
-        .split(/\s+/)
-        .filter((word) => {
-          // More comprehensive filtering
-          const isValidLength = word.length >= 3 && word.length <= 20; // Reasonable word length
-          const isNotStopWord = !this.stopWords.has(word);
-          const hasLetters = /[a-z]/.test(word); // Must contain letters
-          const notNumber = !/^\d+$/.test(word); // Not pure numbers
-          const notCommonWeb = !['http', 'https', 'www', 'com', 'org', 'net'].includes(word); // Not web artifacts
-
-          return isValidLength && isNotStopWord && hasLetters && notNumber && notCommonWeb;
-        });
-
-      // Count frequency with additional scoring
-      const wordCount = {};
-      const wordPositions = {};
-      const sentences = text.split(/[.!?]+/);
-
-      words.forEach((word, index) => {
-        if (!wordCount[word]) {
-          wordCount[word] = 0;
-          wordPositions[word] = [];
-        }
-        wordCount[word]++;
-        wordPositions[word].push(index);
-      });
-
-      // Calculate importance score for each word
-      const wordScores = Object.entries(wordCount).map(([word, count]) => {
-        let score = count; // Base frequency score
-
-        // Bonus for words appearing in different sentences (distribution)
-        const uniqueSentences = new Set();
-        wordPositions[word].forEach((pos) => {
-          // Estimate which sentence this position is in
-          const sentenceIndex = Math.floor(pos / 15); // Rough estimate
-          uniqueSentences.add(sentenceIndex);
-        });
-        score += uniqueSentences.size * 0.5; // Distribution bonus
-
-        // Bonus for academic/technical words
-        const academicWords = [
-          'theory',
-          'method',
-          'process',
-          'system',
-          'analysis',
-          'approach',
-          'concept',
-          'framework',
-          'model',
-          'study',
-        ];
-        if (academicWords.some((academic) => word.includes(academic))) {
-          score += 2;
-        }
-
-        // Length bonus (slightly longer words tend to be more important)
-        if (word.length >= 6 && word.length <= 12) {
-          score += 0.3;
-        }
-
-        return { word, score, count };
-      });
-
-      // Sort by score and take top 40 (increased from 25)
-      return wordScores
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 40)
-        .map((item) => item.word);
-    }
-
-    // Apply highlights directly to live document elements
-    applyHighlightsToDocument(importantWords) {
-      try {
-        // Find article elements directly in the live document
-        const articleElements = document.querySelectorAll(
-          'article, section, [data-selectable-paragraph], .post-content, .entry-content, main'
-        );
-
-        let highlightCount = 0;
-
-        articleElements.forEach((element) => {
-          // Skip if element is too small or contains mostly images/figures
-          if (element.textContent && element.textContent.length > 1000) {
-            // Skip image/figure containers
-            if (this.isImageOrFigureContainer(element)) {
-              return;
-            }
-
-            // Use TreeWalker to find only text nodes (not HTML)
-            const walker = document.createTreeWalker(
-              element,
-              NodeFilter.SHOW_TEXT,
-              {
-                acceptNode: function (node) {
-                  // Skip text nodes inside script, style, or other non-content elements
-                  const parent = node.parentElement;
-                  if (!parent) return NodeFilter.FILTER_REJECT;
-
-                  const tagName = parent.tagName.toLowerCase();
-                  if (
-                    ['script', 'style', 'noscript', 'iframe', 'object', 'embed'].includes(tagName)
-                  ) {
-                    return NodeFilter.FILTER_REJECT;
-                  }
-
-                  // Skip if text is too short or just whitespace
-                  if (!node.textContent || node.textContent.trim().length < 3) {
-                    return NodeFilter.FILTER_REJECT;
-                  }
-
-                  return NodeFilter.FILTER_ACCEPT;
-                },
-              },
-              false
-            );
-
-            const textNodes = [];
-            let node;
-            while ((node = walker.nextNode())) {
-              textNodes.push(node);
-            }
-
-            // Process each text node safely
-            textNodes.forEach((textNode) => {
-              let text = textNode.textContent;
-              let hasMatch = false;
-
-              importantWords.forEach((word) => {
-                const regex = new RegExp(`\\b(${word})\\b`, 'gi');
-                if (regex.test(text)) {
-                  hasMatch = true;
-                  text = text.replace(regex, (match) => {
-                    highlightCount++;
-                    return `<span class="rf-keyword-highlight">${match}</span>`;
-                  });
-                }
-              });
-
-              // Only update if we found matches
-              if (hasMatch) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = text;
-
-                // Replace the text node with highlighted content
-                const parent = textNode.parentNode;
-                while (tempDiv.firstChild) {
-                  parent.insertBefore(tempDiv.firstChild, textNode);
-                }
-                parent.removeChild(textNode);
-              }
-            });
-          }
-        });
-
-        console.log(`✅ [ReadingHelper] Applied ${highlightCount} highlights to article`);
-      } catch (error) {
-        console.error(`❌ [ReadingHelper] Error applying highlights:`, error);
-      }
-    }
+    // Removed frequency-based highlighting methods - now purely AI-dependent
 
     // Check if element is primarily image/figure content
     isImageOrFigureContainer(element) {
@@ -828,9 +572,7 @@ try {
       const isAIMode = this.aiClient && this.settings.enableAiHighlighting;
 
       // Get highlight count based on mode
-      const highlightInfo = isAIMode
-        ? 'AI Smart Highlights'
-        : `${this.highlightedWords.length} words highlighted`;
+      const highlightInfo = isAIMode ? 'AI Smart Highlights' : 'AI Required';
 
       this.controlPanel.innerHTML = `
         <div class="rf-panel-header">
