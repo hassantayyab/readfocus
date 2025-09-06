@@ -25,6 +25,10 @@ class ReadFocusContentScript {
     this.pageAnalysis = null;
     this.settings = {};
     this.isExtensionUrl = false;
+    
+    // Summary service integration
+    this.summaryService = null;
+    this.summaryOverlay = null;
 
     // Listen for deactivation messages from overlays
     window.addEventListener('message', (event) => {
@@ -237,6 +241,26 @@ class ReadFocusContentScript {
           if (this.focusMode?.isActive) {
             this.focusMode.updateSettings(this.settings);
           }
+          sendResponse({ success: true });
+          break;
+
+        case 'GENERATE_SUMMARY':
+          const summaryResult = await this.generateContentSummary(request.options);
+          sendResponse(summaryResult);
+          break;
+
+        case 'SHOW_SUMMARY':
+          const showResult = await this.showSummaryOverlay(request.summaryData);
+          sendResponse(showResult);
+          break;
+
+        case 'REGENERATE_SUMMARY':
+          const regenResult = await this.regenerateContentSummary();
+          sendResponse(regenResult);
+          break;
+
+        case 'HIDE_SUMMARY':
+          this.hideSummaryOverlay();
           sendResponse({ success: true });
           break;
 
@@ -1770,6 +1794,220 @@ class ReadFocusContentScript {
         }
       }, 300);
     }, 3000);
+  }
+
+  /**
+   * Initialize summary service
+   */
+  async initializeSummaryService() {
+    try {
+      console.log('📄 [ContentScript] Initializing summary service...');
+
+      if (!window.ContentSummaryService) {
+        console.error('❌ [ContentScript] ContentSummaryService not available');
+        return false;
+      }
+
+      this.summaryService = new ContentSummaryService();
+
+      // Get API key from settings
+      let apiKey = null;
+      try {
+        // Try multiple storage locations for API key
+        let result = await chrome.storage.sync.get(['readfocusSettings']);
+        if (result.readfocusSettings?.aiApiKey) {
+          apiKey = result.readfocusSettings.aiApiKey;
+        }
+
+        if (!apiKey) {
+          result = await chrome.storage.local.get(['claude_api_key']);
+          apiKey = result.claude_api_key;
+        }
+
+        if (!apiKey) {
+          result = await chrome.storage.sync.get(['claude_api_key']);
+          apiKey = result.claude_api_key;
+        }
+      } catch (error) {
+        console.warn('⚠️ [ContentScript] Could not get API key from storage:', error);
+      }
+
+      if (!apiKey) {
+        throw new Error('API key not configured. Please set up your Claude API key in extension settings.');
+      }
+
+      // Initialize the service
+      await this.summaryService.initialize(apiKey);
+      console.log('✅ [ContentScript] Summary service initialized successfully');
+
+      return true;
+    } catch (error) {
+      console.error('❌ [ContentScript] Failed to initialize summary service:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Generate content summary
+   * @param {Object} options - Summary generation options
+   * @returns {Object} - Summary result
+   */
+  async generateContentSummary(options = {}) {
+    try {
+      console.log('📄 [ContentScript] Generating content summary...');
+
+      // Initialize summary service if needed
+      if (!this.summaryService) {
+        const initialized = await this.initializeSummaryService();
+        if (!initialized) {
+          throw new Error('Failed to initialize summary service');
+        }
+      }
+
+      // Generate summary
+      const summaryResult = await this.summaryService.generateSummary(options);
+
+      if (summaryResult.success) {
+        console.log('✅ [ContentScript] Summary generated successfully');
+        this.showNotification('Content summary generated!', 'success');
+      } else {
+        throw new Error(summaryResult.error || 'Summary generation failed');
+      }
+
+      return summaryResult;
+
+    } catch (error) {
+      console.error('❌ [ContentScript] Failed to generate summary:', error);
+      this.showNotification('Failed to generate summary', 'error');
+      
+      return {
+        success: false,
+        error: error.message,
+        timestamp: Date.now()
+      };
+    }
+  }
+
+  /**
+   * Show summary overlay with given data
+   * @param {Object} summaryData - Summary data to display
+   * @returns {Object} - Show result
+   */
+  async showSummaryOverlay(summaryData = null) {
+    try {
+      console.log('📄 [ContentScript] Showing summary overlay...');
+
+      // Initialize summary overlay if needed
+      if (!this.summaryOverlay) {
+        if (!window.SummaryOverlay) {
+          console.error('❌ [ContentScript] SummaryOverlay not available');
+          throw new Error('Summary overlay component not loaded');
+        }
+
+        this.summaryOverlay = new SummaryOverlay();
+      }
+
+      // If no data provided, try to get current summary
+      if (!summaryData) {
+        if (this.summaryService) {
+          summaryData = this.summaryService.getCurrentSummary();
+        }
+
+        if (!summaryData) {
+          // Generate new summary
+          console.log('📄 [ContentScript] No summary data available, generating new summary...');
+          const generateResult = await this.generateContentSummary();
+          if (generateResult.success) {
+            summaryData = generateResult;
+          } else {
+            throw new Error('Failed to generate summary for display');
+          }
+        }
+      }
+
+      // Show the overlay
+      await this.summaryOverlay.show(summaryData);
+      console.log('✅ [ContentScript] Summary overlay displayed');
+
+      return { success: true };
+
+    } catch (error) {
+      console.error('❌ [ContentScript] Failed to show summary overlay:', error);
+      this.showNotification(`Failed to show summary: ${error.message}`, 'error');
+      
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Hide summary overlay
+   */
+  hideSummaryOverlay() {
+    if (this.summaryOverlay) {
+      this.summaryOverlay.hide();
+      console.log('📄 [ContentScript] Summary overlay hidden');
+    }
+  }
+
+  /**
+   * Regenerate content summary with new options
+   * @param {Object} options - New summary options
+   * @returns {Object} - Regeneration result
+   */
+  async regenerateContentSummary(options = {}) {
+    try {
+      console.log('📄 [ContentScript] Regenerating content summary...');
+
+      // Clear cache if summary service exists
+      if (this.summaryService) {
+        this.summaryService.clearCache();
+      }
+
+      // Generate new summary
+      const summaryResult = await this.generateContentSummary({
+        ...options,
+        forceRegenerate: true
+      });
+
+      if (summaryResult.success) {
+        // Update overlay if it's currently showing
+        if (this.summaryOverlay && this.summaryOverlay.isShowing()) {
+          await this.summaryOverlay.show(summaryResult);
+        }
+
+        return {
+          success: true,
+          summary: summaryResult
+        };
+      } else {
+        throw new Error(summaryResult.error);
+      }
+
+    } catch (error) {
+      console.error('❌ [ContentScript] Failed to regenerate summary:', error);
+      this.showNotification('Failed to regenerate summary', 'error');
+      
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Get summary service status
+   * @returns {Object} - Service status
+   */
+  getSummaryStatus() {
+    return {
+      serviceInitialized: !!this.summaryService,
+      overlayInitialized: !!this.summaryOverlay,
+      overlayVisible: this.summaryOverlay?.isShowing() || false,
+      serviceStatus: this.summaryService?.getStatus() || null
+    };
   }
 }
 

@@ -390,6 +390,15 @@ class ReadFocusPopup {
       this.captureArticle();
     });
 
+    // Summary buttons
+    document.getElementById('generate-summary')?.addEventListener('click', () => {
+      this.generateSummary();
+    });
+
+    document.getElementById('show-summary')?.addEventListener('click', () => {
+      this.showSummary();
+    });
+
     // Keyboard shortcuts info
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.id === 'start-reading-mode') {
@@ -651,6 +660,114 @@ class ReadFocusPopup {
     setTimeout(() => {
       messageElement.classList.remove('show');
     }, 3000);
+  }
+
+  /**
+   * Generate content summary
+   */
+  async generateSummary() {
+    try {
+      this.updateSummaryStatus('processing', 'Generating...');
+      console.log('📄 [Popup] Generating content summary...');
+
+      // Execute content script and generate summary
+      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
+        type: 'GENERATE_SUMMARY',
+        options: {
+          includeKeyPoints: true,
+          includeQuickSummary: true,
+          includeDetailedSummary: true,
+          includeActionItems: true,
+          maxLength: 'medium'
+        }
+      });
+
+      if (response && response.success) {
+        this.updateSummaryStatus('completed', 'Ready');
+        this.showSuccess('Summary generated successfully!');
+        
+        // Show the "Show Summary" button
+        document.getElementById('show-summary').style.display = 'flex';
+        
+        // Automatically show the summary
+        setTimeout(() => this.showSummary(), 500);
+      } else {
+        throw new Error(response?.error || 'Failed to generate summary');
+      }
+
+    } catch (error) {
+      console.error('❌ [Popup] Error generating summary:', error);
+      this.updateSummaryStatus('error', 'Failed');
+      this.showError(`Summary generation failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Show existing summary overlay
+   */
+  async showSummary() {
+    try {
+      console.log('📄 [Popup] Showing summary overlay...');
+
+      // Execute content script to show summary
+      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
+        type: 'SHOW_SUMMARY'
+      });
+
+      if (response && response.success) {
+        this.showSuccess('Summary overlay displayed!');
+        // Close popup after showing summary
+        setTimeout(() => window.close(), 500);
+      } else {
+        throw new Error(response?.error || 'Failed to show summary');
+      }
+
+    } catch (error) {
+      console.error('❌ [Popup] Error showing summary:', error);
+      this.showError(`Failed to show summary: ${error.message}`);
+    }
+  }
+
+  /**
+   * Update summary status indicator
+   * @param {string} status - Status type (processing, completed, error, ready)
+   * @param {string} text - Status text to display
+   */
+  updateSummaryStatus(status, text) {
+    const statusElement = document.getElementById('summary-status');
+    if (statusElement) {
+      statusElement.className = `summary-status ${status}`;
+      statusElement.textContent = text;
+    }
+
+    // Update button states based on status
+    const generateBtn = document.getElementById('generate-summary');
+    const showBtn = document.getElementById('show-summary');
+
+    if (generateBtn) {
+      generateBtn.disabled = status === 'processing';
+      generateBtn.innerHTML = status === 'processing' 
+        ? '<span class="button-icon">⏳</span>Generating...'
+        : '<span class="button-icon">⚡</span>Generate Summary';
+    }
+
+    // Show/hide the show button based on status
+    if (showBtn) {
+      showBtn.style.display = (status === 'completed' || status === 'ready') ? 'flex' : 'none';
+    }
+  }
+
+  /**
+   * Check if summary is available for current page
+   */
+  async checkSummaryStatus() {
+    try {
+      // This could be extended to check if a summary already exists
+      // For now, we'll assume no summary exists initially
+      this.updateSummaryStatus('ready', 'Ready');
+    } catch (error) {
+      console.error('❌ [Popup] Error checking summary status:', error);
+    }
   }
 }
 
