@@ -50,7 +50,7 @@ class EnhancedSummaryOverlay {
             <div class="rf-tab-bar">
               <button class="rf-tab active" data-tab="quick">⚡ Quick</button>
               <button class="rf-tab" data-tab="detailed">📖 Detailed</button>
-              <button class="rf-tab" data-tab="eli12">👶 ELI12</button>
+              <button class="rf-tab" data-tab="eli15">👶 ELI15</button>
               <button class="rf-tab" data-tab="concepts">📚 Concepts</button>
               <button class="rf-tab" data-tab="actions">✅ Actions</button>
             </div>
@@ -70,7 +70,7 @@ class EnhancedSummaryOverlay {
                 </div>
               </div>
               
-              <div class="rf-tab-panel" id="rf-eli12">
+              <div class="rf-tab-panel" id="rf-eli15">
                 <div class="rf-content-loading">
                   <div class="rf-spinner"></div>
                   <p>Creating simple explanation...</p>
@@ -322,13 +322,13 @@ class EnhancedSummaryOverlay {
         font-size: 14px;
       }
 
-      .rf-eli12-content {
+      .rf-eli15-content {
         font-size: 16px;
         line-height: 1.8;
         color: #374151;
       }
 
-      .rf-eli12-content p {
+      .rf-eli15-content p {
         margin-bottom: 20px;
       }
 
@@ -402,7 +402,7 @@ class EnhancedSummaryOverlay {
         const num = parseInt(e.key)
         if (num >= 1 && num <= 5) {
           e.preventDefault()
-          const tabMap = ['quick', 'detailed', 'eli12', 'concepts', 'actions']
+          const tabMap = ['quick', 'detailed', 'eli15', 'concepts', 'actions']
           this.switchTab(tabMap[num - 1])
         }
       }
@@ -499,12 +499,12 @@ class EnhancedSummaryOverlay {
       `
     }
 
-    // Populate ELI12 Summary
-    const eli12Panel = this.overlay.querySelector('#rf-eli12') as HTMLElement
-    if (eli12Panel && data.eliSummary) {
-      eli12Panel.innerHTML = `
-        <div class="rf-eli12-content">
-          <h2>👶 Explain Like I'm 12</h2>
+    // Populate ELI15 Summary
+    const eli15Panel = this.overlay.querySelector('#rf-eli15') as HTMLElement
+    if (eli15Panel && data.eliSummary) {
+      eli15Panel.innerHTML = `
+        <div class="rf-eli15-content">
+          <h2>👶 Explain Like I'm 15</h2>
           <div>${data.eliSummary}</div>
         </div>
       `

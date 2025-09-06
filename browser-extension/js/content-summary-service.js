@@ -203,7 +203,7 @@ RESPONSE FORMAT - Return a JSON object with the following structure:
     "markdown": "# Content Overview\n\nComprehensive markdown-formatted summary with:\n\n## Key Findings\n- Main discovery or argument\n- Supporting evidence\n\n## Context & Background\nRelevant background information\n\n## Implications\n- What this means\n- Why it matters\n\n## Conclusion\nFinal thoughts and takeaways",
     "reading_time": "3-5 minutes"
   },
-  "eliSummary": "Ultra-simplified explanation that a 12-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
+  "eliSummary": "Ultra-simplified explanation that a 15-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
   "conceptDictionary": [
     {
       "term": "technical term 1",
@@ -247,7 +247,7 @@ ${includeDetailedSummary ? `✅ Include DETAILED_SUMMARY: Comprehensive markdown
 ${includeKeyPoints ? '✅ Include KEY_POINTS: 3-6 bullet points of most important information' : '❌ Skip key points'}
 ${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways and next steps' : '❌ Skip action items'}
 
-✅ ALWAYS Include ELI_SUMMARY: Ultra-simplified explanation that a 12-year-old could understand:
+✅ ALWAYS Include ELI_SUMMARY: Ultra-simplified explanation that a 15-year-old could understand:
    - Use analogies and everyday examples
    - Avoid all jargon and technical terms
    - Compare complex concepts to familiar things (like comparing databases to filing cabinets)
@@ -299,7 +299,7 @@ Return only the JSON object, no additional text.`;
           text: summary.detailed_summary.text || summary.detailed_summary.markdown || 'Detailed summary not available',
           markdown: summary.detailed_summary.markdown || summary.detailed_summary.text || 'Detailed summary not available'
         } : null,
-        eliSummary: summary.eliSummary || summary.eli_summary || 'ELI12 summary not available',
+        eliSummary: summary.eliSummary || summary.eli_summary || 'ELI15 summary not available',
         conceptDictionary: Array.isArray(summary.conceptDictionary) ? summary.conceptDictionary : 
                           Array.isArray(summary.concept_dictionary) ? summary.concept_dictionary : [],
         keyPoints: Array.isArray(summary.key_points) ? summary.key_points : [],

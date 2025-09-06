@@ -78,10 +78,10 @@ function IndexPopup(): JSX.Element {
       <div className="feature-header">
         <h3>🧠 Enhanced AI Analysis</h3>
         <p className="feature-description">
-          Get intelligent summaries with simplified explanations, concept definitions, and ELI12 mode
+          Get intelligent summaries with simplified explanations, concept definitions, and ELI15 mode
         </p>
         <div className="feature-badges">
-          <span className="badge">👶 ELI12 Mode</span>
+          <span className="badge">👶 ELI15 Mode</span>
           <span className="badge">📚 Concept Dictionary</span>
           <span className="badge">💡 Analogies</span>
         </div>
@@ -134,7 +134,7 @@ function IndexPopup(): JSX.Element {
           <li>Navigate to any article or webpage</li>
           <li>Click "Summarize" to analyze content</li>
           <li>View different summary formats in the overlay</li>
-          <li>Use <kbd>Ctrl/Cmd+1-4</kbd> to switch between tabs</li>
+          <li>Use <kbd>Ctrl/Cmd+1-6</kbd> to switch between tabs</li>
         </ul>
       </div>
 

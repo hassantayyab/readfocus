@@ -86,10 +86,10 @@
 
 - [x] **Easy Explanation Mode**: Break down complex concepts into simple, everyday language with analogies and examples
 - [x] **Concept Dictionary**: Automatically detect and explain technical terms, jargon, and complex concepts inline
-- [x] **ELI12 (Explain Like I'm 12) Summaries**: Ultra-simplified versions that anyone can understand
+- [x] **ELI15 (Explain Like I'm 15) Summaries**: Ultra-simplified versions that anyone can understand
 - [x] **Difficulty Level Indicator**: Show content difficulty (Beginner, Intermediate, Advanced)
 - [x] **Enhanced AI Prompts**: Educational focus with simplified explanations and analogies
-- [x] **5-Tab Summary Interface**: Quick, Detailed, ELI12, Concepts, and Actions tabs
+- [x] **5-Tab Summary Interface**: Quick, Detailed, ELI15, Concepts, and Actions tabs
 - [x] **Feature Badges in Popup**: Visual indicators showcasing new Phase 1 capabilities
 
 **Remaining Features for Future Phases:**
@@ -106,7 +106,7 @@
 - [x] TypeScript interfaces for new summary data structures (ConceptDefinition, eliSummary, etc.)
 - [x] 5-tab overlay interface with markdown rendering for detailed summaries
 - [x] Concept dictionary with term definitions, analogies, and examples
-- [x] Multi-level complexity adaptation (Expert → Intermediate → Beginner → ELI12)
+- [x] Multi-level complexity adaptation (Expert → Intermediate → Beginner → ELI15)
 - [x] Feature badges and enhanced popup UI
 
 **Discovered During Work:**
@@ -128,7 +128,7 @@
 - [ ] **Project-Based Organization**: Create folders/projects to group related summaries (Research Projects, Work Topics, Learning Goals)
 - [ ] **Smart Collections**: Automatically group summaries by topic, date, or content type
 - [ ] **Custom Lists & Labels**: Create custom organizational systems (Reading List, To Review, Favorites, Archive)
-- [ ] **Custom Summary Styles**: User-defined templates (Academic, Business, Casual, Technical, ELI5)
+- [ ] **Custom Summary Styles**: User-defined templates (Academic, Business, Casual, Technical, ELI15)
 - [ ] **Favorite Topics Tracking**: Learn user interests and adapt summary focus
 - [ ] **Summary Comparison**: Compare summaries of different articles on same topic
 - [ ] **Export Options**: Export summaries to Notion, Google Docs, Markdown files
@@ -323,7 +323,7 @@
 1. **Summary History Dashboard** - View all previously generated summaries in organized list
 2. **Personal Summary Library** - Tag, organize, and search through saved summaries  
 3. **Project-Based Organization** - Create folders/projects to group related summaries
-4. **Custom Summary Styles** - User-defined templates (Academic, Business, Casual, Technical, ELI5)
+4. **Custom Summary Styles** - User-defined templates (Academic, Business, Casual, Technical, ELI15)
 5. **Export Options** - Export summaries to Notion, Google Docs, Markdown files
 
 ---

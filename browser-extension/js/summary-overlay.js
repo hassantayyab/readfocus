@@ -124,8 +124,8 @@ class SummaryOverlay {
           <button class="rf-summary-tab ${this.activeTab === 'detailed' ? 'active' : ''}" data-tab="detailed">
             <span class="rf-tab-icon">📖</span>Detailed
           </button>
-          <button class="rf-summary-tab ${this.activeTab === 'eli12' ? 'active' : ''}" data-tab="eli12">
-            <span class="rf-tab-icon">👶</span>ELI12
+          <button class="rf-summary-tab ${this.activeTab === 'eli15' ? 'active' : ''}" data-tab="eli15">
+            <span class="rf-tab-icon">👶</span>ELI15
           </button>
           <button class="rf-summary-tab ${this.activeTab === 'concepts' ? 'active' : ''}" data-tab="concepts">
             <span class="rf-tab-icon">📚</span>Concepts
@@ -175,8 +175,8 @@ class SummaryOverlay {
         return this.buildQuickSummaryTab();
       case 'detailed':
         return this.buildDetailedSummaryTab();
-      case 'eli12':
-        return this.buildELI12Tab();
+      case 'eli15':
+        return this.buildELI15Tab();
       case 'concepts':
         return this.buildConceptsTab();
       case 'points':
@@ -302,24 +302,24 @@ class SummaryOverlay {
   }
 
   /**
-   * Build ELI12 (Explain Like I'm 12) summary tab
-   * @returns {string} - ELI12 summary HTML
+   * Build ELI15 (Explain Like I'm 15) summary tab
+   * @returns {string} - ELI15 summary HTML
    */
-  buildELI12Tab() {
+  buildELI15Tab() {
     const eliSummary = this.currentSummary.eliSummary;
     
     if (!eliSummary) {
-      return '<div class="rf-summary-empty">ELI12 summary not available</div>';
+      return '<div class="rf-summary-empty">ELI15 summary not available</div>';
     }
 
     return `
-      <div class="rf-tab-content rf-tab-eli12">
-        <div class="rf-eli12-summary">
-          <div class="rf-eli12-header">
-            <span class="rf-eli12-icon">👶</span>
+      <div class="rf-tab-content rf-tab-eli15">
+        <div class="rf-eli15-summary">
+          <div class="rf-eli15-header">
+            <span class="rf-eli15-icon">👶</span>
             <h4>Super Simple Explanation</h4>
           </div>
-          <div class="rf-eli12-text">
+          <div class="rf-eli15-text">
             ${eliSummary}
           </div>
         </div>
@@ -528,7 +528,7 @@ class SummaryOverlay {
         break;
       case '3':
         if (e.ctrlKey || e.metaKey) {
-          this.switchTab('eli12');
+          this.switchTab('eli15');
           e.preventDefault();
         }
         break;
@@ -1276,15 +1276,15 @@ class SummaryOverlay {
         }
       }
       
-      /* ELI12 Tab Styles */
-      .rf-eli12-summary {
+      /* ELI15 Tab Styles */
+      .rf-eli15-summary {
         background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
         border-radius: 12px;
         padding: 24px;
         border: 2px solid #bae6fd;
       }
       
-      .rf-eli12-header {
+      .rf-eli15-header {
         display: flex;
         align-items: center;
         gap: 12px;
@@ -1293,19 +1293,19 @@ class SummaryOverlay {
         border-bottom: 2px solid #7dd3fc;
       }
       
-      .rf-eli12-header h4 {
+      .rf-eli15-header h4 {
         margin: 0;
         color: #0c4a6e;
         font-size: 18px;
         font-weight: 600;
       }
       
-      .rf-eli12-icon {
+      .rf-eli15-icon {
         font-size: 24px;
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
       }
       
-      .rf-eli12-text {
+      .rf-eli15-text {
         font-size: 16px;
         line-height: 1.8;
         color: #0c4a6e;

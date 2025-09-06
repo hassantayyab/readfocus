@@ -20,7 +20,7 @@ interface SummaryResult {
   detailedSummary?: string
   keyPoints?: string[]
   actionItems?: string[]
-  eliSummary?: string  // ELI12 ultra-simplified summary
+  eliSummary?: string  // ELI15 ultra-simplified summary
   conceptDictionary?: ConceptDefinition[]  // Technical terms explained
   difficultyLevel?: 'beginner' | 'intermediate' | 'advanced'
   error?: string
@@ -215,7 +215,7 @@ Please provide a JSON response with the following structure:
   "detailedSummary": "Comprehensive markdown-formatted analysis with clear sections, bullet points, and insights. Use analogies and examples to explain complex concepts.",
   "keyPoints": ["key point 1 with simple explanation", "key point 2 with simple explanation", "key point 3 with simple explanation"],
   "actionItems": ["actionable item 1", "actionable item 2"],
-  "eliSummary": "Ultra-simplified explanation that a 12-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
+  "eliSummary": "Ultra-simplified explanation that a 15-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
   "conceptDictionary": [
     {
       "term": "technical term 1",
@@ -231,7 +231,7 @@ Key instructions:
 - Make everything accessible and easy to understand
 - Use analogies and examples for complex concepts
 - Identify and explain technical terms that might confuse readers
-- The ELI12 summary should avoid all jargon and use simple comparisons
+- The ELI15 summary should avoid all jargon and use simple comparisons
 - Focus on helping people actually understand, not just summarize`
   }
 

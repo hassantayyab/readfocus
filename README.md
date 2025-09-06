@@ -38,7 +38,7 @@ Transform information overload into knowledge advantage. Help users understand a
 
 - **🎓 Easy Explanation Mode**: Break down complex concepts with analogies
 - **📚 Concept Dictionary**: Auto-detect and explain technical terms
-- **👶 ELI12 Summaries**: Ultra-simplified versions anyone can understand
+- **👶 ELI15 Summaries**: Ultra-simplified versions anyone can understand
 
 ### Phase 2: Organization & Personalization
 
@@ -127,7 +127,7 @@ npm run package
 3. **Click "Summarize"** button
 4. **View the generated summary** in the overlay
 5. **Use keyboard shortcuts:**
-   - `Ctrl/Cmd+1-4` - Switch between summary tabs
+   - `Ctrl/Cmd+1-6` - Switch between summary tabs
    - `Escape` - Close overlay
 
 ### 📋 **Available Scripts**
@@ -250,7 +250,7 @@ npm run dev
 
 - **Easy Explanation Mode**: Simplify complex concepts with analogies
 - **Concept Dictionary**: Auto-explain technical terms
-- **ELI12 Summaries**: Ultra-simplified explanations
+- **ELI15 Summaries**: Ultra-simplified explanations
 
 > **Ready for production use!** The extension provides professional-grade AI summarization with modern development practices.
 
