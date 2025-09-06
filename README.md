@@ -1,38 +1,50 @@
-# ReadFocus - Chrome Extension (Enhanced Auto Focus Mode)
+# ReadFocus - AI Content Summarization Chrome Extension
 
-A Chrome extension that **automatically converts any readable webpage** into a distraction-free, **Focus Reading Mode** that keeps students engaged and improves comprehension with minimal effort.
+An AI-powered Chrome extension that **instantly transforms any webpage into intelligent, digestible summaries** to help students, professionals, and researchers quickly understand and retain key information from the web.
 
-> **One-click transform** → Clean, chunked text with guided pacing, highlighted keywords, and quick comprehension checks.
+> **One-click summarization** → Get comprehensive, multi-format AI summaries with key insights, action items, and detailed analysis in under 10 seconds.
 
 ## 🎯 Mission
 
-Transform passive web reading into active learning for students who struggle with focus (especially those with ADD/ADHD). No more zoning out, rereading lines, or failing to understand material online.
+Transform information overload into knowledge advantage. Help users understand and retain more information in less time through AI-powered content summarization with persistent storage and easy-to-understand explanations.
 
-## ✨ Extension Features (In Development)
+## ✨ Current Features
 
-### 🎯 **Core Extension Features**
+### 🤖 **AI-Powered Summarization**
 
-- **🔍 Smart Content Extraction**: Automatically detect main article content, strip ads/nav
-- **📖 Reader Overlay**: Full-viewport, distraction-free reading layer
-- **⚡ One-Click Activation**: Instant Focus Mode with keyboard shortcut or auto-detect
-- **🎨 Typography Controls**: Font size, typeface, line height, themes (light/dark/sepia)
-- **⌨️ Keyboard Shortcuts**: Navigate chunks, toggle quiz, exit mode seamlessly
+- **📄 Multi-Format Summaries**: Quick overview, detailed analysis, key points, and action items
+- **🧠 Intelligent Analysis**: Claude Sonnet 4 AI for high-quality, educational summaries
+- **💾 Persistent Storage**: Generate once, access forever with Chrome local storage
+- **⚡ One-Click Operation**: Single "Summarize" button for instant results
+- **📝 Markdown Rendering**: Rich formatted detailed summaries with proper structure
 
-### 🧠 **Reading Enhancement**
+### 🎯 **Smart Content Processing**
 
-- **📝 Chunked Reading**: Split text into digestible segments with smart boundaries
-- **✨ Keyword Highlighting**: Emphasize key terms to anchor eye movement
-- **⏱️ Guided Pacing**: Tap-to-advance or auto-advance with adjustable speed
-- **❓ Recall Prompts**: "Did you get it?" questions per chunk (MCQ/true-false)
-- **📊 Session Progress**: Track chunks completed, time spent, comprehension accuracy
+- **🔍 Automatic Content Detection**: Extract main article content, ignore ads/navigation
+- **🔄 Storage-First Approach**: Always check local storage before making API calls
+- **💰 Cost Optimization**: Avoid duplicate API requests with intelligent caching
+- **🌐 Universal Compatibility**: Works on articles, blogs, documentation, research papers
 
-### 🔧 **Advanced Features (Planned)**
+### 🛠️ **Modern Development Stack**
 
-- **🔄 Dynamic Content**: Handle late-loading content and infinite scroll articles
-- **📄 Multi-Page Articles**: Seamlessly combine paginated content
-- **📋 Tables & Figures**: Convert to readable summaries with expand options
-- **📚 Citations & Footnotes**: Inline preview on hover
-- **🌍 Site Preferences**: Per-site whitelist/blacklist and auto-start settings
+- **⚡ Plasmo Framework**: Industry-standard Chrome extension development
+- **📘 TypeScript**: Full type safety and modern development experience
+- **⚛️ React Components**: Modern UI with reusable, maintainable components
+- **🔧 Professional Tooling**: Hot reload, proper bundling, optimized builds
+
+## 🚀 **Planned Features (See PLAN.md for full roadmap)**
+
+### Phase 1: Enhanced Intelligence
+
+- **🎓 Easy Explanation Mode**: Break down complex concepts with analogies
+- **📚 Concept Dictionary**: Auto-detect and explain technical terms
+- **👶 ELI12 Summaries**: Ultra-simplified versions anyone can understand
+
+### Phase 2: Organization & Personalization
+
+- **📁 Project-Based Organization**: Folders and collections for related summaries
+- **🏷️ Smart Tagging**: Auto-categorization and custom labels
+- **📊 Personal Dashboard**: History, search, and analytics
 
 ## 🌐 **Current Status: Foundation Web App**
 
@@ -50,152 +62,197 @@ Transform passive web reading into active learning for students who struggle wit
 
 ## 🚀 Getting Started
 
-### 🎯 **Chrome Extension Development** (Primary Focus)
-
-See `PLAN.md` for the complete development roadmap focusing on building the enhanced Chrome extension.
-
-**Current Phase**: Phase 0 - Product Spec & Foundations
-
-- Define user journeys and wireframes
-- Set up extension structure and permissions
-- Implement settings persistence
-
-### 🌐 **Foundation Web App** (Supporting Technology)
-
-The web app serves as the foundation and testing ground for reading features:
-
-#### Prerequisites
+### Prerequisites
 
 - Node.js 18+
 - npm or yarn
+- Chrome browser
+- Anthropic Claude API key
 
-#### Installation
+### 🔧 **Development Setup**
 
-1. Clone the repository:
+1. **Clone the repository:**
 
 ```bash
 git clone https://github.com/hassantayyab/readfocus.git
 cd readfocus
 ```
 
-2. Install dependencies:
+2. **Install dependencies:**
 
 ```bash
 npm install
 ```
 
-3. Run the development server:
+3. **Start development server:**
 
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+This starts the Plasmo development server with hot reload.
 
-#### Available Scripts
+4. **Load extension in Chrome:**
+   - Open `chrome://extensions/`
+   - Enable "Developer mode" (toggle in top-right)
+   - Click "Load unpacked" and select the `build/chrome-mv3-dev` folder
+   - Pin the extension to your toolbar
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+### 📦 **Production Build**
+
+```bash
+npm run build
+# Creates optimized build in build/chrome-mv3-prod/
+
+npm run package
+# Creates .zip file ready for Chrome Web Store
+```
+
+### ⚙️ **Configuration**
+
+1. **Get Claude API Key:**
+   - Visit [Anthropic Console](https://console.anthropic.com/)
+   - Create account and generate API key
+
+2. **Configure Extension:**
+   - Click ReadFocus extension icon
+   - Click "Settings"
+   - Enter your Claude API key
+   - Adjust preferences (theme, font size, etc.)
+
+### 🧪 **Testing the Extension**
+
+1. **Navigate to any article** (Medium, Wikipedia, news site, blog)
+2. **Click the ReadFocus extension icon**
+3. **Click "Summarize"** button
+4. **View the generated summary** in the overlay
+5. **Use keyboard shortcuts:**
+   - `Ctrl/Cmd+1-4` - Switch between summary tabs
+   - `Escape` - Close overlay
+
+### 📋 **Available Scripts**
+
+- `npm run dev` - Start Plasmo development server with hot reload
+- `npm run build` - Build extension for production
+- `npm run package` - Create distribution package (.zip)
+- `npm run lint` - Run ESLint on TypeScript files
 - `npm run type-check` - Run TypeScript type checking
 
 ## 🛠️ **Project Structure**
 
 ```
-├── browser-extension/   # Chrome extension (v1 - basic)
-├── src/                 # Web app foundation
-│   ├── app/             # Next.js App Router pages
-│   ├── components/      # Reusable React components
-│   ├── lib/             # Configuration and utilities
-│   ├── types/           # TypeScript type definitions
-│   └── utils/           # Helper functions
-└── PLAN.md              # Detailed extension development roadmap
+├── src/                          # Plasmo extension source (TypeScript + React)
+│   ├── popup.tsx                 # React popup component
+│   ├── popup.css                 # Popup styling
+│   ├── options.tsx               # Settings page component
+│   ├── options.css               # Settings styling
+│   └── contents/
+│       └── summarizer.ts         # Content script (TypeScript)
+├── browser-extension/            # Legacy JavaScript version
+├── build/                        # Plasmo build output
+│   ├── chrome-mv3-dev/          # Development build
+│   └── chrome-mv3-prod/         # Production build
+├── package.plasmo.ts            # Plasmo manifest configuration
+├── tsconfig.json                # TypeScript configuration
+└── PLAN.md                      # Development roadmap
 ```
 
 ## 🔧 **Tech Stack**
 
-### Extension Stack (Primary)
+### Modern Extension Stack (Current)
 
-- **Extension**: Chrome Manifest V3
-- **Content Scripts**: Vanilla JavaScript/TypeScript
-- **Background**: Service Worker
-- **UI**: HTML5 + CSS3 + Vanilla JS
-- **Storage**: Chrome Storage API
+- **Framework**: Plasmo (industry-standard Chrome extension framework)
+- **Language**: TypeScript with strict mode
+- **UI Components**: React with TSX
+- **Content Scripts**: TypeScript with Chrome APIs
+- **Storage**: Chrome Storage API with typed interfaces
+- **AI Integration**: Anthropic Claude Sonnet 4 API
+- **Build System**: Plasmo's optimized bundling
+- **Development**: Hot reload, type safety, modern tooling
 
-### Web App Stack (Foundation)
+### Legacy Support
 
-- **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
-- **State**: Zustand for state management
-- **Reading Logic**: Custom chunking and highlighting algorithms
+- **Legacy Extension**: Vanilla JavaScript (browser-extension/ folder)
+- **Web App Foundation**: Next.js + React (for feature prototyping)
 
-## 🌐 **Browser Extension Status**
+## 🔍 **Development Workflow**
 
-### 🚀 **Current Extension (v2 - Enhanced Auto Focus Mode)**
+### 🔧 **Hot Reload Development**
 
-The enhanced extension provides **dual reading modes** with in-page overlay:
+```bash
+# Start development server
+npm run dev
 
-#### Installation
+# Watch for changes in src/
+# Automatically rebuilds extension
+# Reload extension in browser to see changes
+```
 
-1. Navigate to `chrome://extensions/` in Chrome
-2. Enable "Developer mode" (toggle in top-right)
-3. Click "Load unpacked" and select the `browser-extension` folder
-4. Pin the extension to your toolbar
+### 🐛 **Debugging**
 
-#### 🎯 **Two Reading Modes Available**
+1. **Extension Console**: Right-click extension icon → "Inspect popup"
+2. **Content Script**: Open browser DevTools on any webpage
+3. **Background Script**: Go to `chrome://extensions/` → Click "Inspect views: service worker"
+4. **TypeScript Errors**: Check terminal running `npm run dev`
 
-**1. Focus Mode (Full Overlay)**
+### 🧪 **Testing Strategy**
 
-- **Complete distraction-free experience** with clean overlay
-- **Immersive reading environment** hiding the original page
-- **Perfect for deep focus** and long-form articles
+1. **Manual Testing**: Test on various websites (news, blogs, Wikipedia)
+2. **Edge Cases**: Try pages with no content, very long articles, dynamic content
+3. **API Testing**: Test with and without API key, test API failures
+4. **Storage Testing**: Clear extension storage and test fresh installs
 
-**2. Reading Helper Mode (Keyword Highlighting)** ⭐ _NEW_
+## 🚨 **Troubleshooting**
 
-- **Highlights important words** across the entire article instantly
-- **Preserves original page layout** with enhanced keyword emphasis
-- **Smart keyword detection** using frequency analysis and filtering
-- **Floating control panel** for settings and refresh
-- **Maintains page context** (images, links, sidebars)
-- **Ideal for research** and quick comprehension scanning
+### Common Issues
 
-#### 🧪 **Testing Both Modes**
+**Extension not loading:**
 
-1. **Visit any article page** (Medium, blog, Wikipedia, news site)
-2. **Click the extension icon** in your toolbar
-3. **Select your preferred mode:**
-   - 📖 **Reading Helper** - Highlight keywords across entire article
-   - 🎯 **Focus Mode** - Clean overlay experience
-4. **Click "Start [Mode]"** to activate
+- Ensure you're loading the correct folder (`build/chrome-mv3-dev/`)
+- Check if `npm run dev` is running without errors
+- Try disabling and re-enabling the extension
 
-#### ⌨️ **Keyboard Shortcuts**
+**"API key not configured" error:**
 
-- `Cmd/Ctrl + Shift + F` - Toggle reading mode (uses your preferred setting)
-- `Cmd/Ctrl + R` - Refresh keyword highlighting (Reading Helper only)
-- `Arrow Keys` or `Space` - Navigate chunks (Focus Mode only)
-- `Escape` - Exit any active mode
-- `Q` - Show quiz (Focus Mode only)
+- Go to extension options (click Settings)
+- Enter your Claude API key from [Anthropic Console](https://console.anthropic.com/)
+- Save settings and try again
 
-#### 🎛️ **Reading Helper Controls**
+**Summaries not generating:**
 
-- **📊 Status** - Shows current highlighting state
-- **🎯 Focus** - Displays keyword emphasis mode
-- **🔄 Refresh** - Re-analyze and highlight keywords
-- **⚙️ Settings** - Customize reading experience
-- **✕ Exit** - Return to normal browsing
+- Check browser console (F12) for error messages
+- Ensure the webpage has readable text content
+- Verify your API key has sufficient credits
 
-#### 🔧 **Customization**
+**TypeScript errors during development:**
 
-- **Typography settings** - Font size, line height, themes
-- **Chunk size preferences** - Small, medium, or large (Focus Mode only)
-- **Keyword highlighting** - Smart frequency-based word detection
-- **Default mode selection** - Focus vs Helper preference
+- Run `npm run type-check` to see all errors
+- Most errors will be fixed by proper typing
+- Check the terminal running `npm run dev` for build errors
 
-See `browser-extension/README.md` for detailed features and troubleshooting.
+### Performance Tips
 
-> **Current Status**: Core functionality complete! Phase 2 features active with both reading modes operational.
+- **Clear cache** occasionally using the "Clear Cache" button
+- **API costs**: Summaries are cached locally to avoid duplicate API calls
+- **Large articles**: May take 10-15 seconds for very long content
+- **Network issues**: Extension will retry failed requests automatically
+
+## 📊 **Development Status**
+
+### ✅ **Phase 0 Complete (Current)**
+
+- **Modern Framework**: Migrated to Plasmo with TypeScript and React
+- **AI Integration**: Claude Sonnet 4 API working with persistent storage
+- **Single-Click UI**: Clean popup interface with settings page
+- **Professional Setup**: Hot reload, type safety, optimized builds
+
+### 🎯 **Next Steps (Phase 1)**
+
+- **Easy Explanation Mode**: Simplify complex concepts with analogies
+- **Concept Dictionary**: Auto-explain technical terms
+- **ELI12 Summaries**: Ultra-simplified explanations
+
+> **Ready for production use!** The extension provides professional-grade AI summarization with modern development practices.
 
 ## 📄 License
 
