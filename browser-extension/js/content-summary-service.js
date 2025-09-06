@@ -8,8 +8,8 @@ class ContentSummaryService {
     this.aiClient = null;
     this.contentAnalyzer = null;
     this.initialized = false;
-    this.summaryCache = new Map();
-    this.maxCacheSize = 50;
+    this.storageKey = 'readfocus_summaries';
+    this.maxStorageItems = 100;
     this.currentContent = null;
   }
 
@@ -63,12 +63,18 @@ class ContentSummaryService {
         throw new Error(`Content analysis failed: ${analysisResult.error}`);
       }
 
-      // Check cache first
-      const cacheKey = this.generateCacheKey(analysisResult.processedContent, options);
-      if (this.summaryCache.has(cacheKey)) {
-        console.log('📄 [SummaryService] Returning cached summary');
-        return this.summaryCache.get(cacheKey);
+      // Check local storage first - ALWAYS
+      const storageKey = this.generateStorageKey(analysisResult.processedContent, options);
+      console.log('📄 [SummaryService] Checking storage with key:', storageKey);
+      
+      const storedSummary = await this.getStoredSummary(storageKey);
+      if (storedSummary) {
+        console.log('📄 [SummaryService] FOUND stored summary, returning it NOW');
+        console.log('📄 [SummaryService] Stored summary data:', storedSummary);
+        return storedSummary;
       }
+      
+      console.log('📄 [SummaryService] NO stored summary found, will call API');
 
       // Generate multiple summary formats
       const summaryResult = await this.generateMultiFormatSummary(
@@ -77,8 +83,8 @@ class ContentSummaryService {
         options
       );
 
-      // Cache the result
-      this.cacheSummary(cacheKey, summaryResult);
+      // Store the result permanently in local storage
+      await this.storeSummary(storageKey, summaryResult);
 
       // Store current content for future reference
       this.currentContent = {
@@ -376,10 +382,12 @@ Return only the JSON object, no additional text.`;
    * @param {Object} options - Summary options
    * @returns {string} - Cache key
    */
-  generateCacheKey(content, options) {
-    const contentHash = this.simpleHash(content);
+  generateStorageKey(content, options) {
+    // Use URL as primary key - ignore content changes from page refreshes
+    const url = window.location.href.split('#')[0].split('?')[0]; // Remove hash and query params
+    const urlHash = this.simpleHash(url);
     const optionsHash = this.simpleHash(JSON.stringify(options));
-    return `${contentHash}_${optionsHash}`;
+    return `${urlHash}_${optionsHash}`;
   }
 
   /**
@@ -398,18 +406,35 @@ Return only the JSON object, no additional text.`;
   }
 
   /**
-   * Cache summary result
-   * @param {string} key - Cache key
-   * @param {Object} result - Summary result to cache
+   * Store summary result in Chrome storage
+   * @param {string} key - Storage key
+   * @param {Object} result - Summary result to store
    */
-  cacheSummary(key, result) {
-    // Implement LRU cache behavior
-    if (this.summaryCache.size >= this.maxCacheSize) {
-      const firstKey = this.summaryCache.keys().next().value;
-      this.summaryCache.delete(firstKey);
+  async storeSummary(key, result) {
+    try {
+      // Get existing summaries
+      const existingSummaries = await this.getAllStoredSummaries();
+      
+      // Add timestamp for cleanup
+      const summaryWithTimestamp = {
+        ...result,
+        storedAt: Date.now(),
+        url: window.location.href
+      };
+      
+      // Add new summary
+      existingSummaries[key] = summaryWithTimestamp;
+      
+      // Clean up old entries if we exceed max storage
+      await this.cleanupOldSummaries(existingSummaries);
+      
+      // Store back to Chrome storage
+      await chrome.storage.local.set({ [this.storageKey]: existingSummaries });
+      
+      console.log(`📄 [SummaryService] Summary stored permanently with key: ${key}`);
+    } catch (error) {
+      console.error('❌ [SummaryService] Error storing summary:', error);
     }
-
-    this.summaryCache.set(key, result);
   }
 
   /**
@@ -421,19 +446,91 @@ Return only the JSON object, no additional text.`;
   }
 
   /**
-   * Clear summary cache
+   * Clear all stored summaries from Chrome storage
    */
-  clearCache() {
-    this.summaryCache.clear();
-    console.log('📄 [SummaryService] Cache cleared');
+  async clearCache() {
+    try {
+      await chrome.storage.local.remove(this.storageKey);
+      console.log('📄 [SummaryService] All stored summaries cleared');
+    } catch (error) {
+      console.error('❌ [SummaryService] Error clearing storage:', error);
+    }
   }
 
   /**
    * Check if cached summary exists for current page
    * @returns {boolean} - True if cached summary exists
    */
-  hasCachedSummary() {
-    return this.summaryCache.size > 0;
+  async hasCachedSummary() {
+    try {
+      const summaries = await this.getAllStoredSummaries();
+      return Object.keys(summaries).length > 0;
+    } catch (error) {
+      console.error('❌ [SummaryService] Error checking cache:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get stored summary by key
+   * @param {string} key - Storage key
+   * @returns {Object|null} - Stored summary or null
+   */
+  async getStoredSummary(key) {
+    try {
+      const summaries = await this.getAllStoredSummaries();
+      console.log('📄 [SummaryService] All stored keys:', Object.keys(summaries));
+      console.log('📄 [SummaryService] Looking for key:', key);
+      
+      const summary = summaries[key];
+      
+      if (summary) {
+        console.log(`📄 [SummaryService] ✅ FOUND stored summary for key: ${key}`);
+        return summary;
+      }
+      
+      console.log(`📄 [SummaryService] ❌ NO summary found for key: ${key}`);
+      return null;
+    } catch (error) {
+      console.error('❌ [SummaryService] Error retrieving stored summary:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get all stored summaries
+   * @returns {Object} - All stored summaries
+   */
+  async getAllStoredSummaries() {
+    try {
+      const result = await chrome.storage.local.get(this.storageKey);
+      return result[this.storageKey] || {};
+    } catch (error) {
+      console.error('❌ [SummaryService] Error getting stored summaries:', error);
+      return {};
+    }
+  }
+
+  /**
+   * Clean up old summaries to maintain storage limits
+   * @param {Object} summaries - Current summaries object
+   */
+  async cleanupOldSummaries(summaries) {
+    const keys = Object.keys(summaries);
+    
+    if (keys.length > this.maxStorageItems) {
+      // Sort by timestamp and remove oldest entries
+      const sortedEntries = keys
+        .map(key => ({ key, timestamp: summaries[key].storedAt || 0 }))
+        .sort((a, b) => a.timestamp - b.timestamp);
+      
+      const toRemove = sortedEntries.slice(0, keys.length - this.maxStorageItems);
+      
+      toRemove.forEach(entry => {
+        delete summaries[entry.key];
+        console.log(`📄 [SummaryService] Removed old summary: ${entry.key}`);
+      });
+    }
   }
 
   /**

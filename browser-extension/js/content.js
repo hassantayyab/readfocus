@@ -181,8 +181,12 @@ class ReadFocusContentScript {
           break;
 
         case 'CHECK_SUMMARY_EXISTS':
-          const exists = this.summaryService && this.summaryService.hasCachedSummary();
-          sendResponse({ exists: exists || false });
+          if (this.summaryService) {
+            const exists = await this.summaryService.hasCachedSummary();
+            sendResponse({ exists: exists || false });
+          } else {
+            sendResponse({ exists: false });
+          }
           break;
 
         default:

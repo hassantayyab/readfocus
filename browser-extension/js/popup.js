@@ -29,8 +29,6 @@ class ReadFocusPopup {
       // Bind events
       this.bindEvents();
 
-      // Start page analysis
-      await this.analyzePage();
 
       console.log('ReadFocus popup initialized');
     } catch (error) {
@@ -72,76 +70,6 @@ class ReadFocusPopup {
     };
   }
 
-  /**
-   * Analyze current page for article content
-   */
-  async analyzePage(retryCount = 0) {
-    if (!this.currentTab) return;
-
-    try {
-      console.log(`🔍 [Popup] Analyzing page (attempt ${retryCount + 1})...`);
-
-      // Update status to analyzing
-      this.updatePageStatus('analyzing', 'Analyzing page...', 'Checking for readable content');
-
-      // Send message to content script to analyze page
-      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'ANALYZE_PAGE',
-      });
-
-      console.log('📊 [Popup] Analysis response:', response);
-
-      if (response && response.success) {
-        this.pageStatus = response.analysis;
-        this.updatePageStatusFromAnalysis();
-        console.log('✅ [Popup] Page analysis successful');
-      } else {
-        console.warn('⚠️ [Popup] Analysis failed, trying injection...');
-        // Fallback: inject content script if not present
-        await this.injectContentScript();
-        // Try again after a brief delay (max 3 attempts)
-        if (retryCount < 2) {
-          setTimeout(() => this.analyzePage(retryCount + 1), 1000);
-        } else {
-          console.error('❌ [Popup] All analysis attempts failed');
-          this.updatePageStatus(
-            'error',
-            'Analysis failed',
-            'Unable to analyze page content. Try refreshing the page.'
-          );
-        }
-      }
-    } catch (error) {
-      console.error('❌ [Popup] Error analyzing page:', error);
-
-      // Check if it's a connection error
-      if (
-        error.message?.includes('Could not establish connection') ||
-        error.message?.includes('Receiving end does not exist')
-      ) {
-        console.log('🔧 [Popup] Connection error detected, attempting content script injection...');
-
-        try {
-          await this.injectContentScript();
-          // Retry analysis after injection (max 3 attempts)
-          if (retryCount < 2) {
-            console.log(`🔄 [Popup] Retrying analysis in 1 second (attempt ${retryCount + 2})...`);
-            setTimeout(() => this.analyzePage(retryCount + 1), 1000);
-            return;
-          }
-        } catch (injectionError) {
-          console.error('❌ [Popup] Content script injection failed:', injectionError);
-        }
-      }
-
-      // Final fallback
-      this.updatePageStatus(
-        'error',
-        'Connection error',
-        'Unable to connect to page. Try refreshing and reopening the extension.'
-      );
-    }
-  }
 
   /**
    * Inject content script if not present
@@ -176,85 +104,6 @@ class ReadFocusPopup {
   }
 
 
-  /**
-   * Update page status based on analysis
-   */
-  updatePageStatusFromAnalysis() {
-    if (!this.pageStatus) return;
-
-    const { isArticle, title, wordCount, confidence } = this.pageStatus;
-
-    if (isArticle && wordCount > 100) {
-      this.updatePageStatus(
-        'article-detected',
-        `Article detected: ${title || 'Untitled'}`,
-        `~${wordCount} words • ${Math.round(confidence * 100)}% confidence`
-      );
-      this.enableSummaryMode();
-    } else {
-      this.updatePageStatus(
-        'no-article',
-        'No article detected',
-        'This page may not be suitable for summarization'
-      );
-      this.disableSummaryMode();
-    }
-  }
-
-  /**
-   * Update page status UI
-   */
-  updatePageStatus(type, title, description) {
-    const statusElement = document.getElementById('page-status');
-    const titleElement = document.getElementById('status-title');
-    const descriptionElement = document.getElementById('status-description');
-    const iconElement = document.getElementById('status-icon');
-
-    // Remove existing status classes
-    statusElement.className = 'page-status';
-    statusElement.classList.add(type);
-
-    titleElement.textContent = title;
-    descriptionElement.textContent = description;
-
-    // Set appropriate icon based on type
-    const icons = {
-      analyzing: '🔍',
-      'article-detected': '✅',
-      'no-article': '❌',
-    };
-    iconElement.textContent = icons[type] || '🔍';
-  }
-
-  /**
-   * Enable summary functionality
-   */
-  enableSummaryMode() {
-    const generateBtn = document.getElementById('generate-summary');
-    if (generateBtn) {
-      generateBtn.disabled = false;
-    }
-    
-    const summarySection = document.getElementById('summary-section');
-    if (summarySection) {
-      summarySection.style.opacity = '1';
-    }
-  }
-
-  /**
-   * Disable summary functionality
-   */
-  disableSummaryMode() {
-    const generateBtn = document.getElementById('generate-summary');
-    if (generateBtn) {
-      generateBtn.disabled = true;
-    }
-    
-    const summarySection = document.getElementById('summary-section');
-    if (summarySection) {
-      summarySection.style.opacity = '0.6';
-    }
-  }
 
 
   /**
@@ -320,19 +169,26 @@ class ReadFocusPopup {
    */
   async clearSummaryCache() {
     try {
+      console.log('🗑️ [Popup] Clearing summary cache...');
+      
       // Send message to content script to clear cache
       const response = await chrome.tabs.sendMessage(this.currentTab.id, {
         type: 'CLEAR_SUMMARY_CACHE'
       });
 
       if (response && response.success) {
-        this.showSuccess('Summary cache cleared!');
+        this.showSuccess('All stored summaries cleared!');
+        
+        // Reset summary status to initial state
+        this.updateSummaryStatus('ready', 'Ready');
+        
+        console.log('✅ [Popup] Cache cleared successfully');
       } else {
-        this.showError('Failed to clear cache');
+        this.showError('Failed to clear stored summaries');
       }
     } catch (error) {
-      console.error('Error clearing cache:', error);
-      this.showSuccess('Cache cleared!'); // Show success anyway as it's not critical
+      console.error('❌ [Popup] Error clearing cache:', error);
+      this.showError('Failed to clear stored summaries');
     }
   }
 
@@ -407,9 +263,6 @@ class ReadFocusPopup {
         this.updateSummaryStatus('completed', 'Ready');
         this.showSuccess('Summary generated successfully!');
         
-        // Show the "Show Summary" button
-        document.getElementById('show-summary').style.display = 'flex';
-        
         // Automatically show the summary
         setTimeout(() => this.showSummary(), 500);
       } else {
@@ -468,13 +321,8 @@ class ReadFocusPopup {
     if (generateBtn) {
       generateBtn.disabled = status === 'processing';
       generateBtn.innerHTML = status === 'processing' 
-        ? '<span class="button-icon">⏳</span>Generating...'
-        : '<span class="button-icon">⚡</span>Generate Summary';
-    }
-
-    // Show/hide the show button based on status
-    if (showBtn) {
-      showBtn.style.display = (status === 'completed') ? 'flex' : 'none';
+        ? '<span class="button-icon">⏳</span>Summarizing...'
+        : '<span class="button-icon">⚡</span>Summarize';
     }
   }
 
@@ -490,18 +338,13 @@ class ReadFocusPopup {
 
       if (response && response.exists) {
         this.updateSummaryStatus('completed', 'Available');
-        // Show the "Show Summary" button if summary exists
-        document.getElementById('show-summary').style.display = 'flex';
       } else {
         this.updateSummaryStatus('ready', 'Ready');
-        // Hide the "Show Summary" button initially
-        document.getElementById('show-summary').style.display = 'none';
       }
     } catch (error) {
       console.error('❌ [Popup] Error checking summary status:', error);
       // Default to initial state
       this.updateSummaryStatus('ready', 'Ready');
-      document.getElementById('show-summary').style.display = 'none';
     }
   }
 }
