@@ -1,568 +1,327 @@
-# PLAN.md — ReadFocus Chrome Extension (AI Content Summary)
+# PLAN.md — ReadFocus Chrome Extension (AI Content Summarization)
 
-## 🎯 Product Goal
+## 🎯 Product Vision
 
-Deliver a Chrome extension that **instantly generates intelligent summaries** of any readable webpage using **AI-powered content analysis** to help students and professionals quickly understand and retain key information.
+**ReadFocus** is an AI-powered Chrome extension that **instantly transforms any webpage into digestible, intelligent summaries** to help students, professionals, and researchers quickly understand and retain key information from the web.
 
-**Outcome:** One-click summary generation → comprehensive multi-format summaries with key points, detailed analysis, and actionable insights.
-
----
-
-## 🔍 Scope & Constraints
-
-- **In-scope:** AI-powered content summarization for readable web pages (articles, wiki pages, blogs, docs rendered as HTML), multi-format summary generation, educational insights.
-- **Out-of-scope:** Reading modes, text highlighting, paywalled content, fully dynamic app UIs, complex web apps (Gmail inbox, Figma), scanned PDFs without text.
-- **Non-goals:** Bypassing paywalls, scraping user data, text modification. Keep privacy-first with user-provided API keys.
+**Core Promise:** Click "Summarize" → Get comprehensive, multi-format AI summaries with key insights, action items, and detailed analysis in under 10 seconds.
 
 ---
 
-## 🧭 Core UX Principles
+## 🔍 Product Scope & Focus
 
-- **Zero-friction:** Instant summary generation with one-click activation.
-- **Intelligent Analysis:** AI-powered content understanding with contextual insights.
-- **Multi-format Output:** Quick overviews, detailed analysis, key points, and action items.
-- **Student-friendly:** Educational focus with clear structure and accessible formatting.
-- **Privacy-first:** User-controlled API keys, no data collection or storage.
+- **Primary Goal:** AI-powered content summarization for maximum information comprehension
+- **Target Users:** Students, researchers, professionals, content consumers
+- **Content Types:** Articles, blog posts, documentation, research papers, news stories
+- **AI Provider:** Claude Sonnet 4 for high-quality, educational summaries
+- **Storage:** Persistent local storage - generate once, access forever
 
-## 🗺️ Phased Development Roadmap
+### ✅ **In-Scope**
 
-### Phase 0 — Product Spec & Foundations
+- AI-powered multi-format summaries (Quick, Detailed, Key Points, Action Items)
+- Persistent storage with instant recall
+- Educational and professional content analysis
+- Markdown-formatted detailed summaries
+- One-click summarization workflow
 
-**Goal:** Establish clear behavior, permissions, and UI skeletons.
+### ❌ **Out-of-Scope**
 
-**Features**
-
-- Extension manifest & baseline permissions (activeTab, minimal host access).
-- Core UI surfaces: **toolbar popup**, **page action button**, **in-page overlay**.
-- Settings storage for user preferences.
-
-**To-Do List**
-
-- [x] Define user journeys (Activate mode, Exit mode, Adjust settings, Quiz flow).
-- [x] Specify minimal permissions and privacy policy copy.
-- [x] Create wireframes for: Popup, Overlay Reader, Control Panel, Quiz Modal, Settings.
-- [x] Set up extension structure (background/service worker, content scripts, options page, popup page).
-- [x] Implement settings persistence (font size, line height, theme, chunk length, pacing).
-
-**✅ Phase 0 Complete!**
-
-- Comprehensive user journeys and wireframes documented
-- Privacy-first permissions and policy established
-- Complete extension structure with organized directories
-- Full settings system with persistence and sync
-- Enhanced popup and options page interfaces
+- Reading modes or text highlighting
+- Content modification or editing
+- Paywalled content bypass
+- Social media or dynamic app interfaces
+- Real-time content streaming
 
 ---
 
-### Phase 1 — MVP Auto Focus Reading Mode
+## 🚀 Development Roadmap
 
-**Goal:** Turn any readable page into a clean, chunked, paced reading experience with recall checks.
+### ✅ **Phase 0: Foundation & Core Summarization (COMPLETED)**
 
-**Features**
+**Goal:** Establish working AI summarization system with persistent storage.
 
-- **Smart Content Extraction:** Detect main article content; strip ads/nav.
-- **Reader Overlay:** Full-viewport, distraction-free layer with typographic defaults.
-- **Chunked Reading:** Split into small paragraphs/segments; next/prev navigation.
-- **Keyword Highlighting:** Emphasize key words to anchor eye movement.
-- **Guided Pacing:** Tap-to-advance and optional auto-advance with adjustable speed.
-- **Recall Prompt:** "Did you get it?" quick question per chunk (MCQ/true-false).
+**Completed Features:**
 
-**To-Do List**
+- [x] Chrome extension manifest V3 setup
+- [x] AI client integration with Claude Sonnet 4
+- [x] Content analyzer for extracting readable text
+- [x] Multi-format summary generation (Quick, Detailed, Key Points, Actions)
+- [x] Beautiful summary overlay with tabbed interface
+- [x] Persistent Chrome storage for summaries
+- [x] Single-button "Summarize" interface
+- [x] Popup UI with API configuration
+- [x] Settings page for API key management
+- [x] Error handling and retry logic
+- [x] Markdown rendering for detailed summaries
 
-- [x] Implement content detection & extraction (main body, title, author, publish date if present).
-- [x] Build overlay reader container (responsive, accessible tab flow, escape to exit).
-- [x] Implement chunking logic (by sentence/paragraph with safe boundaries).
-- [x] Add keyword highlighting strategy (frequency/importance based; toggleable).
-- [x] Add controls: Start, Pause, Next, Previous, Exit, Speed slider.
-- [x] Add recall prompt modal with small question bank per chunk.
-- [x] Track session progress (chunks completed, time in session, answers correct).
-- [x] Handle edge cases: images with captions, lists, code blocks, blockquotes.
+**Technical Infrastructure:**
 
-**✅ Phase 1 Complete!**
+- Content scripts with proper injection
+- Background service worker
+- Chrome storage APIs
+- AI prompt engineering for educational content
+- Responsive overlay design with keyboard shortcuts
 
-- Full MVP Auto Focus Reading Mode with smart content extraction
-- Complete overlay reader with distraction-free interface
-- Intelligent text chunking with keyword highlighting
-- Comprehensive navigation controls and auto-advance
-- Interactive quiz system with multiple question types
-- Session tracking with progress visualization
-- Robust content detection for 90%+ of article pages
+### 🔧 **Phase 0 Todos (Development Infrastructure)**
 
----
+**Goal:** Modernize codebase with industry-standard Chrome extension framework and TypeScript.
 
-### Phase 2 — Usability & Control Surface
+**Immediate Tasks to Complete:**
 
-**Goal:** Reduce friction and give users quick access and personalization with flexible reading modes.
-
-**Features**
-
-- **Toolbar Popup:** Big "Focus this page" button, recent settings, quick tips.
-- **Keyboard Shortcuts:** Toggle mode, next/prev chunk, show quiz.
-- **Auto-Detect & Auto-Start (optional):** Detect articles and auto-offer Focus Mode.
-- **Per-Site Preferences:** Whitelist/blacklist, default start as Focus Mode.
-- **Typography & Layout Controls:** Font size, typeface, line height, margins, theme (light/dark/sepia), column width.
-- **Reading Helper Mode:** Alternative to full overlay - highlights text in-place on original page with floating controls.
-
-**To-Do List**
-
-- [x] Build toolbar popup with status (Detected article? Yes/No).
-- [x] Implement keyboard shortcuts and in-UI hints.
-- [ ] Add auto-detect banner ("Start Focus Mode?") and per-site remember setting.
-- [x] Add per-user typography panel with live preview.
-- [x] Persist preferences per site and globally.
-- [ ] **NEW:** Implement Reading Helper Mode with in-place highlighting and floating controls.
-- [ ] **NEW:** Add mode selection in popup (Focus Mode vs Reading Helper Mode).
-
-**🚀 Phase 2 Active Development!**
-
-- Enhanced toolbar popup with real-time article detection
-- Complete keyboard shortcut system (Cmd+Shift+F, arrows, space, escape)
-- Comprehensive typography controls (font, size, line height, themes)
-- Full settings persistence with Chrome sync support
-- **✅ COMPLETED:** AI-Powered Content Summary feature with markdown formatting
-- **In Progress:** Reading Helper Mode implementation
-- **Remaining:** Auto-detect banner for seamless activation
+- [ ] **Plasmo Framework Migration**: Migrate entire extension to Plasmo framework for modern Chrome extension development
+- [ ] **TypeScript Setup**: Full TypeScript integration with Plasmo's built-in TypeScript support
+- [ ] **React Integration**: Use Plasmo's native React support for popup and content script UIs
+- [ ] **Hot Reload Development**: Leverage Plasmo's hot reload for faster development cycles
+- [ ] **Type Definitions**: Create comprehensive interfaces for all data structures (summaries, settings, API responses)
+- [ ] **Component Architecture**: Break down UI into reusable React components with Plasmo patterns
+- [ ] **Build Optimization**: Use Plasmo's built-in bundling and optimization features
 
 ---
 
-## 📄 AI-Powered Content Summary Feature (Phase 2 - COMPLETED)
+### 🎯 **Phase 1: Enhanced Summarization Intelligence (Next Priority)**
 
-**Goal:** Provide intelligent, multi-format content summaries using AI analysis for enhanced comprehension and learning.
+**Goal:** Make summaries smarter, more contextual, and more useful for different content types.
 
-### 🎯 **Feature Overview:**
+**Features to Build:**
 
-| Component              | Description                                                      | Status      |
-| ---------------------- | ---------------------------------------------------------------- | ----------- |
-| **Smart Analysis**     | AI-powered content extraction and analysis using Claude Sonnet 4 | ✅ Complete |
-| **Multiple Formats**   | Quick (30s), Detailed (3-5min), Key Points, Action Items         | ✅ Complete |
-| **Markdown Rendering** | Rich formatted detailed summaries with headers, lists, emphasis  | ✅ Complete |
-| **Interactive UI**     | Beautiful overlay with tabbed interface and smooth animations    | ✅ Complete |
-| **Popup Integration**  | Generate and show summary buttons with status indicators         | ✅ Complete |
-| **Caching System**     | Prevents duplicate API calls for same content                    | ✅ Complete |
+- [ ] **Content Type Detection**: Automatically detect article type (news, research, tutorial, etc.) and adapt summary style
+- [ ] **Smart Length Adjustment**: Automatically adjust summary length based on source content complexity
+- [ ] **Key Quote Extraction**: Identify and highlight the most important quotes from the original content
+- [ ] **Related Topics Suggestions**: AI-generated list of related topics to explore further
+- [ ] **Difficulty Level Indicator**: Show content difficulty (Beginner, Intermediate, Advanced)
+- [ ] **Reading Time Estimates**: Add estimated reading times for each summary format
+- [ ] **Easy Explanation Mode**: Break down complex concepts into simple, everyday language with analogies and examples
+- [ ] **Concept Dictionary**: Automatically detect and explain technical terms, jargon, and complex concepts inline
+- [ ] **ELI12 (Explain Like I'm 12) Summaries**: Ultra-simplified versions that anyone can understand
 
-### 🛠️ **Technical Implementation:**
+**Technical Implementation:**
 
-**1. ContentSummaryService** (`js/content-summary-service.js`)
-
-- Integrates with existing AI client and content analyzer
-- Comprehensive prompt engineering for educational summaries
-- Multi-format output with structured JSON responses
-- Smart caching and error handling
-
-**2. SummaryOverlay** (`js/summary-overlay.js`)
-
-- Modern overlay with 4 tabbed sections (Quick, Detailed, Key Points, Actions)
-- Built-in markdown renderer for rich text formatting
-- Keyboard shortcuts and interactive elements
-- Responsive design with smooth animations
-
-**3. Integration Points:**
-
-- Content script message handlers for summary generation
-- Popup UI with status indicators and action buttons
-- Manifest updates for proper script loading
-- CSS styling for both popup and overlay components
-
-### 🎨 **User Experience:**
-
-**Summary Types:**
-
-- **Quick Summary:** 2-3 sentence overview for rapid comprehension
-- **Detailed Summary:** Rich markdown-formatted analysis with sections for Key Findings, Context, Analysis, Implications, and Conclusions
-- **Key Points:** 3-6 bullet points highlighting most important information
-- **Action Items:** Practical takeaways and next steps for implementation
-
-**Interactive Features:**
-
-- Real-time status updates during generation
-- Tab navigation with keyboard shortcuts (Ctrl/Cmd + 1-4)
-- Regenerate summaries with one click
-- Direct integration with reading modes
-- Topic tags and content quality indicators
-
-### 📊 **AI Prompt Engineering:**
-
-The system uses advanced prompt engineering to generate educational content:
-
-- Content type detection (article, blog, technical, etc.)
-- Comprehensive analysis covering 70%+ of article content
-- Structured markdown output with proper formatting
-- Context-aware categorization and importance weighting
-- Educational focus with learning objectives consideration
+- Enhanced AI prompts for content classification
+- Metadata extraction and analysis
+- Quote identification algorithms
+- Related content suggestion engine
+- Simplification algorithms with analogy generation
+- Technical term detection and explanation database
+- Multi-level complexity adaptation (Expert → Intermediate → Beginner → ELI12)
 
 ---
 
-## 📖 Reading Helper Mode (Alternative Reading Experience)
+### 📊 **Phase 2: User Experience & Personalization (High Impact)**
 
-**Goal:** Provide a less disruptive reading mode that enhances the original webpage without hiding it.
+**Goal:** Personalize summaries and improve user workflow efficiency.
 
-### 🎯 **Mode Comparison:**
+**Features to Build:**
 
-| Feature              | Full Focus Mode                       | Reading Helper Mode                            |
-| -------------------- | ------------------------------------- | ---------------------------------------------- |
-| **Page Layout**      | Complete overlay hiding original page | Original page preserved                        |
-| **Content Display**  | Clean, distraction-free environment   | In-place text highlighting                     |
-| **Navigation**       | Built-in controls in overlay          | Floating control panel                         |
-| **Context**          | Immersive, isolated reading           | Maintains page context (images, links, layout) |
-| **Disruption Level** | High (transforms entire experience)   | Low (enhances existing page)                   |
-| **Best For**         | Deep focus, long articles             | Research, browsing, quick reading              |
+- [ ] **Summary History Dashboard**: View all previously generated summaries in organized list
+- [ ] **Personal Summary Library**: Tag, organize, and search through saved summaries
+- [ ] **Project-Based Organization**: Create folders/projects to group related summaries (Research Projects, Work Topics, Learning Goals)
+- [ ] **Smart Collections**: Automatically group summaries by topic, date, or content type
+- [ ] **Custom Lists & Labels**: Create custom organizational systems (Reading List, To Review, Favorites, Archive)
+- [ ] **Custom Summary Styles**: User-defined templates (Academic, Business, Casual, Technical, ELI5)
+- [ ] **Favorite Topics Tracking**: Learn user interests and adapt summary focus
+- [ ] **Summary Comparison**: Compare summaries of different articles on same topic
+- [ ] **Export Options**: Export summaries to Notion, Google Docs, Markdown files
+- [ ] **Quick Notes Integration**: Add personal notes to any summary
+- [ ] **Complexity Level Preference**: Remember user's preferred explanation level for consistent experience
+- [ ] **Learning Path Suggestions**: Recommend prerequisite concepts when content is too advanced
 
-### 🛠️ **Technical Implementation:**
+**Technical Implementation:**
 
-**1. Content Detection:** ✅ (Reuses existing system)
-
-- Same smart content extraction as Focus Mode
-- Identify readable text elements and chunks
-
-**2. In-Place Highlighting:**
-
-- Inject CSS to highlight current reading chunk
-- Use subtle but visible highlighting (background, border, or glow)
-- Progressive highlighting as user advances through content
-- Smooth scroll to current chunk
-
-**3. Floating Control Panel:**
-
-- Small, unobtrusive floating toolbar
-- Position: Top-right or bottom-center of viewport
-- Controls: Previous/Next chunk, Auto-advance toggle, Settings, Exit
-- Minimal design to preserve original page aesthetics
-
-**4. Chunk Navigation:**
-
-- Same intelligent chunking logic as Focus Mode
-- Auto-scroll to bring current chunk into view
-- Clear visual indication of active chunk
-- Maintain reading progress across chunks
-
-**5. Quiz Integration:**
-
-- Same quiz system as Focus Mode
-- Display in floating modal that doesn't hide page content
-- Optional and configurable frequency
-
-### 🎨 **UI/UX Design:**
-
-**Highlighting Styles:**
-
-- **Subtle:** Light background color with soft border
-- **Emphasized:** Gentle glow or shadow effect
-- **High Contrast:** Bold border for accessibility
-- **Customizable:** User can adjust highlighting intensity
-
-**Floating Controls:**
-
-```
-┌─ ReadFocus Helper ─┐
-│ ⏮️ ⏸️ ⏭️  ⚙️  ❌  │
-│ Progress: 3/15    │
-└───────────────────┘
-```
-
-**Responsive Behavior:**
-
-- Control panel adapts to screen size
-- Mobile-friendly touch targets
-- Preserves original page responsive design
-
-### 🚀 **Implementation Plan:**
-
-**Phase 2A: Core Reading Helper**
-
-1. Add mode selection to popup UI
-2. Create floating control panel component
-3. Implement in-place chunk highlighting
-4. Add smooth scrolling to active chunks
-5. Integrate with existing settings system
-
-**Phase 2B: Polish & Integration**
-
-1. Add highlighting style customization
-2. Implement floating quiz modals
-3. Add keyboard shortcuts (same as Focus Mode)
-4. Ensure compatibility with various website layouts
-5. Add user preference for default mode
+- Enhanced storage schema with metadata and organizational structure
+- Hierarchical folder/project system with nested organization
+- Advanced search and filtering capabilities (by project, date, topic, tags)
+- Drag-and-drop interface for organizing summaries
+- Bulk operations (move, tag, export multiple summaries)
+- Export API integrations
+- User preference learning algorithms
 
 ---
 
-### Phase 3 — Coverage & Robustness
+### ⚡ **Phase 3: Performance & Reliability (Production Readiness)**
 
-**Goal:** Work well across more page types and tricky structures.
+**Goal:** Make the extension fast, reliable, and production-ready for thousands of users with modern development practices.
 
-**Features**
+**Features to Build:**
 
-- **Dynamic Content Handling:** Late-loading content, infinite articles.
-- **Multi-Page Articles:** Detect next/previous article pagination and combine.
-- **Tables & Figures:** Convert to readable summaries with optional "expand".
-- **Citations & Footnotes:** Inline preview on hover.
-- **PDF in Browser:** Basic support for text PDFs displayed in browser (open in reader overlay when possible).
+- [ ] **Background Processing**: Generate summaries in background without blocking UI
+- [ ] **Batch Processing**: Queue multiple pages for summarization
+- [ ] **Offline Mode**: Access previously generated summaries without internet
+- [ ] **Smart Caching**: Intelligent cache management with deduplication
+- [ ] **Error Recovery**: Robust error handling with user-friendly messages
+- [ ] **Performance Monitoring**: Track summarization speed and success rates
+- [ ] **Rate Limiting**: Smart API usage management and cost optimization
 
-**To-Do List**
+**Development Infrastructure:**
 
-- [ ] Observe DOM for dynamic updates; reflow chunks if content changes.
-- [ ] Pagination detection and seamless merge; show combined progress.
-- [ ] Render tables as simplified lists; provide toggle for original table.
-- [ ] Inline footnote/citation preview; back-to-text anchors.
-- [ ] Add PDF text layer detection; fallback to open-in-new-tab with reader.
+- [ ] **Testing Suite**: Comprehensive unit tests (Jest), integration tests, and E2E testing (Playwright) with Plasmo
+- [ ] **Code Quality Tools**: ESLint, Prettier, Husky pre-commit hooks integrated with Plasmo workflow
+- [ ] **CI/CD Pipeline**: GitHub Actions for automated testing, building, and Chrome Web Store deployment using Plasmo build
+- [ ] **Bundle Analysis**: Optimize extension size with Plasmo's built-in bundle analysis and tree-shaking
 
----
+**Technical Implementation:**
 
-### Phase 4 — AI-Powered Smart Highlighting & Learning Boosters
-
-**Goal:** Replace frequency-based highlighting with intelligent AI analysis for optimal learning focus.
-
-**Features**
-
-- **🤖 AI Smart Highlighting:** Claude Sonnet 4 analyzes full article to identify key sentences, words, and phrases with 3-tier importance system.
-- **📊 Multi-Level Visual Hierarchy:** Different colors/styles for High/Medium/Low importance highlights.
-- **🎯 Context-Aware Analysis:** AI considers entire article context, not just word frequency.
-- **⚡ Real-Time Processing:** Seamless integration with existing Reading Helper Mode.
-- **🔧 Customizable Styles:** User can adjust highlight colors and intensity per importance level.
+- Service worker background processing with modern patterns
+- IndexedDB with proper error handling and data management
+- Network request optimization with retry logic and timeout handling
+- Performance monitoring and analytics with structured data
+- Comprehensive error boundary systems with proper logging
+- Chrome Extension Manifest V3 best practices
+- Automated testing pipeline with coverage reporting
 
 ---
 
-## 🤖 **AI Smart Highlighting System (Phase 4A - Priority Implementation)**
+### 🧠 **Phase 4: Advanced AI Features (Innovation)**
 
-### **📋 Implementation Breakdown:**
+**Goal:** Push the boundaries of AI-powered content understanding and user assistance.
 
-#### **Phase 4A.1: AI Integration Foundation**
+**Features to Build:**
 
-- [ ] **Set up Claude Sonnet 4 API integration**
-  - Add API key management to extension settings
-  - Create secure API client with error handling
-  - Implement rate limiting and usage tracking
-  - Add user consent UI for AI processing
+- [ ] **Multi-Language Support**: Summarize content in 10+ languages
+- [ ] **Cross-Article Analysis**: Generate summaries comparing multiple articles
+- [ ] **Trend Detection**: Identify trending topics across summarized content
+- [ ] **Fact Checking Integration**: Basic fact verification for key claims
+- [ ] **Visual Content Analysis**: Summarize content from images and charts
+- [ ] **Audio Summary Generation**: Text-to-speech summaries for accessibility
+- [ ] **Smart Bookmarking**: AI-powered bookmark organization and retrieval
 
-#### **Phase 4A.2: Content Analysis Pipeline**
+**Technical Implementation:**
 
-- [ ] **Prepare article content for AI analysis**
-  - Extract clean text content (reuse existing content detection)
-  - Remove HTML markup, ads, navigation elements
-  - Preserve paragraph structure and sentence boundaries
-  - Add content length validation (API limits)
-
-#### **Phase 4A.3: AI Prompt Engineering**
-
-- [ ] **Design optimal prompts for highlighting analysis**
-  - Create prompt template for importance classification
-  - Define clear criteria for High/Medium/Low importance
-  - Include context about reading comprehension goals
-  - Test and refine prompts for consistent results
-
-#### **Phase 4A.4: Response Processing**
-
-- [ ] **Parse and validate AI responses**
-  - Define JSON schema for AI response format
-  - Implement response validation and error handling
-  - Map AI selections back to original DOM elements
-  - Handle edge cases (partial matches, overlapping selections)
-
-#### **Phase 4A.5: Visual Highlighting System**
-
-- [ ] **Implement 3-tier highlight styling**
-  - **High Importance:** Bold yellow background, dark text, subtle border
-  - **Medium Importance:** Light yellow background, regular weight
-  - **Low Importance:** Pale yellow background, lighter text
-  - **Not Important:** No highlighting (original text)
-  - Add smooth transitions and hover effects
-
-#### **Phase 4A.6: Integration & Performance**
-
-- [ ] **Integrate with existing Reading Helper Mode**
-  - Replace frequency-based word extraction with AI analysis
-  - Maintain existing control panel and user interactions
-  - Add loading states during AI processing
-  - Implement caching to avoid re-analyzing same content
-
-#### **Phase 4A.7: User Experience Enhancements**
-
-- [ ] **Add AI highlighting controls**
-  - Toggle between AI and frequency-based highlighting
-  - Adjust highlight intensity/opacity per importance level
-  - Show highlight legend explaining importance levels
-  - Add "Analyze Again" option for updated results
-
-#### **Phase 4A.8: Settings & Customization**
-
-- [ ] **Extend settings panel for AI features**
-  - API key configuration with secure storage
-  - Highlight color customization per importance tier
-  - Toggle AI vs frequency-based highlighting
-  - Privacy controls and data handling preferences
+- Multi-language AI model integration
+- Image recognition and analysis
+- Text-to-speech APIs
+- Cross-reference databases for fact checking
+- Advanced AI prompt engineering
 
 ---
 
-### **🎨 Highlight Styling Specifications:**
+### 🎨 **Phase 5: Collaboration & Sharing (Social Features)**
 
-```css
-/* High Importance - Key concepts, main ideas */
-.rf-highlight-high {
-  background: linear-gradient(120deg, #fde047 0%, #facc15 100%);
-  color: #92400e;
-  font-weight: 700;
-  border-bottom: 2px solid #f59e0b;
-  padding: 2px 4px;
-  border-radius: 3px;
-}
+**Goal:** Enable users to share insights and collaborate around summarized content.
 
-/* Medium Importance - Supporting details, explanations */
-.rf-highlight-medium {
-  background: #fef3c7;
-  color: #92400e;
-  font-weight: 600;
-  padding: 1px 3px;
-  border-radius: 2px;
-}
+**Features to Build:**
 
-/* Low Importance - Context, examples */
-.rf-highlight-low {
-  background: #fffbeb;
-  color: #a16207;
-  font-weight: 500;
-  padding: 1px 2px;
-  border-radius: 2px;
-  opacity: 0.8;
-}
-```
+- [ ] **Summary Sharing**: Share summaries with colleagues via secure links
+- [ ] **Team Workspaces**: Collaborative summary collections for teams
+- [ ] **Public Summary Library**: Opt-in community sharing of high-quality summaries
+- [ ] **Discussion Integration**: Comment and discuss summaries with team members
+- [ ] **Summary Templates**: Create and share custom summary templates
+- [ ] **Integration Hub**: Connect with Slack, Microsoft Teams, Discord
 
-### **🤖 AI Prompt Template:**
+**Technical Implementation:**
 
-```
-Analyze this article and identify important content for student reading comprehension.
-
-Article: [ARTICLE_TEXT]
-
-Please categorize sentences, phrases, and key terms into 3 importance levels:
-
-HIGH IMPORTANCE (🔴): Core concepts, main arguments, key facts, definitions
-MEDIUM IMPORTANCE (🟡): Supporting details, explanations, examples, context
-LOW IMPORTANCE (🟢): Minor details, transitions, basic background
-
-Return a JSON response with exact text selections:
-{
-  "high": ["exact text 1", "exact text 2"],
-  "medium": ["exact text 3", "exact text 4"],
-  "low": ["exact text 5", "exact text 6"]
-}
-
-Focus on helping students identify the most critical information for comprehension.
-```
+- Secure sharing infrastructure
+- Real-time collaboration features
+- Community moderation tools
+- Third-party app integrations
+- Privacy and permission controls
 
 ---
 
-## **🚀 Legacy Phase 4 Features (Lower Priority)**
+### 📈 **Phase 6: Analytics & Insights (Data-Driven)**
 
-**Auto Key Points:** Generate 3–5 bullets per section.
-**Concept Glossary:** Detect key terms with short, simple definitions.
-**Smart Quizzes:** Better question generation tied to key points.
-**Section Summaries:** End-of-section short summary and "review all" mode.
+**Goal:** Provide users with insights about their reading habits and content consumption.
 
-**To-Do List**
+**Features to Build:**
 
-- [ ] Generate key points for each chunk; show in expandable panel.
-- [ ] Extract terminology; attach short definitions and example sentences.
-- [ ] Build improved question templates linked to key points.
-- [ ] Add section-end summary card and Review mode (all quizzes in one go).
+- [ ] **Reading Analytics**: Track summarization patterns and topics
+- [ ] **Knowledge Mapping**: Visualize connections between summarized topics
+- [ ] **Learning Progress**: Track comprehension improvement over time
+- [ ] **Content Recommendations**: Suggest relevant articles based on reading history
+- [ ] **Productivity Metrics**: Show time saved through summarization
+- [ ] **Weekly/Monthly Reports**: Insights about reading habits and learning
 
----
+**Technical Implementation:**
 
-### Phase 5 — Accessibility, Localization, Privacy
-
-**Goal:** Ensure the extension is usable, inclusive, and trustworthy.
-
-**Features**
-
-- **Accessibility:** Keyboard-first navigation, ARIA roles, adjustable contrast, dyslexia-friendly toggles (letter spacing, font option), focus indicators.
-- **Localization:** Strings ready for multiple languages.
-- **Privacy Controls:** Clear data handling; all processing on-device when possible; user consent for any remote processing.
-
-**To-Do List**
-
-- [ ] Audit keyboard flows and ARIA labeling; fix focus traps.
-- [ ] Add toggles for contrast, spacing, dyslexia-friendly font.
-- [ ] Externalize UI strings; structure for translations.
-- [ ] Write human-readable privacy and data retention notes in Options.
+- User behavior tracking (privacy-first)
+- Data visualization libraries
+- Machine learning for recommendations
+- Privacy-compliant analytics
+- Report generation systems
 
 ---
 
-### Phase 6 — Polishing & Edge Cases
+## 🛡️ **Production Readiness Checklist**
 
-**Goal:** Make it delightful and resilient.
+### **Security & Privacy**
 
-**Features**
+- [ ] End-to-end encryption for stored summaries
+- [ ] Zero-knowledge architecture for user data
+- [ ] GDPR compliance and privacy controls
+- [ ] Secure API key storage and rotation
+- [ ] Content sanitization and XSS prevention
+- [ ] TypeScript strict null checks and type safety
+- [ ] CSP (Content Security Policy) implementation
+- [ ] Secure build pipeline with dependency vulnerability scanning
 
-- **Visual Polish:** Smooth transitions, progress bar animations, subtle haptics (if applicable).
-- **Error Handling:** Friendly fallbacks when extraction fails ("Open simplified view?" / "Copy text into reader").
-- **Performance:** Fast overlay open, minimal jank on long pages.
+### **Performance & Scalability**
 
-**To-Do List**
+- [ ] Sub-5-second summarization for 90% of content
+- [ ] Efficient storage management (auto-cleanup old summaries)
+- [ ] Memory optimization for long browsing sessions
+- [ ] CDN integration for faster loading
+- [ ] A/B testing infrastructure
 
-- [ ] Add animation cues for advancing chunks.
-- [ ] Build graceful failure messages and alternate flows.
-- [ ] Optimize long-article rendering and memory usage.
+### **User Experience**
 
----
+- [ ] Comprehensive onboarding flow
+- [ ] In-app help system and tutorials
+- [ ] Accessibility compliance (WCAG 2.1)
+- [ ] Keyboard navigation support
+- [ ] Mobile-responsive design
 
-## 🧩 Key UI Components Checklist
+### **Business & Operations**
 
-- [ ] **Toolbar Popup** (status + quick actions)
-- [ ] **In-Page Overlay Reader** (core reading experience)
-- [ ] **Control Panel** (typography, pacing, settings)
-- [ ] **Recall Prompt Modal** (quiz, feedback)
-- [ ] **On-Page Banner** (auto-detect prompt, per-site remember)
-- [ ] **Options/Settings Page** (history, preferences, privacy)
-
----
-
-## ✅ Acceptance Criteria (per Phase)
-
-- **Phase 1:** On 3 sample articles (news, blog, wiki), Focus Mode opens, chunks text, highlights keywords, advances by tap, and shows at least one recall prompt per 3–5 chunks.
-- **Phase 2:** Users can start from popup, use shortcuts, auto-detect prompt appears on articles, typography changes persist per site.
-- **Phase 3:** Dynamic articles and paginated content render correctly; tables and citations have readable fallbacks; text-PDFs open in reader.
-- **Phase 4:** Key points, glossary, and section summaries appear; smart quizzes reference those points.
-- **Phase 5:** Passes basic accessibility checks; localization-ready; privacy copy present.
-- **Phase 6:** Smooth animations, friendly errors, and responsive performance on long pages.
-
----
-
-## 📦 Deliverables
-
-- High-fidelity mockups for: Popup, Overlay Reader, Control Panel, Quiz Modal, Options Page, Auto-detect Banner.
-- Copy deck (labels, microcopy, error states, privacy notes).
-- Interaction specs (advancing chunks, quiz response feedback, animations).
-- Icon set (toolbar icon states: idle, detected, active) and illustration style for student-friendly tone.
-
-> This plan is intentionally implementation-agnostic so an AI editor can choose the exact technical approach while following the product goals, feature sets, and acceptance criteria.
+- [ ] User feedback collection system
+- [ ] Error monitoring and alerting (Sentry/LogRocket integration)
+- [ ] Usage analytics and metrics with proper typing
+- [ ] Automated testing pipeline with TypeScript support
+- [ ] Documentation for users and developers (TypeDoc generation)
+- [ ] Automated Chrome Web Store deployment pipeline
+- [ ] Code coverage reporting and quality gates
 
 ---
 
-## 📚 Previous App Features (Completed)
+## 🎯 **Success Metrics**
 
-**These features are already built in the existing ReadFocus web app:**
+### **User Engagement**
 
-### ✅ Completed Features
+- **Primary**: Daily active users generating summaries
+- **Secondary**: Average summaries per user per day
+- **Retention**: 7-day and 30-day user retention rates
 
-- [x] Text input box and PDF upload handler
-- [x] Chunking function to split text
-- [x] Keyword highlighting function
-- [x] Guided reading view with navigation (tap/scroll)
-- [x] Basic recall prompt logic (MCQ or true/false)
-- [x] Streak counter component
-- [x] Focus timer component
-- [x] Browser extension text capture (basic version)
-- [x] Stats tracking logic
-- [x] Stats dashboard UI
-- [x] XP points system
+### **Product Quality**
 
-### 📋 Remaining Previous Features (Future Integration)
+- **Speed**: Average summarization time < 10 seconds
+- **Accuracy**: User satisfaction rating > 4.5/5 for summary quality
+- **Reliability**: 99%+ successful summarization rate
 
-- [ ] Add share-to-app import for mobile
-- [ ] Add achievements unlocking system
-- [ ] Integrate OCR for image-to-text conversion
-- [x] Add AI summary generation function
-- [ ] Build adaptive focus logic
-- [ ] Design and implement focus pet/plant growth system
-- [ ] Implement report generation logic
-- [ ] Add paywall and subscription system
-- [ ] Add export-to-Quizlet/Notion integration
-- [ ] Implement study group focus feature
+### **Business Impact**
+
+- **Growth**: Monthly active user growth rate
+- **Efficiency**: Average time saved per user per session
+- **Adoption**: Enterprise/team adoption rate
+
+---
+
+## 🚀 **Immediate Next Steps (Phase 1 Priorities)**
+
+1. **Easy Explanation Mode** - Add simplified explanations with analogies for complex concepts
+2. **Content Type Detection** - Enhance AI prompts to recognize and adapt to different content types
+3. **Concept Dictionary** - Automatically detect and explain technical terms inline
+4. **Smart Length Adjustment** - Automatically optimize summary length based on source content
+5. **ELI5 Summaries** - Ultra-simplified versions anyone can understand
+
+---
+
+## 💡 **Innovation Opportunities**
+
+- **AI Research Partnerships**: Collaborate with AI research labs for cutting-edge summarization
+- **Educational Institution Partnerships**: Integrate with university learning management systems
+- **Corporate Learning Programs**: B2B solution for employee knowledge management
+- **API Marketplace**: Offer summarization API to other developers and applications
+- **Voice Interface**: Add voice commands for hands-free summarization
+- **Modern Extension Framework**: Use Plasmo for industry-standard development practices and better developer experience
+
+---
+
+> **Philosophy**: ReadFocus transforms information overload into knowledge advantage. Every feature should serve the core mission of helping users understand and retain more information in less time.
