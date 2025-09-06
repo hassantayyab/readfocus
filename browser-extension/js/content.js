@@ -18,11 +18,6 @@ console.log('🔧 [ContentScript] Window.ReadingHelperOverlay:', window.ReadingH
 
 class ReadFocusContentScript {
   constructor() {
-    this.selectedText = '';
-    this.selectionTimeout = null;
-    this.focusMode = null;
-    this.readingHelper = null;
-    this.pageAnalysis = null;
     this.settings = {};
     this.isExtensionUrl = false;
     
@@ -30,18 +25,6 @@ class ReadFocusContentScript {
     this.summaryService = null;
     this.summaryOverlay = null;
 
-    // Listen for deactivation messages from overlays
-    window.addEventListener('message', (event) => {
-      if (event.source !== window) return;
-
-      if (event.data.type === 'FOCUS_MODE_DEACTIVATED') {
-        this.focusMode = null;
-        console.log('✅ [ContentScript] Focus Mode deactivated from overlay');
-      } else if (event.data.type === 'READING_HELPER_DEACTIVATED') {
-        this.readingHelper = null;
-        console.log('✅ [ContentScript] Reading Helper deactivated from overlay');
-      }
-    });
 
     this.init();
   }
@@ -67,11 +50,6 @@ class ReadFocusContentScript {
       await this.loadSettings();
       console.log('✅ [ContentScript] Settings loaded:', this.settings);
 
-      console.log('👆 [ContentScript] Setting up selection listeners...');
-      // Listen for text selection changes
-      document.addEventListener('mouseup', () => this.handleSelection());
-      document.addEventListener('keyup', () => this.handleSelection());
-
       console.log('📡 [ContentScript] Setting up message listener...');
       // Listen for messages from popup and background
       chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -79,19 +57,6 @@ class ReadFocusContentScript {
         this.handleMessage(request, sender, sendResponse);
         return true; // Keep message channel open for async responses
       });
-
-      console.log('⌨️ [ContentScript] Setting up keyboard shortcuts...');
-      // Listen for keyboard shortcuts
-      document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
-
-      // Add visual feedback styles
-      this.addSelectionStyles();
-
-      // Auto-analyze page if enabled
-      if (this.settings.autoDetectArticles) {
-        console.log('🔍 [ContentScript] Auto-analyzing page for articles...');
-        await this.analyzePageForArticle();
-      }
 
       console.log('🎉 [ContentScript] ReadFocus content script initialized successfully!');
     } catch (error) {
@@ -183,64 +148,8 @@ class ReadFocusContentScript {
   async handleMessage(request, sender, sendResponse) {
     try {
       switch (request.type) {
-        case 'ANALYZE_PAGE':
-          console.log('📊 [ContentScript] Analyzing page for article content');
-          const analysis = await this.analyzePageForArticle();
-          console.log('📊 [ContentScript] Analysis result:', analysis);
-          console.log(
-            '📊 [ContentScript] Analysis mainContent type:',
-            typeof analysis?.mainContent
-          );
-          console.log(
-            '📊 [ContentScript] Analysis mainContent is Element?',
-            analysis?.mainContent instanceof Element
-          );
-          sendResponse({ success: true, analysis });
-          break;
-
-        case 'START_FOCUS_MODE':
-          const started = await this.startFocusMode(request.settings, request.pageAnalysis);
-          sendResponse({ success: started });
-          break;
-
-        case 'START_READING_HELPER':
-          const helperStarted = await this.startReadingHelper(
-            request.settings,
-            request.pageAnalysis
-          );
-          sendResponse({ success: helperStarted });
-          break;
-
-        case 'EXIT_FOCUS_MODE':
-          this.exitFocusMode();
-          sendResponse({ success: true });
-          break;
-
-        case 'EXIT_READING_HELPER':
-          this.exitReadingHelper();
-          sendResponse({ success: true });
-          break;
-
-        case 'GET_SELECTION':
-          const selection = this.getSelectedText();
-          sendResponse({ success: true, text: selection });
-          break;
-
-        case 'EXTRACT_ARTICLE':
-          const article = await this.extractArticleContent();
-          sendResponse({ success: true, ...article });
-          break;
-
-        case 'GET_PAGE_TEXT':
-          const pageText = this.extractPageText();
-          sendResponse({ success: true, text: pageText });
-          break;
-
         case 'SETTINGS_UPDATED':
           this.settings = request.settings;
-          if (this.focusMode?.isActive) {
-            this.focusMode.updateSettings(this.settings);
-          }
           sendResponse({ success: true });
           break;
 
@@ -262,6 +171,18 @@ class ReadFocusContentScript {
         case 'HIDE_SUMMARY':
           this.hideSummaryOverlay();
           sendResponse({ success: true });
+          break;
+
+        case 'CLEAR_SUMMARY_CACHE':
+          if (this.summaryService) {
+            this.summaryService.clearCache();
+          }
+          sendResponse({ success: true });
+          break;
+
+        case 'CHECK_SUMMARY_EXISTS':
+          const exists = this.summaryService && this.summaryService.hasCachedSummary();
+          sendResponse({ exists: exists || false });
           break;
 
         default:

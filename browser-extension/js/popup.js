@@ -20,17 +20,17 @@ class ReadFocusPopup {
       // Load settings
       await this.loadSettings();
 
-      // Update UI with settings
-      this.updateQuickSettings();
+      // Check API status
+      await this.checkApiStatus();
 
-      // Analyze current page
-      await this.analyzePage();
-
-      // Initialize mode selection
-      this.initializeModeSelection();
+      // Check summary status
+      await this.checkSummaryStatus();
 
       // Bind events
       this.bindEvents();
+
+      // Start page analysis
+      await this.analyzePage();
 
       console.log('ReadFocus popup initialized');
     } catch (error) {
@@ -150,10 +150,16 @@ class ReadFocusPopup {
     try {
       console.log('💉 [Popup] Injecting content scripts...');
 
-      // Inject both scripts in the correct order
+      // Inject scripts in the correct order
       await chrome.scripting.executeScript({
         target: { tabId: this.currentTab.id },
-        files: ['js/focus-mode-overlay.js', 'js/content.js'],
+        files: [
+          'js/ai-client.js',
+          'js/content-analyzer.js',
+          'js/content-summary-service.js',
+          'js/summary-overlay.js',
+          'js/content.js'
+        ],
       });
 
       // Also inject CSS
@@ -169,97 +175,6 @@ class ReadFocusPopup {
     }
   }
 
-  /**
-   * Initialize mode selection UI and behavior
-   */
-  initializeModeSelection() {
-    console.log('🎯 [Popup] Initializing mode selection...');
-
-    // Get the saved reading mode preference
-    const savedMode = this.settings.readingMode || 'focus';
-
-    // Set the radio button
-    const modeRadio = document.getElementById(`${savedMode}-mode-radio`);
-    if (modeRadio) {
-      modeRadio.checked = true;
-    }
-
-    // Update button UI based on mode
-    this.updateModeUI(savedMode);
-
-    // Add event listeners for mode changes
-    const focusRadio = document.getElementById('focus-mode-radio');
-    const helperRadio = document.getElementById('helper-mode-radio');
-
-    if (focusRadio) {
-      focusRadio.addEventListener('change', () => {
-        if (focusRadio.checked) {
-          this.updateModeUI('focus');
-          this.saveSelectedMode('focus');
-        }
-      });
-    }
-
-    if (helperRadio) {
-      helperRadio.addEventListener('change', () => {
-        if (helperRadio.checked) {
-          this.updateModeUI('helper');
-          this.saveSelectedMode('helper');
-        }
-      });
-    }
-
-    console.log('✅ [Popup] Mode selection initialized with mode:', savedMode);
-  }
-
-  /**
-   * Update UI elements based on selected mode
-   */
-  updateModeUI(mode) {
-    const modeIcon = document.getElementById('mode-icon');
-    const modeTitle = document.getElementById('mode-title');
-    const modeSubtitle = document.getElementById('mode-subtitle');
-
-    if (mode === 'helper') {
-      if (modeIcon) modeIcon.textContent = '📖';
-      if (modeTitle) modeTitle.textContent = 'Start Reading Helper';
-      if (modeSubtitle) modeSubtitle.textContent = 'Highlight text on original page';
-    } else {
-      if (modeIcon) modeIcon.textContent = '🎯';
-      if (modeTitle) modeTitle.textContent = 'Start Focus Mode';
-      if (modeSubtitle) modeSubtitle.textContent = 'Transform this page for focused reading';
-    }
-  }
-
-  /**
-   * Save selected mode to settings
-   */
-  async saveSelectedMode(mode) {
-    try {
-      this.settings.readingMode = mode;
-      await chrome.storage.sync.set({ readfocusSettings: this.settings });
-      console.log('💾 [Popup] Saved reading mode:', mode);
-    } catch (error) {
-      console.error('❌ [Popup] Error saving mode:', error);
-    }
-  }
-
-  /**
-   * Get currently selected reading mode
-   */
-  getSelectedMode() {
-    const focusRadio = document.getElementById('focus-mode-radio');
-    const helperRadio = document.getElementById('helper-mode-radio');
-
-    if (helperRadio && helperRadio.checked) {
-      return 'helper';
-    } else if (focusRadio && focusRadio.checked) {
-      return 'focus';
-    }
-
-    // Default to focus mode
-    return 'focus';
-  }
 
   /**
    * Update page status based on analysis
@@ -275,14 +190,14 @@ class ReadFocusPopup {
         `Article detected: ${title || 'Untitled'}`,
         `~${wordCount} words • ${Math.round(confidence * 100)}% confidence`
       );
-      this.enableFocusMode();
+      this.enableSummaryMode();
     } else {
       this.updatePageStatus(
         'no-article',
         'No article detected',
-        'This page may not be suitable for Focus Mode'
+        'This page may not be suitable for summarization'
       );
-      this.disableFocusMode();
+      this.disableSummaryMode();
     }
   }
 
@@ -312,82 +227,48 @@ class ReadFocusPopup {
   }
 
   /**
-   * Enable Focus Mode button
+   * Enable summary functionality
    */
-  enableFocusMode() {
-    const button = document.getElementById('start-reading-mode');
-    if (!button) return;
-
-    button.disabled = false;
-
-    // Update button text based on selected mode
-    const selectedMode = this.getSelectedMode();
-    this.updateModeUI(selectedMode);
+  enableSummaryMode() {
+    const generateBtn = document.getElementById('generate-summary');
+    if (generateBtn) {
+      generateBtn.disabled = false;
+    }
+    
+    const summarySection = document.getElementById('summary-section');
+    if (summarySection) {
+      summarySection.style.opacity = '1';
+    }
   }
 
   /**
-   * Disable Focus Mode button
+   * Disable summary functionality
    */
-  disableFocusMode() {
-    const button = document.getElementById('start-reading-mode');
-    if (!button) return;
-
-    button.disabled = true;
-
-    const modeTitle = document.getElementById('mode-title');
-    const modeSubtitle = document.getElementById('mode-subtitle');
-
-    if (modeTitle) modeTitle.textContent = 'Reading Mode Unavailable';
-    if (modeSubtitle) modeSubtitle.textContent = 'No suitable article found on this page';
+  disableSummaryMode() {
+    const generateBtn = document.getElementById('generate-summary');
+    if (generateBtn) {
+      generateBtn.disabled = true;
+    }
+    
+    const summarySection = document.getElementById('summary-section');
+    if (summarySection) {
+      summarySection.style.opacity = '0.6';
+    }
   }
 
-  /**
-   * Update quick settings display
-   */
-  updateQuickSettings() {
-    if (!this.settings) return;
-
-    // Update theme
-    document.getElementById('current-theme').textContent =
-      this.settings.theme.charAt(0).toUpperCase() + this.settings.theme.slice(1);
-
-    // Update speed
-    document.getElementById('current-speed').textContent = `${this.settings.readingSpeed}s auto`;
-
-    // Update quiz frequency
-    document.getElementById('current-quiz').textContent =
-      `Every ${this.settings.quizFrequency} chunks`;
-
-    // Update font size
-    document.getElementById('current-font').textContent = `${this.settings.fontSize}px`;
-  }
 
   /**
    * Bind event listeners
    */
   bindEvents() {
-    // Reading Mode button (updated to handle both modes)
-    document.getElementById('start-reading-mode')?.addEventListener('click', () => {
-      this.startReadingMode();
-    });
-
     // Settings button
     document.getElementById('open-settings')?.addEventListener('click', () => {
       this.openSettings();
     });
 
-    // Stats button
-    document.getElementById('reading-stats')?.addEventListener('click', () => {
-      this.openStats();
-    });
-
-    // Fallback text capture buttons
-    document.getElementById('capture-selection')?.addEventListener('click', () => {
-      this.captureSelection();
-    });
-
-    document.getElementById('capture-article')?.addEventListener('click', () => {
-      this.captureArticle();
+    // Clear cache button
+    document.getElementById('clear-cache')?.addEventListener('click', () => {
+      this.clearSummaryCache();
     });
 
     // Summary buttons
@@ -398,87 +279,60 @@ class ReadFocusPopup {
     document.getElementById('show-summary')?.addEventListener('click', () => {
       this.showSummary();
     });
-
-    // Keyboard shortcuts info
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && e.target.id === 'start-reading-mode') {
-        this.startReadingMode();
-      }
-    });
   }
 
   /**
-   * Start Reading Mode (Focus or Helper) based on selection
+   * Check API status and configuration
    */
-  async startReadingMode() {
-    const selectedMode = this.getSelectedMode();
-    console.log('🚀 [Popup] Starting reading mode:', selectedMode);
+  async checkApiStatus() {
+    try {
+      // Check if API key is configured
+      const result = await chrome.storage.sync.get(['readfocusSettings']);
+      const settings = result.readfocusSettings || {};
+      const hasApiKey = !!(settings.aiApiKey || settings.claude_api_key);
 
-    if (selectedMode === 'helper') {
-      await this.startReadingHelper();
-    } else {
-      await this.startFocusMode();
+      const statusDot = document.getElementById('api-status-dot');
+      const statusText = document.getElementById('api-status-text');
+
+      if (hasApiKey) {
+        statusDot.className = 'status-dot connected';
+        statusText.textContent = 'API key configured';
+      } else {
+        statusDot.className = 'status-dot disconnected';
+        statusText.textContent = 'API key required - click Settings';
+      }
+
+      // Update summary section availability
+      const summarySection = document.getElementById('summary-section');
+      if (summarySection) {
+        summarySection.style.opacity = hasApiKey ? '1' : '0.6';
+      }
+
+      return hasApiKey;
+    } catch (error) {
+      console.error('Error checking API status:', error);
+      return false;
     }
   }
 
   /**
-   * Start Reading Helper Mode on current page
+   * Clear summary cache
    */
-  async startReadingHelper() {
-    if (!this.currentTab || !this.pageStatus) return;
-
+  async clearSummaryCache() {
     try {
-      this.showLoading('Starting Reading Helper...');
-
-      // Send message to start Reading Helper Mode
+      // Send message to content script to clear cache
       const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'START_READING_HELPER',
-        settings: this.settings,
-        pageAnalysis: this.pageStatus,
+        type: 'CLEAR_SUMMARY_CACHE'
       });
 
       if (response && response.success) {
-        console.log('✅ [Popup] Reading Helper started successfully');
-        // Close popup after successful start
-        window.close();
+        this.showSuccess('Summary cache cleared!');
       } else {
-        console.error('❌ [Popup] Failed to start Reading Helper');
-        this.showError('Failed to start Reading Helper. Please try again.');
+        this.showError('Failed to clear cache');
       }
     } catch (error) {
-      console.error('❌ [Popup] Error starting Reading Helper:', error);
-      this.showError('Failed to start Reading Helper. Please try again.');
-    } finally {
-      this.hideLoading();
-    }
-  }
-
-  /**
-   * Start Focus Mode on current page
-   */
-  async startFocusMode() {
-    if (!this.currentTab || !this.pageStatus?.isArticle) return;
-
-    try {
-      this.showLoading('Activating Focus Mode...');
-
-      // Send message to content script to start Focus Mode
-      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'START_FOCUS_MODE',
-        settings: this.settings,
-        pageAnalysis: this.pageStatus,
-      });
-
-      if (response && response.success) {
-        this.showSuccess('Focus Mode activated!');
-        // Close popup after brief delay
-        setTimeout(() => window.close(), 1000);
-      } else {
-        throw new Error(response?.error || 'Failed to start Focus Mode');
-      }
-    } catch (error) {
-      console.error('Error starting Focus Mode:', error);
-      this.showError('Failed to start Focus Mode. Please try again.');
+      console.error('Error clearing cache:', error);
+      this.showSuccess('Cache cleared!'); // Show success anyway as it's not critical
     }
   }
 
@@ -490,96 +344,6 @@ class ReadFocusPopup {
     window.close();
   }
 
-  /**
-   * Open reading stats (placeholder for now)
-   */
-  openStats() {
-    // For now, open the web app stats page
-    chrome.tabs.create({
-      url: 'http://localhost:3000?stats=true',
-    });
-    window.close();
-  }
-
-  /**
-   * Fallback: Capture selected text
-   */
-  async captureSelection() {
-    try {
-      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'GET_SELECTION',
-      });
-
-      if (response && response.text) {
-        await this.sendToReadFocus(response.text, 'Selected Text');
-      } else {
-        this.showError('No text selected. Please select some text first.');
-      }
-    } catch (error) {
-      console.error('Error capturing selection:', error);
-      this.showError('Failed to capture selected text');
-    }
-  }
-
-  /**
-   * Fallback: Capture article content
-   */
-  async captureArticle() {
-    try {
-      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'EXTRACT_ARTICLE',
-      });
-
-      if (response && response.text) {
-        await this.sendToReadFocus(response.text, response.title || 'Article');
-      } else {
-        this.showError('Failed to extract article content');
-      }
-    } catch (error) {
-      console.error('Error capturing article:', error);
-      this.showError('Failed to capture article');
-    }
-  }
-
-  /**
-   * Send text to ReadFocus web app (fallback method)
-   */
-  async sendToReadFocus(text, title) {
-    try {
-      const textData = {
-        id: this.generateId(),
-        text: text,
-        title: title,
-        sourceUrl: this.currentTab.url,
-        timestamp: Date.now(),
-      };
-
-      // Store in chrome storage
-      await chrome.storage.local.set({
-        readfocus_captured_text: textData,
-      });
-
-      // Construct URL with text data
-      const baseUrl = 'http://localhost:3000';
-      const urlParams = new URLSearchParams({
-        source: 'extension',
-        id: textData.id,
-        title: encodeURIComponent(title),
-        text: encodeURIComponent(text.substring(0, 2000)), // Limit URL length
-      });
-
-      const readfocusUrl = `${baseUrl}?${urlParams.toString()}`;
-
-      // Open ReadFocus app
-      await chrome.tabs.create({ url: readfocusUrl });
-
-      this.showSuccess('Text sent to ReadFocus!');
-      setTimeout(() => window.close(), 1500);
-    } catch (error) {
-      console.error('Error sending to ReadFocus:', error);
-      this.showError('Failed to send text to ReadFocus');
-    }
-  }
 
   /**
    * Generate unique ID
@@ -589,51 +353,9 @@ class ReadFocusPopup {
   }
 
   /**
-   * Show loading state
-   */
-  showLoading(message) {
-    const button = document.getElementById('start-reading-mode');
-    if (!button) return;
-
-    button.disabled = true;
-    button.classList.add('loading');
-
-    const originalContent = button.innerHTML;
-    button.innerHTML = `
-      <div class="focus-button-content">
-        <span class="focus-icon">⏳</span>
-        <div class="focus-text">
-          <div class="focus-title">${message}</div>
-          <div class="focus-subtitle">Please wait...</div>
-        </div>
-      </div>
-    `;
-
-    // Store original content for restoration
-    button.dataset.originalContent = originalContent;
-  }
-
-  /**
-   * Hide loading state
-   */
-  hideLoading() {
-    const button = document.getElementById('start-reading-mode');
-    if (!button) return;
-
-    button.disabled = false;
-    button.classList.remove('loading');
-
-    if (button.dataset.originalContent) {
-      button.innerHTML = button.dataset.originalContent;
-      delete button.dataset.originalContent;
-    }
-  }
-
-  /**
    * Show success message
    */
   showSuccess(message) {
-    this.hideLoading();
     this.showMessage(message, 'success');
   }
 
@@ -641,7 +363,6 @@ class ReadFocusPopup {
    * Show error message
    */
   showError(message) {
-    this.hideLoading();
     this.showMessage(message, 'error');
   }
 
@@ -753,7 +474,7 @@ class ReadFocusPopup {
 
     // Show/hide the show button based on status
     if (showBtn) {
-      showBtn.style.display = (status === 'completed' || status === 'ready') ? 'flex' : 'none';
+      showBtn.style.display = (status === 'completed') ? 'flex' : 'none';
     }
   }
 
@@ -762,11 +483,25 @@ class ReadFocusPopup {
    */
   async checkSummaryStatus() {
     try {
-      // This could be extended to check if a summary already exists
-      // For now, we'll assume no summary exists initially
-      this.updateSummaryStatus('ready', 'Ready');
+      // Check if a summary already exists for this page
+      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
+        type: 'CHECK_SUMMARY_EXISTS'
+      });
+
+      if (response && response.exists) {
+        this.updateSummaryStatus('completed', 'Available');
+        // Show the "Show Summary" button if summary exists
+        document.getElementById('show-summary').style.display = 'flex';
+      } else {
+        this.updateSummaryStatus('ready', 'Ready');
+        // Hide the "Show Summary" button initially
+        document.getElementById('show-summary').style.display = 'none';
+      }
     } catch (error) {
       console.error('❌ [Popup] Error checking summary status:', error);
+      // Default to initial state
+      this.updateSummaryStatus('ready', 'Ready');
+      document.getElementById('show-summary').style.display = 'none';
     }
   }
 }

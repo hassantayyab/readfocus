@@ -1,27 +1,28 @@
-# PLAN.md — ReadFocus Chrome Extension (Enhanced Auto Focus Mode)
+# PLAN.md — ReadFocus Chrome Extension (AI Content Summary)
 
 ## 🎯 Product Goal
 
-Deliver a Chrome extension that **automatically converts any readable webpage** into a distraction-free, **Focus Reading Mode** that keeps students engaged and improves comprehension with minimal effort.
+Deliver a Chrome extension that **instantly generates intelligent summaries** of any readable webpage using **AI-powered content analysis** to help students and professionals quickly understand and retain key information.
 
-**Outcome:** One-click (or auto) transform → clean, chunked text with guided pacing, highlighted keywords, and quick "Did you get it?" checks.
+**Outcome:** One-click summary generation → comprehensive multi-format summaries with key points, detailed analysis, and actionable insights.
 
 ---
 
 ## 🔍 Scope & Constraints
 
-- **In-scope:** Readable web pages (articles, wiki pages, blogs, docs rendered as HTML), Google Docs basic support, embedded article pages.
-- **Out-of-scope (initially):** Paywalled content, fully dynamic app UIs, complex web apps (Gmail inbox, Figma), scanned PDFs without text.
-- **Non-goals:** Bypassing paywalls, scraping user data. Keep privacy-first.
+- **In-scope:** AI-powered content summarization for readable web pages (articles, wiki pages, blogs, docs rendered as HTML), multi-format summary generation, educational insights.
+- **Out-of-scope:** Reading modes, text highlighting, paywalled content, fully dynamic app UIs, complex web apps (Gmail inbox, Figma), scanned PDFs without text.
+- **Non-goals:** Bypassing paywalls, scraping user data, text modification. Keep privacy-first with user-provided API keys.
 
 ---
 
 ## 🧭 Core UX Principles
 
-- **Zero-friction:** Instant mode activation with keyboard shortcut / auto-detect.
-- **Minimal UI:** One overlay, one focus task, big readable text.
-- **Student-friendly:** Soft visuals, positive, and clear.
-- **Accessible:** Dyslexia-friendly options, adjustable spacing, high contrast.
+- **Zero-friction:** Instant summary generation with one-click activation.
+- **Intelligent Analysis:** AI-powered content understanding with contextual insights.
+- **Multi-format Output:** Quick overviews, detailed analysis, key points, and action items.
+- **Student-friendly:** Educational focus with clear structure and accessible formatting.
+- **Privacy-first:** User-controlled API keys, no data collection or storage.
 
 ## 🗺️ Phased Development Roadmap
 

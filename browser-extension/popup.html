@@ -30,32 +30,10 @@
         </div>
       </div>
 
-      <!-- Mode Selection -->
-      <div class="mode-selection" id="mode-selection">
-        <h3>Reading Mode</h3>
-        <div class="mode-toggle">
-          <label class="mode-option" for="focus-mode-radio">
-            <input type="radio" id="focus-mode-radio" name="reading-mode" value="focus" checked />
-            <div class="mode-card">
-              <div class="mode-icon">🎯</div>
-              <div class="mode-info">
-                <div class="mode-title">Focus Mode</div>
-                <div class="mode-description">Clean overlay, distraction-free</div>
-              </div>
-            </div>
-          </label>
-
-          <label class="mode-option" for="helper-mode-radio">
-            <input type="radio" id="helper-mode-radio" name="reading-mode" value="helper" />
-            <div class="mode-card">
-              <div class="mode-icon">📖</div>
-              <div class="mode-info">
-                <div class="mode-title">Reading Helper</div>
-                <div class="mode-description">Highlight text on original page</div>
-              </div>
-            </div>
-          </label>
-        </div>
+      <!-- Feature Header -->
+      <div class="feature-header">
+        <h3>📄 AI Content Summary</h3>
+        <p class="feature-description">Get intelligent summaries with key insights from any webpage</p>
       </div>
 
       <!-- Content Summary Section -->
@@ -82,41 +60,13 @@
         </div>
       </div>
 
-      <!-- Primary Action -->
-      <div class="primary-action" id="primary-action">
-        <button class="focus-button" id="start-reading-mode" disabled>
-          <div class="focus-button-content">
-            <span class="focus-icon" id="mode-icon">🎯</span>
-            <div class="focus-text">
-              <div class="focus-title" id="mode-title">Start Focus Mode</div>
-              <div class="focus-subtitle" id="mode-subtitle">
-                Transform this page for focused reading
-              </div>
-            </div>
-          </div>
-        </button>
-      </div>
 
-      <!-- Quick Settings -->
-      <div class="quick-settings" id="quick-settings">
-        <h3>Current Settings</h3>
-        <div class="settings-grid">
-          <div class="setting-item">
-            <span class="setting-label">Theme</span>
-            <span class="setting-value" id="current-theme">Light</span>
-          </div>
-          <div class="setting-item">
-            <span class="setting-label">Speed</span>
-            <span class="setting-value" id="current-speed">5s auto</span>
-          </div>
-          <div class="setting-item">
-            <span class="setting-label">Quizzes</span>
-            <span class="setting-value" id="current-quiz">Every 5 chunks</span>
-          </div>
-          <div class="setting-item">
-            <span class="setting-label">Font Size</span>
-            <span class="setting-value" id="current-font">18px</span>
-          </div>
+      <!-- API Status -->
+      <div class="api-status-section" id="api-status-section">
+        <h3>API Configuration</h3>
+        <div class="status-indicator">
+          <span class="status-dot" id="api-status-dot"></span>
+          <span class="status-text" id="api-status-text">Checking API key...</span>
         </div>
       </div>
 
@@ -127,51 +77,27 @@
             <span class="button-icon">⚙️</span>
             Settings
           </button>
-          <button class="secondary-button" id="reading-stats">
-            <span class="button-icon">📊</span>
-            Stats
+          <button class="secondary-button" id="clear-cache">
+            <span class="button-icon">🗑️</span>
+            Clear Cache
           </button>
         </div>
       </div>
 
-      <!-- Alternative Text Capture (Fallback) -->
-      <div class="fallback-section" id="fallback-section">
-        <details class="fallback-details">
-          <summary>Alternative Text Capture</summary>
-          <div class="fallback-actions">
-            <button class="action-button" id="capture-selection">
-              <span class="button-icon">✂️</span>
-              <div class="button-content">
-                <div class="button-title">Selected Text</div>
-                <div class="button-description">Send to ReadFocus web app</div>
-              </div>
-            </button>
-
-            <button class="action-button" id="capture-article">
-              <span class="button-icon">📄</span>
-              <div class="button-content">
-                <div class="button-title">Smart Article</div>
-                <div class="button-description">Extract main content</div>
-              </div>
-            </button>
-          </div>
-        </details>
-      </div>
-
       <!-- Quick Tips -->
       <div class="tips-section">
-        <h4>⚡ Quick Tips</h4>
+        <h4>⚡ How to Use</h4>
         <ul class="tips-list">
-          <li><kbd>Cmd+Shift+F</kbd> Toggle Focus Mode</li>
-          <li><kbd>←/→</kbd> Navigate chunks</li>
-          <li><kbd>Space</kbd> Pause auto-advance</li>
-          <li><kbd>Esc</kbd> Exit Focus Mode</li>
+          <li>Navigate to any article or webpage</li>
+          <li>Click "Generate Summary" to analyze content</li>
+          <li>View different summary formats in the overlay</li>
+          <li>Use <kbd>Ctrl/Cmd+1-4</kbd> to switch between tabs</li>
         </ul>
       </div>
 
       <!-- Footer -->
       <div class="footer">
-        <div class="version-info">ReadFocus v2.0.0</div>
+        <div class="version-info">ReadFocus Summary v3.0.0</div>
       </div>
 
       <!-- Status Messages -->

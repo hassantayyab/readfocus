@@ -429,6 +429,14 @@ Return only the JSON object, no additional text.`;
   }
 
   /**
+   * Check if cached summary exists for current page
+   * @returns {boolean} - True if cached summary exists
+   */
+  hasCachedSummary() {
+    return this.summaryCache.size > 0;
+  }
+
+  /**
    * Get service status
    * @returns {Object} - Service status information
    */
