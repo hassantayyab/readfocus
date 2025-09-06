@@ -203,6 +203,15 @@ RESPONSE FORMAT - Return a JSON object with the following structure:
     "markdown": "# Content Overview\n\nComprehensive markdown-formatted summary with:\n\n## Key Findings\n- Main discovery or argument\n- Supporting evidence\n\n## Context & Background\nRelevant background information\n\n## Implications\n- What this means\n- Why it matters\n\n## Conclusion\nFinal thoughts and takeaways",
     "reading_time": "3-5 minutes"
   },
+  "eliSummary": "Ultra-simplified explanation that a 12-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
+  "conceptDictionary": [
+    {
+      "term": "technical term 1",
+      "definition": "simple definition in everyday language",
+      "analogy": "comparison to something familiar",
+      "example": "real-world example"
+    }
+  ],
   "key_points": [
     "• First major point or finding",
     "• Second important concept or argument", 
@@ -238,9 +247,22 @@ ${includeDetailedSummary ? `✅ Include DETAILED_SUMMARY: Comprehensive markdown
 ${includeKeyPoints ? '✅ Include KEY_POINTS: 3-6 bullet points of most important information' : '❌ Skip key points'}
 ${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways and next steps' : '❌ Skip action items'}
 
+✅ ALWAYS Include ELI_SUMMARY: Ultra-simplified explanation that a 12-year-old could understand:
+   - Use analogies and everyday examples
+   - Avoid all jargon and technical terms
+   - Compare complex concepts to familiar things (like comparing databases to filing cabinets)
+   - Focus on the "why it matters" in simple terms
+
+✅ ALWAYS Include CONCEPT_DICTIONARY: Identify and explain technical terms with:
+   - Simple definitions in everyday language
+   - Analogies to familiar concepts when possible
+   - Real-world examples
+   - Focus on terms that might confuse readers
+
 - Focus on educational value and practical insights
-- Maintain accuracy and avoid speculation
-- Use clear, accessible language
+- Make everything accessible and easy to understand
+- Use analogies and examples for complex concepts
+- Maintain accuracy while simplifying language
 - Preserve important nuances and qualifications
 - Organize information logically
 
@@ -277,6 +299,9 @@ Return only the JSON object, no additional text.`;
           text: summary.detailed_summary.text || summary.detailed_summary.markdown || 'Detailed summary not available',
           markdown: summary.detailed_summary.markdown || summary.detailed_summary.text || 'Detailed summary not available'
         } : null,
+        eliSummary: summary.eliSummary || summary.eli_summary || 'ELI12 summary not available',
+        conceptDictionary: Array.isArray(summary.conceptDictionary) ? summary.conceptDictionary : 
+                          Array.isArray(summary.concept_dictionary) ? summary.concept_dictionary : [],
         keyPoints: Array.isArray(summary.key_points) ? summary.key_points : [],
         actionItems: Array.isArray(summary.action_items) ? summary.action_items : [],
         mainTopics: Array.isArray(summary.main_topics) ? summary.main_topics : [],
@@ -299,6 +324,15 @@ Return only the JSON object, no additional text.`;
           markdown: '# Summary Error\n\nUnable to generate detailed summary. Please try again or check your API configuration.',
           reading_time: 'Unknown' 
         },
+        eliSummary: 'Sorry, we couldn\'t create a simple explanation right now. Please try again!',
+        conceptDictionary: [
+          {
+            term: 'Error',
+            definition: 'Something went wrong with creating the summary',
+            analogy: 'Like when a recipe doesn\'t work and you need to try again',
+            example: 'Refresh the page and try once more'
+          }
+        ],
         keyPoints: ['Summary generation encountered an error'],
         actionItems: ['Please try again or check your API configuration'],
         mainTopics: ['Content analysis'],

@@ -222,9 +222,25 @@ body {
 }
 
 .feature-description {
-  margin: 0;
+  margin: 0 0 12px 0;
   font-size: 14px;
   color: var(--rf-text-muted);
+}
+
+.feature-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.badge {
+  background: linear-gradient(135deg, var(--rf-primary) 0%, var(--rf-primary-dark) 100%);
+  color: white;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 500;
   line-height: 1.4;
 }
 

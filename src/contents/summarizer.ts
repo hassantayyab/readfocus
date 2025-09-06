@@ -20,7 +20,27 @@ interface SummaryResult {
   detailedSummary?: string
   keyPoints?: string[]
   actionItems?: string[]
+  eliSummary?: string  // ELI12 ultra-simplified summary
+  conceptDictionary?: ConceptDefinition[]  // Technical terms explained
+  difficultyLevel?: 'beginner' | 'intermediate' | 'advanced'
   error?: string
+}
+
+interface ConceptDefinition {
+  term: string
+  definition: string
+  analogy?: string
+  example?: string
+}
+
+// Enhanced overlay interface
+declare global {
+  interface Window {
+    ReadFocusEnhancedOverlay?: {
+      show(data: SummaryResult): void
+      hide(): void
+    }
+  }
 }
 
 class ReadFocusSummarizer {
@@ -185,19 +205,34 @@ class ReadFocusSummarizer {
   }
 
   buildPrompt(content: string, options: SummaryOptions): string {
-    return `Analyze this webpage content and provide a comprehensive summary.
+    return `Analyze this webpage content and provide a comprehensive, educational summary that makes complex information easy to understand.
 
 Content: ${content.slice(0, 8000)}
 
 Please provide a JSON response with the following structure:
 {
-  "quickSummary": "2-3 sentence overview",
-  "detailedSummary": "Comprehensive markdown-formatted analysis with sections, bullet points, and key insights",
-  "keyPoints": ["key point 1", "key point 2", "key point 3"],
-  "actionItems": ["actionable item 1", "actionable item 2"]
+  "quickSummary": "2-3 sentence overview in simple language",
+  "detailedSummary": "Comprehensive markdown-formatted analysis with clear sections, bullet points, and insights. Use analogies and examples to explain complex concepts.",
+  "keyPoints": ["key point 1 with simple explanation", "key point 2 with simple explanation", "key point 3 with simple explanation"],
+  "actionItems": ["actionable item 1", "actionable item 2"],
+  "eliSummary": "Ultra-simplified explanation that a 12-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
+  "conceptDictionary": [
+    {
+      "term": "technical term 1",
+      "definition": "simple definition in everyday language", 
+      "analogy": "comparison to something familiar",
+      "example": "real-world example"
+    }
+  ],
+  "difficultyLevel": "beginner/intermediate/advanced - based on content complexity"
 }
 
-Focus on making the content easy to understand with clear explanations of complex concepts.`
+Key instructions:
+- Make everything accessible and easy to understand
+- Use analogies and examples for complex concepts
+- Identify and explain technical terms that might confuse readers
+- The ELI12 summary should avoid all jargon and use simple comparisons
+- Focus on helping people actually understand, not just summarize`
   }
 
   generateStorageKey(content: string, options: SummaryOptions): string {
@@ -266,8 +301,22 @@ Focus on making the content easy to understand with clear explanations of comple
   }
 
   async showSummaryOverlay() {
-    // For now, just log - we'll implement the overlay later
-    console.log('📄 [ReadFocus] Would show summary overlay here')
+    try {
+      // Get the latest summary from storage
+      const summaries = await this.getAllStoredSummaries()
+      const latestSummary = Object.values(summaries).find(summary => 
+        summary.url === window.location.href
+      )
+      
+      if (latestSummary && window.ReadFocusEnhancedOverlay) {
+        console.log('📄 [ReadFocus] Showing enhanced summary overlay')
+        window.ReadFocusEnhancedOverlay.show(latestSummary)
+      } else {
+        console.log('📄 [ReadFocus] No summary available to show')
+      }
+    } catch (error) {
+      console.error('❌ [ReadFocus] Error showing summary overlay:', error)
+    }
   }
 }
 

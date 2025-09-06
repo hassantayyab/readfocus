@@ -124,6 +124,12 @@ class SummaryOverlay {
           <button class="rf-summary-tab ${this.activeTab === 'detailed' ? 'active' : ''}" data-tab="detailed">
             <span class="rf-tab-icon">📖</span>Detailed
           </button>
+          <button class="rf-summary-tab ${this.activeTab === 'eli12' ? 'active' : ''}" data-tab="eli12">
+            <span class="rf-tab-icon">👶</span>ELI12
+          </button>
+          <button class="rf-summary-tab ${this.activeTab === 'concepts' ? 'active' : ''}" data-tab="concepts">
+            <span class="rf-tab-icon">📚</span>Concepts
+          </button>
           <button class="rf-summary-tab ${this.activeTab === 'points' ? 'active' : ''}" data-tab="points">
             <span class="rf-tab-icon">📌</span>Key Points
           </button>
@@ -169,6 +175,10 @@ class SummaryOverlay {
         return this.buildQuickSummaryTab();
       case 'detailed':
         return this.buildDetailedSummaryTab();
+      case 'eli12':
+        return this.buildELI12Tab();
+      case 'concepts':
+        return this.buildConceptsTab();
       case 'points':
         return this.buildKeyPointsTab();
       case 'actions':
@@ -286,6 +296,64 @@ class SummaryOverlay {
       <div class="rf-tab-content rf-tab-actions">
         <div class="rf-action-items-list">
           ${actionsHTML}
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Build ELI12 (Explain Like I'm 12) summary tab
+   * @returns {string} - ELI12 summary HTML
+   */
+  buildELI12Tab() {
+    const eliSummary = this.currentSummary.eliSummary;
+    
+    if (!eliSummary) {
+      return '<div class="rf-summary-empty">ELI12 summary not available</div>';
+    }
+
+    return `
+      <div class="rf-tab-content rf-tab-eli12">
+        <div class="rf-eli12-summary">
+          <div class="rf-eli12-header">
+            <span class="rf-eli12-icon">👶</span>
+            <h4>Super Simple Explanation</h4>
+          </div>
+          <div class="rf-eli12-text">
+            ${eliSummary}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Build concepts dictionary tab
+   * @returns {string} - Concepts HTML
+   */
+  buildConceptsTab() {
+    const conceptDictionary = this.currentSummary.conceptDictionary;
+    
+    if (!conceptDictionary || conceptDictionary.length === 0) {
+      return '<div class="rf-summary-empty">No technical concepts identified</div>';
+    }
+
+    const conceptsHTML = conceptDictionary.map((concept, index) => `
+      <div class="rf-concept-item">
+        <div class="rf-concept-term">
+          <span class="rf-concept-icon">📚</span>
+          ${concept.term}
+        </div>
+        <div class="rf-concept-definition">${concept.definition}</div>
+        ${concept.analogy ? `<div class="rf-concept-analogy">💡 <strong>Like:</strong> ${concept.analogy}</div>` : ''}
+        ${concept.example ? `<div class="rf-concept-example">📋 <strong>Example:</strong> ${concept.example}</div>` : ''}
+      </div>
+    `).join('');
+
+    return `
+      <div class="rf-tab-content rf-tab-concepts">
+        <div class="rf-concepts-list">
+          ${conceptsHTML}
         </div>
       </div>
     `;
@@ -460,11 +528,23 @@ class SummaryOverlay {
         break;
       case '3':
         if (e.ctrlKey || e.metaKey) {
-          this.switchTab('points');
+          this.switchTab('eli12');
           e.preventDefault();
         }
         break;
       case '4':
+        if (e.ctrlKey || e.metaKey) {
+          this.switchTab('concepts');
+          e.preventDefault();
+        }
+        break;
+      case '5':
+        if (e.ctrlKey || e.metaKey) {
+          this.switchTab('points');
+          e.preventDefault();
+        }
+        break;
+      case '6':
         if (e.ctrlKey || e.metaKey) {
           this.switchTab('actions');
           e.preventDefault();
@@ -1194,6 +1274,121 @@ class SummaryOverlay {
         .rf-summary-actions {
           justify-content: center;
         }
+      }
+      
+      /* ELI12 Tab Styles */
+      .rf-eli12-summary {
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border-radius: 12px;
+        padding: 24px;
+        border: 2px solid #bae6fd;
+      }
+      
+      .rf-eli12-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #7dd3fc;
+      }
+      
+      .rf-eli12-header h4 {
+        margin: 0;
+        color: #0c4a6e;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      
+      .rf-eli12-icon {
+        font-size: 24px;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+      }
+      
+      .rf-eli12-text {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #0c4a6e;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #0ea5e9;
+      }
+      
+      /* Concepts Tab Styles */
+      .rf-concepts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .rf-concept-item {
+        background: #fefefe;
+        border: 2px solid #f3f4f6;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      
+      .rf-concept-item:hover {
+        border-color: #d1d5db;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      
+      .rf-concept-term {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e5e7eb;
+      }
+      
+      .rf-concept-icon {
+        font-size: 20px;
+        color: #3b82f6;
+      }
+      
+      .rf-concept-definition {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #374151;
+        margin-bottom: 12px;
+        background: #f9fafb;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 3px solid #3b82f6;
+      }
+      
+      .rf-concept-analogy {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #059669;
+        margin-bottom: 8px;
+        background: #ecfdf5;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border-left: 3px solid #10b981;
+      }
+      
+      .rf-concept-example {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #7c2d12;
+        background: #fef7ed;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border-left: 3px solid #ea580c;
+      }
+      
+      .rf-concept-analogy strong,
+      .rf-concept-example strong {
+        font-weight: 600;
       }
     `;
     

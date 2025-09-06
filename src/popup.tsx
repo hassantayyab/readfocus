@@ -76,10 +76,15 @@ function IndexPopup(): JSX.Element {
       </div>
 
       <div className="feature-header">
-        <h3>📄 AI Content Summary</h3>
+        <h3>🧠 Enhanced AI Analysis</h3>
         <p className="feature-description">
-          Get intelligent summaries with key insights from any webpage
+          Get intelligent summaries with simplified explanations, concept definitions, and ELI12 mode
         </p>
+        <div className="feature-badges">
+          <span className="badge">👶 ELI12 Mode</span>
+          <span className="badge">📚 Concept Dictionary</span>
+          <span className="badge">💡 Analogies</span>
+        </div>
       </div>
 
       <div className="summary-section">
