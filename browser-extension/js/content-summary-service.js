@@ -194,8 +194,8 @@ RESPONSE FORMAT - Return a JSON object with the following structure:
     "reading_time": "30 seconds"
   },
   "detailed_summary": {
-    "text": "Comprehensive 1-2 paragraph summary covering all major points",
-    "reading_time": "2-3 minutes"
+    "markdown": "# Content Overview\n\nComprehensive markdown-formatted summary with:\n\n## Key Findings\n- Main discovery or argument\n- Supporting evidence\n\n## Context & Background\nRelevant background information\n\n## Implications\n- What this means\n- Why it matters\n\n## Conclusion\nFinal thoughts and takeaways",
+    "reading_time": "3-5 minutes"
   },
   "key_points": [
     "• First major point or finding",
@@ -219,7 +219,16 @@ RESPONSE FORMAT - Return a JSON object with the following structure:
 
 SUMMARY GUIDELINES:
 ${includeQuickSummary ? '✅ Include QUICK_SUMMARY: Ultra-concise overview in 2-3 sentences' : '❌ Skip quick summary'}
-${includeDetailedSummary ? '✅ Include DETAILED_SUMMARY: Comprehensive 1-2 paragraph overview' : '❌ Skip detailed summary'}  
+${includeDetailedSummary ? `✅ Include DETAILED_SUMMARY: Comprehensive markdown-formatted analysis with:
+   - # Main title reflecting the content theme
+   - ## Key Findings section with bullet points of major discoveries/arguments
+   - ## Context & Background section explaining relevant background
+   - ## Analysis section breaking down the main concepts
+   - ## Implications section explaining significance and impact
+   - ## Conclusion section with final thoughts
+   - Use **bold** for emphasis, *italics* for definitions, and > for important quotes
+   - Include relevant data, statistics, or examples where present
+   - Target 4-6 well-structured paragraphs total` : '❌ Skip detailed summary'}  
 ${includeKeyPoints ? '✅ Include KEY_POINTS: 3-6 bullet points of most important information' : '❌ Skip key points'}
 ${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways and next steps' : '❌ Skip action items'}
 
@@ -256,7 +265,12 @@ Return only the JSON object, no additional text.`;
       // Validate and structure
       const result = {
         quickSummary: summary.quick_summary || null,
-        detailedSummary: summary.detailed_summary || null,
+        detailedSummary: summary.detailed_summary ? {
+          ...summary.detailed_summary,
+          // Ensure we have both text and markdown formats
+          text: summary.detailed_summary.text || summary.detailed_summary.markdown || 'Detailed summary not available',
+          markdown: summary.detailed_summary.markdown || summary.detailed_summary.text || 'Detailed summary not available'
+        } : null,
         keyPoints: Array.isArray(summary.key_points) ? summary.key_points : [],
         actionItems: Array.isArray(summary.action_items) ? summary.action_items : [],
         mainTopics: Array.isArray(summary.main_topics) ? summary.main_topics : [],
@@ -274,7 +288,11 @@ Return only the JSON object, no additional text.`;
       // Return fallback structure
       return {
         quickSummary: { text: 'Summary parsing failed', reading_time: 'Unknown' },
-        detailedSummary: { text: 'Unable to generate detailed summary', reading_time: 'Unknown' },
+        detailedSummary: { 
+          text: 'Unable to generate detailed summary', 
+          markdown: '# Summary Error\n\nUnable to generate detailed summary. Please try again or check your API configuration.',
+          reading_time: 'Unknown' 
+        },
         keyPoints: ['Summary generation encountered an error'],
         actionItems: ['Please try again or check your API configuration'],
         mainTopics: ['Content analysis'],

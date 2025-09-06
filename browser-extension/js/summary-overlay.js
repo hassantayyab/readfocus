@@ -216,14 +216,18 @@ class SummaryOverlay {
       return '<div class="rf-summary-empty">Detailed summary not available</div>';
     }
 
+    // Use markdown if available, otherwise fall back to text
+    const contentToRender = detailedSummary.markdown || detailedSummary.text || 'Detailed summary not available';
+    const renderedContent = this.renderMarkdown(contentToRender);
+
     return `
       <div class="rf-tab-content rf-tab-detailed">
         <div class="rf-detailed-summary">
-          <div class="rf-summary-text">
-            <p class="rf-summary-paragraph">${detailedSummary.text || 'Detailed summary not available'}</p>
+          <div class="rf-summary-markdown">
+            ${renderedContent}
           </div>
           <div class="rf-detailed-meta">
-            <span class="rf-reading-time">⏱️ ${detailedSummary.reading_time || '2-3 minutes'}</span>
+            <span class="rf-reading-time">⏱️ ${detailedSummary.reading_time || '3-5 minutes'}</span>
           </div>
         </div>
         
@@ -599,6 +603,69 @@ class SummaryOverlay {
   }
 
   /**
+   * Simple markdown renderer for detailed summaries
+   * @param {string} markdown - Markdown text to render
+   * @returns {string} - HTML output
+   */
+  renderMarkdown(markdown) {
+    if (!markdown || typeof markdown !== 'string') {
+      return '<p>Content not available</p>';
+    }
+
+    let html = markdown
+      // Headers
+      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+      .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
+      
+      // Bold text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      
+      // Italic text
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      
+      // Blockquotes
+      .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
+      
+      // Unordered lists
+      .replace(/^- (.*$)/gm, '<li>$1</li>')
+      .replace(/^• (.*$)/gm, '<li>$1</li>')
+      .replace(/^\* (.*$)/gm, '<li>$1</li>')
+      
+      // Code blocks (inline)
+      .replace(/`(.*?)`/g, '<code>$1</code>')
+      
+      // Line breaks to paragraphs
+      .replace(/\n\s*\n/g, '</p><p>')
+      
+      // Wrap in paragraph tags if not already wrapped
+      .replace(/^(?!<[h1-6]|<blockquote|<li|<ul|<ol)/gm, '<p>')
+      .replace(/(?<!<\/[h1-6]>|<\/blockquote>|<\/li>|<\/ul>|<\/ol>)$/gm, '</p>');
+
+    // Clean up list formatting - wrap consecutive <li> elements in <ul>
+    html = html.replace(/<li>/g, '::LI_START::').replace(/<\/li>/g, '::LI_END::');
+    html = html.replace(/(::LI_START::.*?::LI_END::)+/gs, (match) => {
+      const listItems = match.replace(/::LI_START::/g, '<li>').replace(/::LI_END::/g, '</li>');
+      return '<ul>' + listItems + '</ul>';
+    });
+
+    // Clean up multiple consecutive paragraph tags
+    html = html
+      .replace(/<\/p>\s*<p>/g, '</p>\n<p>')
+      .replace(/(<p><\/p>)/g, '')
+      .replace(/^<p><\/p>/g, '')
+      .replace(/<p><h([1-6])>/g, '<h$1>')
+      .replace(/<\/h([1-6])><\/p>/g, '</h$1>')
+      .replace(/<p><blockquote>/g, '<blockquote>')
+      .replace(/<\/blockquote><\/p>/g, '</blockquote>')
+      .replace(/<p><ul>/g, '<ul>')
+      .replace(/<\/ul><\/p>/g, '</ul>');
+
+    return html;
+  }
+
+  /**
    * Inject overlay styles
    */
   injectStyles() {
@@ -773,6 +840,91 @@ class SummaryOverlay {
         font-size: 16px;
         color: #334155;
         margin: 0 0 16px 0;
+      }
+      
+      .rf-summary-markdown {
+        line-height: 1.7;
+        color: #334155;
+      }
+      
+      .rf-summary-markdown h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 16px 0;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e2e8f0;
+      }
+      
+      .rf-summary-markdown h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 24px 0 12px 0;
+      }
+      
+      .rf-summary-markdown h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #334155;
+        margin: 20px 0 10px 0;
+      }
+      
+      .rf-summary-markdown h4 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #475569;
+        margin: 16px 0 8px 0;
+      }
+      
+      .rf-summary-markdown p {
+        margin: 0 0 16px 0;
+        font-size: 16px;
+        line-height: 1.7;
+      }
+      
+      .rf-summary-markdown strong {
+        font-weight: 600;
+        color: #1e293b;
+      }
+      
+      .rf-summary-markdown em {
+        font-style: italic;
+        color: #475569;
+      }
+      
+      .rf-summary-markdown code {
+        background: #f1f5f9;
+        color: #3730a3;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+        font-size: 14px;
+      }
+      
+      .rf-summary-markdown blockquote {
+        background: #f8fafc;
+        border-left: 4px solid #3b82f6;
+        margin: 16px 0;
+        padding: 12px 16px;
+        color: #475569;
+        font-style: italic;
+        border-radius: 0 6px 6px 0;
+      }
+      
+      .rf-summary-markdown ul {
+        margin: 16px 0;
+        padding-left: 20px;
+      }
+      
+      .rf-summary-markdown li {
+        margin: 8px 0;
+        line-height: 1.6;
+        position: relative;
+      }
+      
+      .rf-summary-markdown li::marker {
+        color: #3b82f6;
       }
       
       .rf-reading-time {
