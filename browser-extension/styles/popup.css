@@ -236,7 +236,7 @@ body {
 
 .badge {
   background: linear-gradient(135deg, var(--rf-primary) 0%, var(--rf-primary-dark) 100%);
-  color: white;
+  color: var(--rf-text);
   font-size: 11px;
   padding: 4px 8px;
   border-radius: 12px;
@@ -402,8 +402,13 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 /* Primary Action */

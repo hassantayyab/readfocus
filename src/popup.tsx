@@ -1,24 +1,22 @@
-import { useState, useEffect } from "react"
+import { JSX, useEffect, useState } from 'react';
 
-import "./popup.css"
-
-interface PopupProps {}
+import './popup.css';
 
 function IndexPopup(): JSX.Element {
-  const [currentTab, setCurrentTab] = useState<chrome.tabs.Tab | null>(null)
+  const [currentTab, setCurrentTab] = useState<chrome.tabs.Tab | null>(null);
 
   useEffect(() => {
     // Get current active tab
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]) {
-        setCurrentTab(tabs[0])
+        setCurrentTab(tabs[0]);
       }
-    })
-  }, [])
+    });
+  }, []);
 
   const handleSummarize = async () => {
-    if (!currentTab) return
-    
+    if (!currentTab) return;
+
     try {
       // Send message to content script to generate summary
       const response = await chrome.tabs.sendMessage(currentTab.id!, {
@@ -28,42 +26,42 @@ function IndexPopup(): JSX.Element {
           includeQuickSummary: true,
           includeDetailedSummary: true,
           includeActionItems: true,
-          maxLength: 'medium'
-        }
-      })
+          maxLength: 'medium',
+        },
+      });
 
       if (response?.success) {
-        console.log('Summary generated successfully')
+        console.log('Summary generated successfully');
         // Auto-show summary overlay
         setTimeout(async () => {
           await chrome.tabs.sendMessage(currentTab.id!, {
-            type: 'SHOW_SUMMARY'
-          })
-          window.close()
-        }, 500)
+            type: 'SHOW_SUMMARY',
+          });
+          window.close();
+        }, 500);
       }
     } catch (error) {
-      console.error('Error generating summary:', error)
+      console.error('Error generating summary:', error);
     }
-  }
+  };
 
   const handleSettings = () => {
-    chrome.runtime.openOptionsPage()
-    window.close()
-  }
+    chrome.runtime.openOptionsPage();
+    window.close();
+  };
 
   const handleClearCache = async () => {
-    if (!currentTab) return
-    
+    if (!currentTab) return;
+
     try {
       await chrome.tabs.sendMessage(currentTab.id!, {
-        type: 'CLEAR_SUMMARY_CACHE'
-      })
-      console.log('Cache cleared')
+        type: 'CLEAR_SUMMARY_CACHE',
+      });
+      console.log('Cache cleared');
     } catch (error) {
-      console.error('Error clearing cache:', error)
+      console.error('Error clearing cache:', error);
     }
-  }
+  };
 
   return (
     <div className="popup-container">
@@ -78,7 +76,8 @@ function IndexPopup(): JSX.Element {
       <div className="feature-header">
         <h3>🧠 Enhanced AI Analysis</h3>
         <p className="feature-description">
-          Get intelligent summaries with simplified explanations, concept definitions, and ELI15 mode
+          Get intelligent summaries with simplified explanations, concept definitions, and ELI15
+          mode
         </p>
         <div className="feature-badges">
           <span className="badge">👶 ELI15 Mode</span>
@@ -98,10 +97,7 @@ function IndexPopup(): JSX.Element {
             Get AI-powered summary with key points and insights
           </div>
           <div className="summary-actions">
-            <button 
-              className="summary-button" 
-              onClick={handleSummarize}
-            >
+            <button className="summary-button" onClick={handleSummarize}>
               <span className="button-icon">⚡</span>
               Summarize
             </button>
@@ -111,17 +107,11 @@ function IndexPopup(): JSX.Element {
 
       <div className="secondary-actions">
         <div className="action-row">
-          <button 
-            className="secondary-button" 
-            onClick={handleSettings}
-          >
+          <button className="secondary-button" onClick={handleSettings}>
             <span className="button-icon">⚙️</span>
             Settings
           </button>
-          <button 
-            className="secondary-button" 
-            onClick={handleClearCache}
-          >
+          <button className="secondary-button" onClick={handleClearCache}>
             <span className="button-icon">🗑️</span>
             Clear Cache
           </button>
@@ -134,7 +124,9 @@ function IndexPopup(): JSX.Element {
           <li>Navigate to any article or webpage</li>
           <li>Click "Summarize" to analyze content</li>
           <li>View different summary formats in the overlay</li>
-          <li>Use <kbd>Ctrl/Cmd+1-6</kbd> to switch between tabs</li>
+          <li>
+            Use <kbd>Ctrl/Cmd+1-6</kbd> to switch between tabs
+          </li>
         </ul>
       </div>
 
@@ -142,7 +134,7 @@ function IndexPopup(): JSX.Element {
         <div className="version-info">ReadFocus Summary v3.0.0</div>
       </div>
     </div>
-  )
+  );
 }
 
-export default IndexPopup
+export default IndexPopup;
