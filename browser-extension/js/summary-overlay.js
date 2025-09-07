@@ -30,12 +30,19 @@ class SummaryOverlay {
       // Create overlay
       this.createOverlay();
       
+      // Check if overlay was created successfully
+      if (!this.overlay) {
+        throw new Error('Failed to create overlay element');
+      }
+      
       // Add to DOM
       document.body.appendChild(this.overlay);
       
       // Animate in
       requestAnimationFrame(() => {
-        this.overlay.classList.add('rf-summary-visible');
+        if (this.overlay) {
+          this.overlay.classList.add('rf-summary-visible');
+        }
       });
       
       this.isVisible = true;
@@ -70,17 +77,23 @@ class SummaryOverlay {
    * Create the main overlay element
    */
   createOverlay() {
-    this.overlay = document.createElement('div');
-    this.overlay.className = 'rf-summary-overlay';
-    
-    // Add overlay styles
-    this.injectStyles();
-    
-    // Build overlay content
-    this.overlay.innerHTML = this.buildOverlayHTML();
-    
-    // Bind event listeners
-    this.bindEvents();
+    try {
+      this.overlay = document.createElement('div');
+      this.overlay.className = 'rf-summary-overlay';
+      
+      // Add overlay styles
+      this.injectStyles();
+      
+      // Build overlay content
+      this.overlay.innerHTML = this.buildOverlayHTML();
+      
+      // Bind event listeners
+      this.bindEvents();
+    } catch (error) {
+      console.error('❌ [SummaryOverlay] Failed to create overlay:', error);
+      this.overlay = null;
+      throw error;
+    }
   }
 
   /**

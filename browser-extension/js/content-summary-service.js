@@ -20,17 +20,17 @@ class ContentSummaryService {
   async initialize(apiKey) {
     try {
       console.log('📄 [SummaryService] Initializing content summary service...');
-      
+
       // Initialize AI client
       this.aiClient = new AIClient();
       await this.aiClient.initialize(apiKey);
-      
+
       // Initialize content analyzer
       this.contentAnalyzer = new ContentAnalyzer();
-      
+
       this.initialized = true;
       console.log('✅ [SummaryService] Content summary service initialized');
-      
+
       return { success: true };
     } catch (error) {
       console.error('❌ [SummaryService] Failed to initialize:', error);
@@ -66,19 +66,19 @@ class ContentSummaryService {
       // Check local storage first - ALWAYS
       const storageKey = this.generateStorageKey(analysisResult.processedContent, options);
       console.log('📄 [SummaryService] Checking storage with key:', storageKey);
-      
+
       const storedSummary = await this.getStoredSummary(storageKey);
       if (storedSummary) {
         console.log('📄 [SummaryService] FOUND stored summary, returning it NOW');
         console.log('📄 [SummaryService] Stored summary data:', storedSummary);
         return storedSummary;
       }
-      
+
       console.log('📄 [SummaryService] NO stored summary found, will call API');
 
       // Generate multiple summary formats
       const summaryResult = await this.generateMultiFormatSummary(
-        analysisResult.processedContent, 
+        analysisResult.processedContent,
         analysisResult.metadata,
         options
       );
@@ -90,18 +90,17 @@ class ContentSummaryService {
       this.currentContent = {
         analysis: analysisResult,
         summary: summaryResult,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       console.log('✅ [SummaryService] Summary generation completed');
       return summaryResult;
-
     } catch (error) {
       console.error('❌ [SummaryService] Summary generation failed:', error);
       return {
         success: false,
         error: error.message,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     }
   }
@@ -119,7 +118,7 @@ class ContentSummaryService {
       includeQuickSummary = true,
       includeDetailedSummary = true,
       includeActionItems = true,
-      maxLength = 'medium'
+      maxLength = 'medium',
     } = options;
 
     console.log('📄 [SummaryService] Generating multi-format summary...');
@@ -130,19 +129,19 @@ class ContentSummaryService {
       includeQuickSummary,
       includeDetailedSummary,
       includeActionItems,
-      maxLength
+      maxLength,
     });
 
     try {
       // Request summary from AI
       const response = await this.aiClient.makeRequest(prompt, {
         temperature: 0.3, // Balanced creativity for summaries
-        maxTokens: 4096
+        maxTokens: 4096,
       });
 
       // Parse and validate response
       const parsedSummary = this.parseSummaryResponse(response);
-      
+
       // Add metadata to result
       const result = {
         success: true,
@@ -151,13 +150,12 @@ class ContentSummaryService {
           originalWordCount: metadata.wordCount,
           contentType: metadata.contentType,
           readabilityScore: metadata.readabilityScore,
-          processingTime: Date.now()
+          processingTime: Date.now(),
         },
-        ...parsedSummary
+        ...parsedSummary,
       };
 
       return result;
-
     } catch (error) {
       console.error('❌ [SummaryService] AI summary generation failed:', error);
       throw error;
@@ -177,7 +175,7 @@ class ContentSummaryService {
       includeQuickSummary,
       includeDetailedSummary,
       includeActionItems,
-      maxLength
+      maxLength,
     } = options;
 
     return `You are an expert content analyst and summarization specialist. Analyze this ${metadata.contentType} content and provide comprehensive summaries in multiple formats for students and professionals.
@@ -200,7 +198,7 @@ RESPONSE FORMAT - Return a JSON object with the following structure:
     "reading_time": "30 seconds"
   },
   "detailed_summary": {
-    "markdown": "# Content Overview\n\nComprehensive markdown-formatted summary with:\n\n## Key Findings\n- Main discovery or argument\n- Supporting evidence\n\n## Context & Background\nRelevant background information\n\n## Implications\n- What this means\n- Why it matters\n\n## Conclusion\nFinal thoughts and takeaways",
+    "markdown": "Comprehensive markdown-formatted summary with detailed analysis, context, examples, and practical insights. Use structured sections with ## headings, bullet points, and clear explanations that help readers understand the subject matter deeply.",
     "reading_time": "3-5 minutes"
   },
   "eliSummary": "Ultra-simplified explanation that a 15-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
@@ -234,18 +232,20 @@ RESPONSE FORMAT - Return a JSON object with the following structure:
 
 SUMMARY GUIDELINES:
 ${includeQuickSummary ? '✅ Include QUICK_SUMMARY: Ultra-concise overview in 2-3 sentences' : '❌ Skip quick summary'}
-${includeDetailedSummary ? `✅ Include DETAILED_SUMMARY: Comprehensive markdown-formatted analysis with:
+${
+  includeDetailedSummary
+    ? `✅ Include DETAILED_SUMMARY: Comprehensive markdown-formatted analysis with:
    - # Main title reflecting the content theme
-   - ## Key Findings section with bullet points of major discoveries/arguments
-   - ## Context & Background section explaining relevant background
-   - ## Analysis section breaking down the main concepts
-   - ## Implications section explaining significance and impact
-   - ## Conclusion section with final thoughts
-   - Use **bold** for emphasis, *italics* for definitions, and > for important quotes
-   - Include relevant data, statistics, or examples where present
-   - Target 4-6 well-structured paragraphs total` : '❌ Skip detailed summary'}  
+   - ## Overview, Key Concepts, Main Arguments sections
+   - ## Practical Applications and Critical Analysis
+   - ## Future Implications and conclusions
+   - Use structured headings, bullet points, **bold** for emphasis
+   - Include examples, data, and clear explanations
+   - Target comprehensive understanding with detailed insights`
+    : '❌ Skip detailed summary'
+}  
 ${includeKeyPoints ? '✅ Include KEY_POINTS: 3-6 bullet points of most important information' : '❌ Skip key points'}
-${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways and next steps' : '❌ Skip action items'}
+${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways' : '❌ Skip action items'}
 
 ✅ ALWAYS Include ELI_SUMMARY: Ultra-simplified explanation that a 15-year-old could understand:
    - Use analogies and everyday examples
@@ -293,25 +293,35 @@ Return only the JSON object, no additional text.`;
       // Validate and structure
       const result = {
         quickSummary: summary.quick_summary || null,
-        detailedSummary: summary.detailed_summary ? {
-          ...summary.detailed_summary,
-          // Ensure we have both text and markdown formats
-          text: summary.detailed_summary.text || summary.detailed_summary.markdown || 'Detailed summary not available',
-          markdown: summary.detailed_summary.markdown || summary.detailed_summary.text || 'Detailed summary not available'
-        } : null,
+        detailedSummary: summary.detailed_summary
+          ? {
+              ...summary.detailed_summary,
+              // Ensure we have both text and markdown formats
+              text:
+                summary.detailed_summary.text ||
+                summary.detailed_summary.markdown ||
+                'Detailed summary not available',
+              markdown:
+                summary.detailed_summary.markdown ||
+                summary.detailed_summary.text ||
+                'Detailed summary not available',
+            }
+          : null,
         eliSummary: summary.eliSummary || summary.eli_summary || 'ELI15 summary not available',
-        conceptDictionary: Array.isArray(summary.conceptDictionary) ? summary.conceptDictionary : 
-                          Array.isArray(summary.concept_dictionary) ? summary.concept_dictionary : [],
+        conceptDictionary: Array.isArray(summary.conceptDictionary)
+          ? summary.conceptDictionary
+          : Array.isArray(summary.concept_dictionary)
+            ? summary.concept_dictionary
+            : [],
         keyPoints: Array.isArray(summary.key_points) ? summary.key_points : [],
         actionItems: Array.isArray(summary.action_items) ? summary.action_items : [],
         mainTopics: Array.isArray(summary.main_topics) ? summary.main_topics : [],
         difficultyLevel: summary.difficulty_level || 'Intermediate',
         estimatedReadTime: summary.estimated_read_time || 'Unknown',
-        contentQuality: summary.content_quality || 'Medium'
+        contentQuality: summary.content_quality || 'Medium',
       };
 
       return result;
-
     } catch (error) {
       console.error('❌ [SummaryService] Failed to parse summary response:', error);
       console.error('Raw response:', response);
@@ -319,26 +329,27 @@ Return only the JSON object, no additional text.`;
       // Return fallback structure
       return {
         quickSummary: { text: 'Summary parsing failed', reading_time: 'Unknown' },
-        detailedSummary: { 
-          text: 'Unable to generate detailed summary', 
-          markdown: '# Summary Error\n\nUnable to generate detailed summary. Please try again or check your API configuration.',
-          reading_time: 'Unknown' 
+        detailedSummary: {
+          text: 'Unable to generate detailed summary',
+          markdown:
+            '# Summary Error\n\nUnable to generate detailed summary. Please try again or check your API configuration.',
+          reading_time: 'Unknown',
         },
-        eliSummary: 'Sorry, we couldn\'t create a simple explanation right now. Please try again!',
+        eliSummary: "Sorry, we couldn't create a simple explanation right now. Please try again!",
         conceptDictionary: [
           {
             term: 'Error',
             definition: 'Something went wrong with creating the summary',
-            analogy: 'Like when a recipe doesn\'t work and you need to try again',
-            example: 'Refresh the page and try once more'
-          }
+            analogy: "Like when a recipe doesn't work and you need to try again",
+            example: 'Refresh the page and try once more',
+          },
         ],
         keyPoints: ['Summary generation encountered an error'],
         actionItems: ['Please try again or check your API configuration'],
         mainTopics: ['Content analysis'],
         difficultyLevel: 'Unknown',
         estimatedReadTime: 'Unknown',
-        contentQuality: 'Unknown'
+        contentQuality: 'Unknown',
       };
     }
   }
@@ -360,7 +371,7 @@ Return only the JSON object, no additional text.`;
       '.story-body',
       '#content',
       '#main-content',
-      '.main-content'
+      '.main-content',
     ];
 
     for (const selector of selectors) {
@@ -384,7 +395,7 @@ Return only the JSON object, no additional text.`;
 
     const textContent = element.textContent?.trim() || '';
     const wordCount = textContent.split(/\s+/).length;
-    
+
     return wordCount > 50 && element.offsetHeight > 100;
   }
 
@@ -397,10 +408,10 @@ Return only the JSON object, no additional text.`;
     let largest = null;
     let maxWords = 0;
 
-    candidates.forEach(element => {
+    candidates.forEach((element) => {
       const text = element.textContent?.trim() || '';
       const wordCount = text.split(/\s+/).length;
-      
+
       if (wordCount > maxWords && this.isValidContentElement(element)) {
         maxWords = wordCount;
         largest = element;
@@ -433,7 +444,7 @@ Return only the JSON object, no additional text.`;
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(36);
@@ -448,23 +459,23 @@ Return only the JSON object, no additional text.`;
     try {
       // Get existing summaries
       const existingSummaries = await this.getAllStoredSummaries();
-      
+
       // Add timestamp for cleanup
       const summaryWithTimestamp = {
         ...result,
         storedAt: Date.now(),
-        url: window.location.href
+        url: window.location.href,
       };
-      
+
       // Add new summary
       existingSummaries[key] = summaryWithTimestamp;
-      
+
       // Clean up old entries if we exceed max storage
       await this.cleanupOldSummaries(existingSummaries);
-      
+
       // Store back to Chrome storage
       await chrome.storage.local.set({ [this.storageKey]: existingSummaries });
-      
+
       console.log(`📄 [SummaryService] Summary stored permanently with key: ${key}`);
     } catch (error) {
       console.error('❌ [SummaryService] Error storing summary:', error);
@@ -515,14 +526,14 @@ Return only the JSON object, no additional text.`;
       const summaries = await this.getAllStoredSummaries();
       console.log('📄 [SummaryService] All stored keys:', Object.keys(summaries));
       console.log('📄 [SummaryService] Looking for key:', key);
-      
+
       const summary = summaries[key];
-      
+
       if (summary) {
         console.log(`📄 [SummaryService] ✅ FOUND stored summary for key: ${key}`);
         return summary;
       }
-      
+
       console.log(`📄 [SummaryService] ❌ NO summary found for key: ${key}`);
       return null;
     } catch (error) {
@@ -551,16 +562,16 @@ Return only the JSON object, no additional text.`;
    */
   async cleanupOldSummaries(summaries) {
     const keys = Object.keys(summaries);
-    
+
     if (keys.length > this.maxStorageItems) {
       // Sort by timestamp and remove oldest entries
       const sortedEntries = keys
-        .map(key => ({ key, timestamp: summaries[key].storedAt || 0 }))
+        .map((key) => ({ key, timestamp: summaries[key].storedAt || 0 }))
         .sort((a, b) => a.timestamp - b.timestamp);
-      
+
       const toRemove = sortedEntries.slice(0, keys.length - this.maxStorageItems);
-      
-      toRemove.forEach(entry => {
+
+      toRemove.forEach((entry) => {
         delete summaries[entry.key];
         console.log(`📄 [SummaryService] Removed old summary: ${entry.key}`);
       });
@@ -577,7 +588,7 @@ Return only the JSON object, no additional text.`;
       hasContent: !!this.currentContent,
       cacheSize: this.summaryCache.size,
       aiClientReady: !!(this.aiClient && this.aiClient.apiKey),
-      lastProcessed: this.currentContent?.timestamp
+      lastProcessed: this.currentContent?.timestamp,
     };
   }
 }
@@ -587,7 +598,7 @@ if (typeof window !== 'undefined') {
   window.ContentSummaryService = ContentSummaryService;
 }
 
-// Export for Node.js/testing  
+// Export for Node.js/testing
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ContentSummaryService;
 }
