@@ -29,7 +29,6 @@ class ReadFocusPopup {
       // Bind events
       this.bindEvents();
 
-
       console.log('ReadFocus popup initialized');
     } catch (error) {
       console.error('Error initializing popup:', error);
@@ -70,7 +69,6 @@ class ReadFocusPopup {
     };
   }
 
-
   /**
    * Inject content script if not present
    */
@@ -86,7 +84,7 @@ class ReadFocusPopup {
           'js/content-analyzer.js',
           'js/content-summary-service.js',
           'js/summary-overlay.js',
-          'js/content.js'
+          'js/content.js',
         ],
       });
 
@@ -102,9 +100,6 @@ class ReadFocusPopup {
       throw error;
     }
   }
-
-
-
 
   /**
    * Bind event listeners
@@ -170,18 +165,18 @@ class ReadFocusPopup {
   async clearSummaryCache() {
     try {
       console.log('🗑️ [Popup] Clearing summary cache...');
-      
+
       // Send message to content script to clear cache
       const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'CLEAR_SUMMARY_CACHE'
+        type: 'CLEAR_SUMMARY_CACHE',
       });
 
       if (response && response.success) {
         this.showSuccess('All stored summaries cleared!');
-        
+
         // Reset summary status to initial state
         this.updateSummaryStatus('ready', 'Ready');
-        
+
         console.log('✅ [Popup] Cache cleared successfully');
       } else {
         this.showError('Failed to clear stored summaries');
@@ -199,7 +194,6 @@ class ReadFocusPopup {
     chrome.runtime.openOptionsPage();
     window.close();
   }
-
 
   /**
    * Generate unique ID
@@ -255,20 +249,17 @@ class ReadFocusPopup {
           includeQuickSummary: true,
           includeDetailedSummary: true,
           includeActionItems: true,
-          maxLength: 'medium'
-        }
+          maxLength: 'medium',
+        },
       });
 
       if (response && response.success) {
         this.updateSummaryStatus('completed', 'Ready');
-        this.showSuccess('Summary generated successfully!');
-        
-        // Automatically show the summary
-        setTimeout(() => this.showSummary(), 500);
+
+        this.showSummary();
       } else {
         throw new Error(response?.error || 'Failed to generate summary');
       }
-
     } catch (error) {
       console.error('❌ [Popup] Error generating summary:', error);
       this.updateSummaryStatus('error', 'Failed');
@@ -285,7 +276,7 @@ class ReadFocusPopup {
 
       // Execute content script to show summary
       const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'SHOW_SUMMARY'
+        type: 'SHOW_SUMMARY',
       });
 
       if (response && response.success) {
@@ -295,7 +286,6 @@ class ReadFocusPopup {
       } else {
         throw new Error(response?.error || 'Failed to show summary');
       }
-
     } catch (error) {
       console.error('❌ [Popup] Error showing summary:', error);
       this.showError(`Failed to show summary: ${error.message}`);
@@ -320,9 +310,10 @@ class ReadFocusPopup {
 
     if (generateBtn) {
       generateBtn.disabled = status === 'processing';
-      generateBtn.innerHTML = status === 'processing' 
-        ? '<span class="button-icon">⏳</span>Summarizing...'
-        : '<span class="button-icon">⚡</span>Summarize';
+      generateBtn.innerHTML =
+        status === 'processing'
+          ? '<span class="button-icon">⏳</span>Summarizing...'
+          : '<span class="button-icon">⚡</span>Summarize';
     }
   }
 
@@ -333,11 +324,17 @@ class ReadFocusPopup {
     try {
       // Check if a summary already exists for this page
       const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'CHECK_SUMMARY_EXISTS'
+        type: 'CHECK_SUMMARY_EXISTS',
       });
 
       if (response && response.exists) {
-        this.updateSummaryStatus('completed', 'Available');
+        if (response.preloaded) {
+          this.updateSummaryStatus('completed', 'Pre-loaded');
+        } else {
+          this.updateSummaryStatus('completed', 'Available');
+        }
+      } else if (response && response.isGenerating) {
+        this.updateSummaryStatus('processing', 'Loading...');
       } else {
         this.updateSummaryStatus('ready', 'Ready');
       }

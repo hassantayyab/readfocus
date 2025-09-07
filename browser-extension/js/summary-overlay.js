@@ -11,6 +11,10 @@ class SummaryOverlay {
     this.activeTab = 'quick';
     this.animationDuration = 300;
     this.settings = null;
+    this.justOpened = false; // Flag to prevent immediate closure
+    this.boundKeyboardHandler = this.handleKeyboard.bind(this); // Store bound function
+    this.instanceId = 'overlay_' + Date.now(); // Unique instance ID for debugging
+    console.log('📄 [SummaryOverlay] New instance created:', this.instanceId);
   }
 
   /**
@@ -19,8 +23,6 @@ class SummaryOverlay {
    */
   async show(summaryData) {
     try {
-      console.log('📄 [SummaryOverlay] Displaying summary overlay...');
-
       this.currentSummary = summaryData;
 
       // Load settings to determine which tabs to show
@@ -32,6 +34,8 @@ class SummaryOverlay {
       // Remove existing overlay
       if (this.overlay) {
         this.hide();
+        // Add a small delay to ensure cleanup is complete
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
       // Create overlay
@@ -42,18 +46,27 @@ class SummaryOverlay {
         throw new Error('Failed to create overlay element');
       }
 
+      // Set flag to prevent immediate closure BEFORE adding to DOM
+      this.justOpened = true;
+
       // Add to DOM
       document.body.appendChild(this.overlay);
 
-      // Animate in
-      requestAnimationFrame(() => {
-        if (this.overlay) {
-          this.overlay.classList.add('rf-summary-visible');
-        }
-      });
+      // Animate in with a slight delay to prevent immediate event handling
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          if (this.overlay) {
+            this.overlay.classList.add('rf-summary-visible');
+          }
+        });
+      }, 10);
+
+      // Clear the justOpened flag after animation and a longer buffer
+      setTimeout(() => {
+        this.justOpened = false;
+      }, this.animationDuration + 500); // Increased buffer time
 
       this.isVisible = true;
-      console.log('✅ [SummaryOverlay] Summary overlay displayed');
     } catch (error) {
       console.error('❌ [SummaryOverlay] Failed to show overlay:', error);
       this.showError('Failed to display summary');
@@ -64,9 +77,12 @@ class SummaryOverlay {
    * Hide summary overlay
    */
   hide() {
-    if (!this.overlay || !this.isVisible) return;
+    if (!this.overlay || !this.isVisible) {
+      return;
+    }
 
-    console.log('📄 [SummaryOverlay] Hiding summary overlay...');
+    // Reset the flag
+    this.justOpened = false;
 
     this.overlay.classList.remove('rf-summary-visible');
 
@@ -74,6 +90,9 @@ class SummaryOverlay {
       if (this.overlay && this.overlay.parentNode) {
         this.overlay.parentNode.removeChild(this.overlay);
       }
+      // Remove keyboard event listener when hiding
+      document.removeEventListener('keydown', this.boundKeyboardHandler);
+
       this.overlay = null;
       this.isVisible = false;
     }, this.animationDuration);
@@ -90,7 +109,6 @@ class SummaryOverlay {
         includeActionItems: true,
         includeConcepts: true,
       };
-      console.log('📄 [SummaryOverlay] Loaded settings:', this.settings);
     } catch (error) {
       console.error('❌ [SummaryOverlay] Failed to load settings:', error);
       // Use defaults if settings can't be loaded
@@ -111,7 +129,6 @@ class SummaryOverlay {
     // If current active tab is not in visible tabs, switch to first visible tab
     if (!visibleTabs.includes(this.activeTab)) {
       this.activeTab = visibleTabs[0] || 'quick';
-      console.log('📄 [SummaryOverlay] Active tab changed to:', this.activeTab);
     }
   }
 
@@ -562,15 +579,22 @@ class SummaryOverlay {
       });
     });
 
-    // Click outside to close
-    this.overlay.addEventListener('click', (e) => {
-      if (e.target === this.overlay) {
-        this.hide();
-      }
-    });
+    // Click outside to close - with protection against immediate closure
+    this.overlay.addEventListener(
+      'click',
+      (e) => {
+        // Only close if clicking directly on the overlay background, not if already closed, and not if just opened
+        if (e.target === this.overlay && this.isVisible && !this.justOpened) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.hide();
+        }
+      },
+      true
+    ); // Use capture phase to handle events before they bubble
 
     // Keyboard shortcuts
-    document.addEventListener('keydown', this.handleKeyboard.bind(this));
+    document.addEventListener('keydown', this.boundKeyboardHandler);
   }
 
   /**
@@ -578,6 +602,10 @@ class SummaryOverlay {
    * @param {string} tab - Tab identifier
    */
   switchTab(tab) {
+    if (!this.overlay || !this.isVisible) {
+      return;
+    }
+
     this.activeTab = tab;
 
     // Update tab buttons
@@ -600,6 +628,10 @@ class SummaryOverlay {
    * Re-bind action buttons after content update
    */
   bindActionButtons() {
+    if (!this.overlay) {
+      return;
+    }
+
     // Action item done buttons
     const doneButtons = this.overlay.querySelectorAll('.rf-action-done');
     doneButtons.forEach((button) => {
@@ -664,8 +696,6 @@ class SummaryOverlay {
    */
   async regenerateSummary() {
     try {
-      console.log('📄 [SummaryOverlay] Regenerating summary...');
-
       // Show loading state
       this.showLoading();
 
@@ -1713,7 +1743,7 @@ class SummaryOverlay {
     this.hide();
 
     // Remove event listener
-    document.removeEventListener('keydown', this.handleKeyboard.bind(this));
+    document.removeEventListener('keydown', this.boundKeyboardHandler);
 
     // Remove styles
     const styleEl = document.getElementById('rf-summary-overlay-styles');
