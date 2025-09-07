@@ -940,8 +940,8 @@ class SummaryOverlay {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(4px);
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(8px);
         z-index: 2147483647;
         display: flex;
         align-items: center;
@@ -959,13 +959,14 @@ class SummaryOverlay {
       
       .rf-summary-container {
         background: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        border: 1px solid #e5e7eb;
         width: 90%;
         max-width: 800px;
         max-height: 90vh;
         overflow: hidden;
-        transform: scale(0.9) translateY(20px);
+        transform: scale(0.95) translateY(20px);
         transition: transform 0.3s ease;
         display: flex;
         flex-direction: column;
@@ -976,13 +977,14 @@ class SummaryOverlay {
       }
       
       .rf-summary-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #000000;
         color: white;
         padding: 20px 24px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         position: relative;
+        border-bottom: 1px solid #1f1f1f;
       }
       
       .rf-summary-title {
@@ -1008,41 +1010,49 @@ class SummaryOverlay {
       }
       
       .rf-summary-badge {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
         padding: 4px 10px;
-        border-radius: 12px;
+        border-radius: 6px;
         font-size: 12px;
         font-weight: 500;
       }
       
-      .rf-badge-success { background-color: rgba(34, 197, 94, 0.9); }
-      .rf-badge-warning { background-color: rgba(245, 158, 11, 0.9); }
-      .rf-badge-error { background-color: rgba(239, 68, 68, 0.9); }
-      .rf-badge-info { background-color: rgba(59, 130, 246, 0.9); }
+      .rf-badge-success,
+      .rf-badge-warning,
+      .rf-badge-error,
+      .rf-badge-info,
+      .rf-badge-time,
+      .rf-badge-level {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+      }
       
       .rf-summary-close {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        border-radius: 8px;
-        width: 36px;
-        height: 36px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
         color: white;
-        font-size: 20px;
+        font-size: 18px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.2s;
+        transition: all 0.2s;
       }
       
       .rf-summary-close:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
       }
       
       .rf-summary-tabs {
         display: flex;
-        background: #f8fafc;
-        border-bottom: 1px solid #e2e8f0;
+        background: #f5f5f5;
+        border-bottom: 1px solid #d1d1d1;
       }
       
       .rf-summary-tab {
@@ -1058,18 +1068,18 @@ class SummaryOverlay {
         gap: 8px;
         font-size: 14px;
         font-weight: 500;
-        color: #64748b;
+        color: #666666;
       }
       
       .rf-summary-tab:hover {
-        background: #e2e8f0;
-        color: #334155;
+        background: #e8e8e8;
+        color: #333333;
       }
       
       .rf-summary-tab.active {
         background: white;
-        color: #3b82f6;
-        border-bottom: 2px solid #3b82f6;
+        color: #000000;
+        border-bottom: 2px solid #000000;
       }
       
       .rf-tab-icon {
@@ -1095,42 +1105,42 @@ class SummaryOverlay {
       .rf-summary-paragraph {
         line-height: 1.7;
         font-size: 16px;
-        color: #334155;
+        color: #333333;
         margin: 0 0 16px 0;
       }
       
       .rf-summary-markdown {
         line-height: 1.7;
-        color: #334155;
+        color: #333333;
       }
       
       .rf-summary-markdown h1 {
         font-size: 24px;
         font-weight: 700;
-        color: #1e293b;
+        color: #000000;
         margin: 0 0 16px 0;
         padding-bottom: 8px;
-        border-bottom: 2px solid #e2e8f0;
+        border-bottom: 2px solid #d1d1d1;
       }
       
       .rf-summary-markdown h2 {
         font-size: 20px;
         font-weight: 600;
-        color: #1e293b;
+        color: #000000;
         margin: 24px 0 12px 0;
       }
       
       .rf-summary-markdown h3 {
         font-size: 18px;
         font-weight: 600;
-        color: #334155;
+        color: #333333;
         margin: 20px 0 10px 0;
       }
       
       .rf-summary-markdown h4 {
         font-size: 16px;
         font-weight: 600;
-        color: #475569;
+        color: #666666;
         margin: 16px 0 8px 0;
       }
       
@@ -1142,29 +1152,30 @@ class SummaryOverlay {
       
       .rf-summary-markdown strong {
         font-weight: 600;
-        color: #1e293b;
+        color: #000000;
       }
       
       .rf-summary-markdown em {
         font-style: italic;
-        color: #475569;
+        color: #666666;
       }
       
       .rf-summary-markdown code {
-        background: #f1f5f9;
-        color: #3730a3;
+        background: #f5f5f5;
+        color: #000000;
         padding: 2px 6px;
         border-radius: 4px;
         font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
         font-size: 14px;
+        border: 1px solid #d1d1d1;
       }
       
       .rf-summary-markdown blockquote {
-        background: #f8fafc;
-        border-left: 4px solid #3b82f6;
+        background: #f8f8f8;
+        border-left: 4px solid #000000;
         margin: 16px 0;
         padding: 12px 16px;
-        color: #475569;
+        color: #666666;
         font-style: italic;
         border-radius: 0 6px 6px 0;
       }
@@ -1185,7 +1196,7 @@ class SummaryOverlay {
       }
       
       .rf-summary-markdown li::marker {
-        color: #3b82f6;
+        color: #000000;
       }
       
       .rf-summary-markdown ol {
@@ -1200,25 +1211,26 @@ class SummaryOverlay {
       }
       
       .rf-reading-time {
-        background: #f1f5f9;
-        color: #64748b;
+        background: #f5f5f5;
+        color: #666666;
         padding: 6px 12px;
         border-radius: 20px;
         font-size: 14px;
         display: inline-flex;
         align-items: center;
         gap: 4px;
+        border: 1px solid #d1d1d1;
       }
       
       .rf-main-topics {
         margin-top: 24px;
         padding-top: 20px;
-        border-top: 1px solid #e2e8f0;
+        border-top: 1px solid #d1d1d1;
       }
       
       .rf-main-topics h4 {
         margin: 0 0 12px 0;
-        color: #1e293b;
+        color: #000000;
         font-size: 16px;
         font-weight: 600;
       }
@@ -1230,12 +1242,13 @@ class SummaryOverlay {
       }
       
       .rf-topic-tag {
-        background: #e0e7ff;
-        color: #3730a3;
+        background: #f5f5f5;
+        color: #000000;
         padding: 6px 12px;
         border-radius: 16px;
         font-size: 14px;
         font-weight: 500;
+        border: 1px solid #d1d1d1;
       }
       
       .rf-key-points-list {
@@ -1248,13 +1261,14 @@ class SummaryOverlay {
         display: flex;
         gap: 16px;
         padding: 16px;
-        background: #f8fafc;
+        background: #f8f8f8;
         border-radius: 12px;
-        border-left: 4px solid #3b82f6;
+        border-left: 4px solid #000000;
+        border: 1px solid #e8e8e8;
       }
       
       .rf-point-number {
-        background: #3b82f6;
+        background: #000000;
         color: white;
         width: 28px;
         height: 28px;
@@ -1268,7 +1282,7 @@ class SummaryOverlay {
       }
       
       .rf-point-text {
-        color: #334155;
+        color: #333333;
         line-height: 1.6;
         font-size: 15px;
       }
@@ -1284,15 +1298,16 @@ class SummaryOverlay {
         align-items: center;
         gap: 12px;
         padding: 16px;
-        background: #fefce8;
+        background: #f8f8f8;
         border-radius: 12px;
-        border-left: 4px solid #eab308;
+        border-left: 4px solid #666666;
+        border: 1px solid #e8e8e8;
         transition: all 0.2s;
       }
       
       .rf-action-item.rf-action-completed {
-        background: #f0fdf4;
-        border-left-color: #22c55e;
+        background: #f0f0f0;
+        border-left-color: #000000;
         opacity: 0.7;
       }
       
@@ -1307,12 +1322,12 @@ class SummaryOverlay {
       
       .rf-action-text {
         flex: 1;
-        color: #374151;
+        color: #333333;
         line-height: 1.5;
       }
       
       .rf-action-done {
-        background: #22c55e;
+        background: #000000;
         color: white;
         border: none;
         border-radius: 50%;
@@ -1327,14 +1342,14 @@ class SummaryOverlay {
       }
       
       .rf-action-done:hover {
-        background: #16a34a;
+        background: #333333;
         transform: scale(1.1);
       }
       
       .rf-summary-footer {
-        background: #f8fafc;
+        background: #f8f8f8;
         padding: 20px 24px;
-        border-top: 1px solid #e2e8f0;
+        border-top: 1px solid #d1d1d1;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -1346,7 +1361,7 @@ class SummaryOverlay {
         display: flex;
         gap: 16px;
         font-size: 14px;
-        color: #64748b;
+        color: #666666;
         flex-wrap: wrap;
       }
       
@@ -1369,29 +1384,29 @@ class SummaryOverlay {
       }
       
       .rf-btn-primary {
-        background: #3b82f6;
+        background: #000000;
         color: white;
       }
       
       .rf-btn-primary:hover {
-        background: #2563eb;
+        background: #333333;
         transform: translateY(-1px);
       }
       
       .rf-btn-secondary {
         background: white;
-        color: #64748b;
-        border: 1px solid #e2e8f0;
+        color: #666666;
+        border: 1px solid #d1d1d1;
       }
       
       .rf-btn-secondary:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
+        background: #f8f8f8;
+        border-color: #999999;
       }
       
       .rf-summary-empty {
         text-align: center;
-        color: #64748b;
+        color: #666666;
         font-style: italic;
         padding: 40px 20px;
       }
@@ -1404,8 +1419,8 @@ class SummaryOverlay {
       .rf-loading-spinner {
         width: 40px;
         height: 40px;
-        border: 3px solid #e2e8f0;
-        border-top: 3px solid #3b82f6;
+        border: 3px solid #e8e8e8;
+        border-top: 3px solid #000000;
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin: 0 auto 16px;
@@ -1416,8 +1431,9 @@ class SummaryOverlay {
       }
       
       .rf-summary-error .rf-error-message {
-        color: #dc2626;
+        color: #000000;
         margin-bottom: 16px;
+        font-weight: 600;
       }
       
       .rf-error-content {
@@ -1470,10 +1486,10 @@ class SummaryOverlay {
       
       /* ELI15 Tab Styles */
       .rf-eli15-summary {
-        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        background: #f8f8f8;
         border-radius: 12px;
         padding: 24px;
-        border: 2px solid #bae6fd;
+        border: 2px solid #d1d1d1;
       }
       
       .rf-eli15-header {
@@ -1482,12 +1498,12 @@ class SummaryOverlay {
         gap: 12px;
         margin-bottom: 16px;
         padding-bottom: 12px;
-        border-bottom: 2px solid #7dd3fc;
+        border-bottom: 2px solid #666666;
       }
       
       .rf-eli15-header h4 {
         margin: 0;
-        color: #0c4a6e;
+        color: #000000;
         font-size: 18px;
         font-weight: 600;
       }
@@ -1500,12 +1516,13 @@ class SummaryOverlay {
       .rf-eli15-text {
         font-size: 16px;
         line-height: 1.8;
-        color: #0c4a6e;
+        color: #333333;
         background: white;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #0ea5e9;
+        border-left: 4px solid #000000;
+        border: 1px solid #e8e8e8;
       }
       
       /* Concepts Tab Styles */
@@ -1516,8 +1533,8 @@ class SummaryOverlay {
       }
       
       .rf-concept-item {
-        background: #fefefe;
-        border: 2px solid #f3f4f6;
+        background: white;
+        border: 2px solid #e8e8e8;
         border-radius: 12px;
         padding: 20px;
         transition: all 0.2s ease;
@@ -1525,7 +1542,7 @@ class SummaryOverlay {
       }
       
       .rf-concept-item:hover {
-        border-color: #d1d5db;
+        border-color: #d1d1d1;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       }
       
@@ -1536,46 +1553,49 @@ class SummaryOverlay {
         margin-bottom: 12px;
         font-size: 18px;
         font-weight: 700;
-        color: #1f2937;
+        color: #000000;
         padding-bottom: 8px;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 2px solid #d1d1d1;
       }
       
       .rf-concept-icon {
         font-size: 20px;
-        color: #3b82f6;
+        color: #000000;
       }
       
       .rf-concept-definition {
         font-size: 15px;
         line-height: 1.6;
-        color: #374151;
+        color: #333333;
         margin-bottom: 12px;
-        background: #f9fafb;
+        background: #f8f8f8;
         padding: 12px;
         border-radius: 8px;
-        border-left: 3px solid #3b82f6;
+        border-left: 3px solid #000000;
+        border: 1px solid #e8e8e8;
       }
       
       .rf-concept-analogy {
         font-size: 14px;
         line-height: 1.5;
-        color: #059669;
+        color: #333333;
         margin-bottom: 8px;
-        background: #ecfdf5;
+        background: #f0f0f0;
         padding: 10px 12px;
         border-radius: 6px;
-        border-left: 3px solid #10b981;
+        border-left: 3px solid #666666;
+        border: 1px solid #d1d1d1;
       }
       
       .rf-concept-example {
         font-size: 14px;
         line-height: 1.5;
-        color: #7c2d12;
-        background: #fef7ed;
+        color: #333333;
+        background: #f5f5f5;
         padding: 10px 12px;
         border-radius: 6px;
-        border-left: 3px solid #ea580c;
+        border-left: 3px solid #999999;
+        border: 1px solid #d1d1d1;
       }
       
       .rf-concept-analogy strong,
