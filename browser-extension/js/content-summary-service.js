@@ -242,7 +242,7 @@ RESPONSE FORMAT - Return a JSON object with the following structure:
     "reading_time": "30 seconds"
   },
   "detailed_summary": {
-    "markdown": "Comprehensive markdown-formatted summary with detailed analysis, context, examples, and practical insights. Use structured sections with ## headings, bullet points, and clear explanations that help readers understand the subject matter deeply.",
+    "markdown": "Comprehensive markdown-formatted summary with detailed analysis, context, examples, and practical insights. Use structured sections with ## headings, proper bullet points (- item), numbered lists (1. item), and clear explanations that help readers understand the subject matter deeply. ENSURE proper markdown formatting with line breaks before and after lists.",
     "reading_time": "3-5 minutes"
   },
   "eliSummary": "Ultra-simplified explanation that a 15-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
@@ -280,10 +280,13 @@ ${
   includeDetailedSummary
     ? `✅ Include DETAILED_SUMMARY: Comprehensive markdown-formatted analysis with:
    - # Main title reflecting the content theme
-   - ## Overview, Key Concepts, Main Arguments sections
+   - ## Overview, Key Concepts, Main Arguments sections  
    - ## Practical Applications and Critical Analysis
    - ## Future Implications and conclusions
-   - Use structured headings, bullet points, **bold** for emphasis
+   - Use structured headings, proper bullet points with dashes (- item)
+   - Use numbered lists with proper format (1. item, 2. item)
+   - **Bold** for emphasis, *italic* for subtle emphasis
+   - CRITICAL: Add blank lines before and after all lists and headings
    - Include examples, data, and clear explanations
    - Target comprehensive understanding with detailed insights`
     : '❌ Skip detailed summary'
@@ -309,6 +312,25 @@ ${includeConcepts !== false ? '✅ Include CONCEPT_DICTIONARY: Identify and expl
 - Maintain accuracy while simplifying language
 - Preserve important nuances and qualifications
 - Organize information logically
+
+MARKDOWN FORMATTING REQUIREMENTS:
+- Always add blank lines before and after headings (## Heading)
+- Always add blank lines before and after bullet point lists
+- Use dashes for bullet points: - Item one
+- Use numbers for ordered lists: 1. First item
+- Use **bold** for important terms and *italic* for emphasis
+- Ensure proper line spacing between sections
+- Example of proper list formatting:
+
+## Section Title
+
+This is a paragraph before a list.
+
+- First bullet point
+- Second bullet point
+- Third bullet point
+
+This is a paragraph after the list.
 
 LENGTH TARGET: ${maxLength === 'short' ? 'Concise summaries' : maxLength === 'medium' ? 'Balanced detail' : 'Comprehensive coverage'}
 

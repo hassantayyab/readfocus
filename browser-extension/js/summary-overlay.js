@@ -20,15 +20,15 @@ class SummaryOverlay {
   async show(summaryData) {
     try {
       console.log('📄 [SummaryOverlay] Displaying summary overlay...');
-      
+
       this.currentSummary = summaryData;
-      
+
       // Load settings to determine which tabs to show
       await this.loadSettings();
-      
+
       // Ensure active tab is still visible after loading settings
       this.validateActiveTab();
-      
+
       // Remove existing overlay
       if (this.overlay) {
         this.hide();
@@ -36,25 +36,24 @@ class SummaryOverlay {
 
       // Create overlay
       this.createOverlay();
-      
+
       // Check if overlay was created successfully
       if (!this.overlay) {
         throw new Error('Failed to create overlay element');
       }
-      
+
       // Add to DOM
       document.body.appendChild(this.overlay);
-      
+
       // Animate in
       requestAnimationFrame(() => {
         if (this.overlay) {
           this.overlay.classList.add('rf-summary-visible');
         }
       });
-      
+
       this.isVisible = true;
       console.log('✅ [SummaryOverlay] Summary overlay displayed');
-      
     } catch (error) {
       console.error('❌ [SummaryOverlay] Failed to show overlay:', error);
       this.showError('Failed to display summary');
@@ -66,11 +65,11 @@ class SummaryOverlay {
    */
   hide() {
     if (!this.overlay || !this.isVisible) return;
-    
+
     console.log('📄 [SummaryOverlay] Hiding summary overlay...');
-    
+
     this.overlay.classList.remove('rf-summary-visible');
-    
+
     setTimeout(() => {
       if (this.overlay && this.overlay.parentNode) {
         this.overlay.parentNode.removeChild(this.overlay);
@@ -89,7 +88,7 @@ class SummaryOverlay {
       this.settings = result.readfocusSettings || {
         includeKeyPoints: true,
         includeActionItems: true,
-        includeConcepts: true
+        includeConcepts: true,
       };
       console.log('📄 [SummaryOverlay] Loaded settings:', this.settings);
     } catch (error) {
@@ -98,7 +97,7 @@ class SummaryOverlay {
       this.settings = {
         includeKeyPoints: true,
         includeActionItems: true,
-        includeConcepts: true
+        includeConcepts: true,
       };
     }
   }
@@ -108,7 +107,7 @@ class SummaryOverlay {
    */
   validateActiveTab() {
     const visibleTabs = this.getVisibleTabs();
-    
+
     // If current active tab is not in visible tabs, switch to first visible tab
     if (!visibleTabs.includes(this.activeTab)) {
       this.activeTab = visibleTabs[0] || 'quick';
@@ -121,7 +120,7 @@ class SummaryOverlay {
    */
   getVisibleTabs() {
     const visibleTabs = ['quick', 'detailed', 'eli15']; // Always show these basic tabs
-    
+
     if (this.settings?.includeConcepts !== false) {
       visibleTabs.push('concepts');
     }
@@ -131,7 +130,7 @@ class SummaryOverlay {
     if (this.settings?.includeActionItems !== false) {
       visibleTabs.push('actions');
     }
-    
+
     return visibleTabs;
   }
 
@@ -142,13 +141,13 @@ class SummaryOverlay {
     try {
       this.overlay = document.createElement('div');
       this.overlay.className = 'rf-summary-overlay';
-      
+
       // Add overlay styles
       this.injectStyles();
-      
+
       // Build overlay content
       this.overlay.innerHTML = this.buildOverlayHTML();
-      
+
       // Bind event listeners
       this.bindEvents();
     } catch (error) {
@@ -164,7 +163,7 @@ class SummaryOverlay {
    */
   buildOverlayHTML() {
     const { currentSummary } = this;
-    
+
     if (!currentSummary || !currentSummary.success) {
       return this.buildErrorHTML(currentSummary?.error || 'Summary not available');
     }
@@ -202,18 +201,30 @@ class SummaryOverlay {
           <button class="rf-summary-tab ${this.activeTab === 'eli15' ? 'active' : ''}" data-tab="eli15">
             <span class="rf-tab-icon">👶</span>ELI15
           </button>
-          ${this.settings?.includeConcepts !== false ? `
+          ${
+            this.settings?.includeConcepts !== false
+              ? `
           <button class="rf-summary-tab ${this.activeTab === 'concepts' ? 'active' : ''}" data-tab="concepts">
             <span class="rf-tab-icon">📚</span>Concepts
-          </button>` : ''}
-          ${this.settings?.includeKeyPoints !== false ? `
+          </button>`
+              : ''
+          }
+          ${
+            this.settings?.includeKeyPoints !== false
+              ? `
           <button class="rf-summary-tab ${this.activeTab === 'points' ? 'active' : ''}" data-tab="points">
             <span class="rf-tab-icon">📌</span>Key Points
-          </button>` : ''}
-          ${this.settings?.includeActionItems !== false ? `
+          </button>`
+              : ''
+          }
+          ${
+            this.settings?.includeActionItems !== false
+              ? `
           <button class="rf-summary-tab ${this.activeTab === 'actions' ? 'active' : ''}" data-tab="actions">
             <span class="rf-tab-icon">🎯</span>Actions
-          </button>` : ''}
+          </button>`
+              : ''
+          }
         </div>
 
         <!-- Content Area -->
@@ -247,13 +258,13 @@ class SummaryOverlay {
    */
   buildTabContent() {
     const { currentSummary, activeTab } = this;
-    
+
     // Check if the active tab should be visible based on settings
     const visibleTabs = this.getVisibleTabs();
     if (!visibleTabs.includes(activeTab)) {
       return '<div class="rf-summary-empty">This section is disabled in your settings.</div>';
     }
-    
+
     switch (activeTab) {
       case 'quick':
         return this.buildQuickSummaryTab();
@@ -262,14 +273,17 @@ class SummaryOverlay {
       case 'eli15':
         return this.buildELI15Tab();
       case 'concepts':
-        return this.settings?.includeConcepts !== false ? this.buildConceptsTab() : 
-               '<div class="rf-summary-empty">Concept dictionary is disabled in settings.</div>';
+        return this.settings?.includeConcepts !== false
+          ? this.buildConceptsTab()
+          : '<div class="rf-summary-empty">Concept dictionary is disabled in settings.</div>';
       case 'points':
-        return this.settings?.includeKeyPoints !== false ? this.buildKeyPointsTab() : 
-               '<div class="rf-summary-empty">Key points are disabled in settings.</div>';
+        return this.settings?.includeKeyPoints !== false
+          ? this.buildKeyPointsTab()
+          : '<div class="rf-summary-empty">Key points are disabled in settings.</div>';
       case 'actions':
-        return this.settings?.includeActionItems !== false ? this.buildActionItemsTab() : 
-               '<div class="rf-summary-empty">Action items are disabled in settings.</div>';
+        return this.settings?.includeActionItems !== false
+          ? this.buildActionItemsTab()
+          : '<div class="rf-summary-empty">Action items are disabled in settings.</div>';
       default:
         return this.buildQuickSummaryTab();
     }
@@ -281,7 +295,7 @@ class SummaryOverlay {
    */
   buildQuickSummaryTab() {
     const quickSummary = this.currentSummary.quickSummary;
-    
+
     if (!quickSummary) {
       return '<div class="rf-summary-empty">Quick summary not available</div>';
     }
@@ -308,13 +322,14 @@ class SummaryOverlay {
    */
   buildDetailedSummaryTab() {
     const detailedSummary = this.currentSummary.detailedSummary;
-    
+
     if (!detailedSummary) {
       return '<div class="rf-summary-empty">Detailed summary not available</div>';
     }
 
     // Use markdown if available, otherwise fall back to text
-    const contentToRender = detailedSummary.markdown || detailedSummary.text || 'Detailed summary not available';
+    const contentToRender =
+      detailedSummary.markdown || detailedSummary.text || 'Detailed summary not available';
     const renderedContent = this.renderMarkdown(contentToRender);
 
     return `
@@ -339,17 +354,21 @@ class SummaryOverlay {
    */
   buildKeyPointsTab() {
     const keyPoints = this.currentSummary.keyPoints;
-    
+
     if (!keyPoints || keyPoints.length === 0) {
       return '<div class="rf-summary-empty">No key points extracted</div>';
     }
 
-    const pointsHTML = keyPoints.map((point, index) => `
+    const pointsHTML = keyPoints
+      .map(
+        (point, index) => `
       <div class="rf-key-point">
         <div class="rf-point-number">${index + 1}</div>
         <div class="rf-point-text">${point}</div>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     return `
       <div class="rf-tab-content rf-tab-points">
@@ -366,18 +385,22 @@ class SummaryOverlay {
    */
   buildActionItemsTab() {
     const actionItems = this.currentSummary.actionItems;
-    
+
     if (!actionItems || actionItems.length === 0) {
       return '<div class="rf-summary-empty">No specific actions identified</div>';
     }
 
-    const actionsHTML = actionItems.map((action, index) => `
+    const actionsHTML = actionItems
+      .map(
+        (action, index) => `
       <div class="rf-action-item">
         <div class="rf-action-icon">🎯</div>
         <div class="rf-action-text">${action}</div>
         <button class="rf-action-done" title="Mark as done">✓</button>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     return `
       <div class="rf-tab-content rf-tab-actions">
@@ -394,7 +417,7 @@ class SummaryOverlay {
    */
   buildELI15Tab() {
     const eliSummary = this.currentSummary.eliSummary;
-    
+
     if (!eliSummary) {
       return '<div class="rf-summary-empty">ELI15 summary not available</div>';
     }
@@ -420,12 +443,14 @@ class SummaryOverlay {
    */
   buildConceptsTab() {
     const conceptDictionary = this.currentSummary.conceptDictionary;
-    
+
     if (!conceptDictionary || conceptDictionary.length === 0) {
       return '<div class="rf-summary-empty">No technical concepts identified</div>';
     }
 
-    const conceptsHTML = conceptDictionary.map((concept, index) => `
+    const conceptsHTML = conceptDictionary
+      .map(
+        (concept, index) => `
       <div class="rf-concept-item">
         <div class="rf-concept-term">
           <span class="rf-concept-icon">📚</span>
@@ -435,7 +460,9 @@ class SummaryOverlay {
         ${concept.analogy ? `<div class="rf-concept-analogy">💡 <strong>Like:</strong> ${concept.analogy}</div>` : ''}
         ${concept.example ? `<div class="rf-concept-example">📋 <strong>Example:</strong> ${concept.example}</div>` : ''}
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     return `
       <div class="rf-tab-content rf-tab-concepts">
@@ -452,14 +479,18 @@ class SummaryOverlay {
    */
   buildMainTopicsSection() {
     const mainTopics = this.currentSummary.mainTopics;
-    
+
     if (!mainTopics || mainTopics.length === 0) {
       return '';
     }
 
-    const topicsHTML = mainTopics.map(topic => `
+    const topicsHTML = mainTopics
+      .map(
+        (topic) => `
       <span class="rf-topic-tag">${topic}</span>
-    `).join('');
+    `
+      )
+      .join('');
 
     return `
       <div class="rf-main-topics">
@@ -513,7 +544,7 @@ class SummaryOverlay {
 
     // Tab navigation
     const tabButtons = this.overlay.querySelectorAll('.rf-summary-tab');
-    tabButtons.forEach(button => {
+    tabButtons.forEach((button) => {
       button.addEventListener('click', (e) => {
         const tab = e.target.closest('.rf-summary-tab').dataset.tab;
         this.switchTab(tab);
@@ -537,7 +568,7 @@ class SummaryOverlay {
 
     // Action item done buttons
     const doneButtons = this.overlay.querySelectorAll('.rf-action-done');
-    doneButtons.forEach(button => {
+    doneButtons.forEach((button) => {
       button.addEventListener('click', (e) => {
         e.target.closest('.rf-action-item').classList.toggle('rf-action-completed');
       });
@@ -560,18 +591,18 @@ class SummaryOverlay {
    */
   switchTab(tab) {
     this.activeTab = tab;
-    
+
     // Update tab buttons
     const tabButtons = this.overlay.querySelectorAll('.rf-summary-tab');
-    tabButtons.forEach(button => {
+    tabButtons.forEach((button) => {
       button.classList.toggle('active', button.dataset.tab === tab);
     });
-    
+
     // Update content
     const contentArea = this.overlay.querySelector('.rf-summary-content');
     if (contentArea) {
       contentArea.innerHTML = this.buildTabContent();
-      
+
       // Re-bind action buttons for new content
       this.bindActionButtons();
     }
@@ -583,7 +614,7 @@ class SummaryOverlay {
   bindActionButtons() {
     // Action item done buttons
     const doneButtons = this.overlay.querySelectorAll('.rf-action-done');
-    doneButtons.forEach(button => {
+    doneButtons.forEach((button) => {
       button.addEventListener('click', (e) => {
         e.target.closest('.rf-action-item').classList.toggle('rf-action-completed');
       });
@@ -596,7 +627,7 @@ class SummaryOverlay {
    */
   handleKeyboard(e) {
     if (!this.isVisible) return;
-    
+
     switch (e.key) {
       case 'Escape':
         this.hide();
@@ -646,21 +677,20 @@ class SummaryOverlay {
   async regenerateSummary() {
     try {
       console.log('📄 [SummaryOverlay] Regenerating summary...');
-      
+
       // Show loading state
       this.showLoading();
-      
+
       // Trigger regeneration via message to content script
       const response = await chrome.runtime.sendMessage({
-        type: 'REGENERATE_SUMMARY'
+        type: 'REGENERATE_SUMMARY',
       });
-      
+
       if (response && response.success) {
         this.show(response.summary);
       } else {
         this.showError('Failed to regenerate summary');
       }
-      
     } catch (error) {
       console.error('❌ [SummaryOverlay] Failed to regenerate:', error);
       this.showError('Failed to regenerate summary');
@@ -673,12 +703,11 @@ class SummaryOverlay {
   async startReadingMode() {
     try {
       this.hide();
-      
+
       // Trigger reading mode via message
       await chrome.runtime.sendMessage({
-        type: 'START_READING_MODE'
+        type: 'START_READING_MODE',
       });
-      
     } catch (error) {
       console.error('❌ [SummaryOverlay] Failed to start reading mode:', error);
     }
@@ -690,7 +719,7 @@ class SummaryOverlay {
   async openSettings() {
     try {
       await chrome.runtime.sendMessage({
-        type: 'OPEN_OPTIONS_PAGE'
+        type: 'OPEN_OPTIONS_PAGE',
       });
     } catch (error) {
       console.error('❌ [SummaryOverlay] Failed to open settings:', error);
@@ -702,7 +731,7 @@ class SummaryOverlay {
    */
   showLoading() {
     if (!this.overlay) return;
-    
+
     const contentArea = this.overlay.querySelector('.rf-summary-content');
     if (contentArea) {
       contentArea.innerHTML = `
@@ -720,7 +749,7 @@ class SummaryOverlay {
    */
   showError(message) {
     if (!this.overlay) return;
-    
+
     const contentArea = this.overlay.querySelector('.rf-summary-content');
     if (contentArea) {
       contentArea.innerHTML = `
@@ -741,10 +770,14 @@ class SummaryOverlay {
    */
   getBadgeType(quality) {
     switch (quality?.toLowerCase()) {
-      case 'high': return 'success';
-      case 'medium': return 'warning';
-      case 'low': return 'error';
-      default: return 'info';
+      case 'high':
+        return 'success';
+      case 'medium':
+        return 'warning';
+      case 'low':
+        return 'error';
+      default:
+        return 'info';
     }
   }
 
@@ -755,15 +788,15 @@ class SummaryOverlay {
    */
   formatTimestamp(timestamp) {
     if (!timestamp) return 'recently';
-    
+
     const now = Date.now();
     const diff = now - timestamp;
     const minutes = Math.floor(diff / 60000);
-    
+
     if (minutes < 1) return 'just now';
     if (minutes === 1) return '1 minute ago';
     if (minutes < 60) return `${minutes} minutes ago`;
-    
+
     const hours = Math.floor(minutes / 60);
     if (hours === 1) return '1 hour ago';
     return `${hours} hours ago`;
@@ -779,57 +812,114 @@ class SummaryOverlay {
       return '<p>Content not available</p>';
     }
 
-    let html = markdown
+    // Split by lines and process line by line for better control
+    const lines = markdown.split('\n');
+    let html = '';
+    let inList = false;
+    let listItems = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i].trim();
+      
+      // Skip empty lines but close lists
+      if (!line) {
+        if (inList) {
+          html += `<ul>${listItems.join('')}</ul>`;
+          listItems = [];
+          inList = false;
+        }
+        continue;
+      }
+
       // Headers
-      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-      .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
-      
-      // Bold text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      
-      // Italic text
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      
+      if (line.startsWith('# ')) {
+        if (inList) {
+          html += `<ul>${listItems.join('')}</ul>`;
+          listItems = [];
+          inList = false;
+        }
+        html += `<h1>${this.processInlineMarkdown(line.substring(2))}</h1>`;
+      } else if (line.startsWith('## ')) {
+        if (inList) {
+          html += `<ul>${listItems.join('')}</ul>`;
+          listItems = [];
+          inList = false;
+        }
+        html += `<h2>${this.processInlineMarkdown(line.substring(3))}</h2>`;
+      } else if (line.startsWith('### ')) {
+        if (inList) {
+          html += `<ul>${listItems.join('')}</ul>`;
+          listItems = [];
+          inList = false;
+        }
+        html += `<h3>${this.processInlineMarkdown(line.substring(4))}</h3>`;
+      } else if (line.startsWith('#### ')) {
+        if (inList) {
+          html += `<ul>${listItems.join('')}</ul>`;
+          listItems = [];
+          inList = false;
+        }
+        html += `<h4>${this.processInlineMarkdown(line.substring(5))}</h4>`;
+      }
+      // List items - handle various bullet formats
+      else if (line.match(/^[-•*] /)) {
+        const content = line.substring(2).trim();
+        listItems.push(`<li>${this.processInlineMarkdown(content)}</li>`);
+        inList = true;
+      }
+      // Nested list items (with indentation)
+      else if (line.match(/^\s{2,}[-•*] /)) {
+        const content = line.replace(/^\s+[-•*] /, '');
+        listItems.push(`<li style="margin-left: 20px;">${this.processInlineMarkdown(content)}</li>`);
+        inList = true;
+      }
       // Blockquotes
-      .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
-      
-      // Unordered lists
-      .replace(/^- (.*$)/gm, '<li>$1</li>')
-      .replace(/^• (.*$)/gm, '<li>$1</li>')
-      .replace(/^\* (.*$)/gm, '<li>$1</li>')
-      
-      // Code blocks (inline)
-      .replace(/`(.*?)`/g, '<code>$1</code>')
-      
-      // Line breaks to paragraphs
-      .replace(/\n\s*\n/g, '</p><p>')
-      
-      // Wrap in paragraph tags if not already wrapped
-      .replace(/^(?!<[h1-6]|<blockquote|<li|<ul|<ol)/gm, '<p>')
-      .replace(/(?<!<\/[h1-6]>|<\/blockquote>|<\/li>|<\/ul>|<\/ol>)$/gm, '</p>');
+      else if (line.startsWith('> ')) {
+        if (inList) {
+          html += `<ul>${listItems.join('')}</ul>`;
+          listItems = [];
+          inList = false;
+        }
+        html += `<blockquote>${this.processInlineMarkdown(line.substring(2))}</blockquote>`;
+      }
+      // Regular paragraphs
+      else {
+        if (inList) {
+          html += `<ul>${listItems.join('')}</ul>`;
+          listItems = [];
+          inList = false;
+        }
+        // Only add paragraph if it's not empty
+        const processedContent = this.processInlineMarkdown(line);
+        if (processedContent.trim()) {
+          html += `<p>${processedContent}</p>`;
+        }
+      }
+    }
 
-    // Clean up list formatting - wrap consecutive <li> elements in <ul>
-    html = html.replace(/<li>/g, '::LI_START::').replace(/<\/li>/g, '::LI_END::');
-    html = html.replace(/(::LI_START::.*?::LI_END::)+/gs, (match) => {
-      const listItems = match.replace(/::LI_START::/g, '<li>').replace(/::LI_END::/g, '</li>');
-      return '<ul>' + listItems + '</ul>';
-    });
-
-    // Clean up multiple consecutive paragraph tags
-    html = html
-      .replace(/<\/p>\s*<p>/g, '</p>\n<p>')
-      .replace(/(<p><\/p>)/g, '')
-      .replace(/^<p><\/p>/g, '')
-      .replace(/<p><h([1-6])>/g, '<h$1>')
-      .replace(/<\/h([1-6])><\/p>/g, '</h$1>')
-      .replace(/<p><blockquote>/g, '<blockquote>')
-      .replace(/<\/blockquote><\/p>/g, '</blockquote>')
-      .replace(/<p><ul>/g, '<ul>')
-      .replace(/<\/ul><\/p>/g, '</ul>');
+    // Close any remaining list
+    if (inList && listItems.length > 0) {
+      html += `<ul>${listItems.join('')}</ul>`;
+    }
 
     return html;
+  }
+
+  /**
+   * Process inline markdown elements (bold, italic, code)
+   * @param {string} text - Text to process
+   * @returns {string} - Processed HTML
+   */
+  processInlineMarkdown(text) {
+    if (!text) return '';
+    
+    return text
+      // Bold text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      // Italic text  
+      .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+      // Inline code
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
   }
 
   /**
@@ -837,10 +927,10 @@ class SummaryOverlay {
    */
   injectStyles() {
     const styleId = 'rf-summary-overlay-styles';
-    
+
     // Don't inject if already exists
     if (document.getElementById(styleId)) return;
-    
+
     const style = document.createElement('style');
     style.id = styleId;
     style.textContent = `
@@ -1081,17 +1171,32 @@ class SummaryOverlay {
       
       .rf-summary-markdown ul {
         margin: 16px 0;
-        padding-left: 20px;
+        padding-left: 24px;
+        list-style-type: disc;
+        list-style-position: outside;
       }
       
       .rf-summary-markdown li {
         margin: 8px 0;
         line-height: 1.6;
         position: relative;
+        display: list-item;
+        list-style-type: disc;
       }
       
       .rf-summary-markdown li::marker {
         color: #3b82f6;
+      }
+      
+      .rf-summary-markdown ol {
+        margin: 16px 0;
+        padding-left: 24px;
+        list-style-type: decimal;
+        list-style-position: outside;
+      }
+      
+      .rf-summary-markdown ol li {
+        list-style-type: decimal;
       }
       
       .rf-reading-time {
@@ -1478,7 +1583,7 @@ class SummaryOverlay {
         font-weight: 600;
       }
     `;
-    
+
     document.head.appendChild(style);
   }
 
@@ -1503,16 +1608,16 @@ class SummaryOverlay {
    */
   destroy() {
     this.hide();
-    
+
     // Remove event listener
     document.removeEventListener('keydown', this.handleKeyboard.bind(this));
-    
+
     // Remove styles
     const styleEl = document.getElementById('rf-summary-overlay-styles');
     if (styleEl) {
       styleEl.remove();
     }
-    
+
     console.log('📄 [SummaryOverlay] Overlay destroyed');
   }
 }
