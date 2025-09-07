@@ -1,16 +1,16 @@
 /* ReadFocus Options Page Styles */
 
 :root {
-  --rf-primary: #2563eb;
-  --rf-primary-hover: #1d4ed8;
-  --rf-secondary: #64748b;
+  --rf-primary: #000000;
+  --rf-primary-hover: #333333;
+  --rf-secondary: #666666;
   --rf-background: #ffffff;
-  --rf-surface: #f8fafc;
-  --rf-border: #e2e8f0;
-  --rf-text: #0f172a;
-  --rf-text-muted: #64748b;
-  --rf-success: #10b981;
-  --rf-warning: #f59e0b;
+  --rf-surface: #f8f8f8;
+  --rf-border: #d1d1d1;
+  --rf-text: #000000;
+  --rf-text-muted: #666666;
+  --rf-success: #000000;
+  --rf-warning: #666666;
   --rf-radius: 8px;
   --rf-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
@@ -39,9 +39,10 @@ body {
 
 /* Header */
 .header {
-  background: linear-gradient(135deg, var(--rf-primary), #3b82f6);
-  color: white;
+  background: white;
+  color: #000000;
   padding: 2rem;
+  border-bottom: 1px solid var(--rf-border);
 }
 
 .header-content {
@@ -132,7 +133,7 @@ input[type='range']::-webkit-slider-thumb {
   appearance: none;
   width: 20px;
   height: 20px;
-  background: var(--rf-primary);
+  background: #000000;
   border-radius: 50%;
   cursor: pointer;
 }
@@ -140,7 +141,7 @@ input[type='range']::-webkit-slider-thumb {
 input[type='range']::-moz-range-thumb {
   width: 20px;
   height: 20px;
-  background: var(--rf-primary);
+  background: #000000;
   border-radius: 50%;
   cursor: pointer;
   border: none;
@@ -149,7 +150,7 @@ input[type='range']::-moz-range-thumb {
 input[type='checkbox'] {
   width: 18px;
   height: 18px;
-  accent-color: var(--rf-primary);
+  accent-color: #000000;
 }
 
 select {
@@ -164,8 +165,8 @@ select {
 
 select:focus {
   outline: none;
-  border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgb(0 0 0 / 0.1);
 }
 
 textarea {
@@ -183,8 +184,8 @@ textarea {
 
 textarea:focus {
   outline: none;
-  border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgb(0 0 0 / 0.1);
 }
 
 .setting-value {
@@ -195,9 +196,10 @@ textarea:focus {
   border-radius: 4px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--rf-primary);
+  color: #000000;
   min-width: 50px;
   text-align: center;
+  border: 1px solid var(--rf-border);
 }
 
 /* Buttons */
@@ -288,7 +290,7 @@ textarea:focus {
 
 /* Success/Error States */
 .save-success {
-  background-color: var(--rf-success);
+  background-color: #000000;
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: var(--rf-radius);
@@ -307,7 +309,7 @@ input:focus,
 select:focus,
 textarea:focus,
 button:focus {
-  outline: 2px solid var(--rf-primary);
+  outline: 2px solid #000000;
   outline-offset: 2px;
 }
 
@@ -344,13 +346,13 @@ button:focus {
 
 .api-key-input:focus {
   outline: none;
-  border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgb(0 0 0 / 0.1);
 }
 
 .test-button {
   padding: 8px 16px;
-  background: var(--rf-primary);
+  background: #000000;
   color: white;
   border: none;
   border-radius: var(--rf-radius);
@@ -362,7 +364,7 @@ button:focus {
 }
 
 .test-button:hover {
-  background: var(--rf-primary-hover);
+  background: #333333;
 }
 
 .test-button:disabled {
@@ -379,21 +381,21 @@ button:focus {
 }
 
 .api-status.success {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
+  background: #f8f8f8;
+  color: #000000;
+  border: 1px solid #d1d1d1;
 }
 
 .api-status.error {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
+  background: #f0f0f0;
+  color: #666666;
+  border: 1px solid #d1d1d1;
 }
 
 .api-status.testing {
-  background: #fef3c7;
-  color: #d97706;
-  border: 1px solid #fde68a;
+  background: #f5f5f5;
+  color: #666666;
+  border: 1px solid #d1d1d1;
 }
 
 .usage-stats {
@@ -425,15 +427,15 @@ button:focus {
 }
 
 #ai-status.connected {
-  color: var(--rf-success);
+  color: #000000;
 }
 
 #ai-status.disconnected {
-  color: #dc2626;
+  color: #666666;
 }
 
 .setting-description a {
-  color: var(--rf-primary);
+  color: #000000;
   text-decoration: none;
 }
 

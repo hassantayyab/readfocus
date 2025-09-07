@@ -952,6 +952,22 @@ class SummaryOverlay {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       }
       
+      .rf-summary-overlay .rf-summary-content * {
+        text-align: left !important;
+      }
+      
+      .rf-summary-overlay .rf-summary-tabs {
+        text-align: center !important;
+      }
+      
+      .rf-summary-overlay .rf-summary-header {
+        text-align: left !important;
+      }
+      
+      .rf-summary-overlay .rf-summary-footer {
+        text-align: left !important;
+      }
+      
       .rf-summary-overlay.rf-summary-visible {
         opacity: 1;
         visibility: visible;
@@ -977,14 +993,14 @@ class SummaryOverlay {
       }
       
       .rf-summary-header {
-        background: #000000;
-        color: white;
+        background: white;
+        color: #000000;
         padding: 20px 24px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         position: relative;
-        border-bottom: 1px solid #1f1f1f;
+        border-bottom: 1px solid #d1d1d1;
       }
       
       .rf-summary-title {
@@ -1010,12 +1026,13 @@ class SummaryOverlay {
       }
       
       .rf-summary-badge {
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: #f5f5f5;
+        border: 1px solid #d1d1d1;
         padding: 4px 10px;
         border-radius: 6px;
         font-size: 12px;
         font-weight: 500;
+        color: #333333;
       }
       
       .rf-badge-success,
@@ -1024,18 +1041,18 @@ class SummaryOverlay {
       .rf-badge-info,
       .rf-badge-time,
       .rf-badge-level {
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
+        background: #f5f5f5;
+        border: 1px solid #d1d1d1;
+        color: #333333;
       }
       
       .rf-summary-close {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: #f5f5f5;
+        border: 1px solid #d1d1d1;
         border-radius: 6px;
         width: 32px;
         height: 32px;
-        color: white;
+        color: #000000;
         font-size: 18px;
         cursor: pointer;
         display: flex;
@@ -1045,7 +1062,7 @@ class SummaryOverlay {
       }
       
       .rf-summary-close:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: #e8e8e8;
         transform: translateY(-1px);
       }
       
@@ -1091,10 +1108,12 @@ class SummaryOverlay {
         overflow-y: auto;
         padding: 24px;
         min-height: 200px;
+        text-align: left;
       }
       
       .rf-tab-content {
         animation: fadeIn 0.3s ease;
+        text-align: left;
       }
       
       @keyframes fadeIn {
@@ -1107,11 +1126,13 @@ class SummaryOverlay {
         font-size: 16px;
         color: #333333;
         margin: 0 0 16px 0;
+        text-align: left;
       }
       
       .rf-summary-markdown {
         line-height: 1.7;
         color: #333333;
+        text-align: left;
       }
       
       .rf-summary-markdown h1 {
@@ -1121,6 +1142,7 @@ class SummaryOverlay {
         margin: 0 0 16px 0;
         padding-bottom: 8px;
         border-bottom: 2px solid #d1d1d1;
+        text-align: left;
       }
       
       .rf-summary-markdown h2 {
@@ -1128,6 +1150,7 @@ class SummaryOverlay {
         font-weight: 600;
         color: #000000;
         margin: 24px 0 12px 0;
+        text-align: left;
       }
       
       .rf-summary-markdown h3 {
@@ -1135,6 +1158,7 @@ class SummaryOverlay {
         font-weight: 600;
         color: #333333;
         margin: 20px 0 10px 0;
+        text-align: left;
       }
       
       .rf-summary-markdown h4 {
@@ -1142,12 +1166,14 @@ class SummaryOverlay {
         font-weight: 600;
         color: #666666;
         margin: 16px 0 8px 0;
+        text-align: left;
       }
       
       .rf-summary-markdown p {
         margin: 0 0 16px 0;
         font-size: 16px;
         line-height: 1.7;
+        text-align: left;
       }
       
       .rf-summary-markdown strong {
@@ -1178,6 +1204,7 @@ class SummaryOverlay {
         color: #666666;
         font-style: italic;
         border-radius: 0 6px 6px 0;
+        text-align: left;
       }
       
       .rf-summary-markdown ul {
@@ -1185,6 +1212,7 @@ class SummaryOverlay {
         padding-left: 24px;
         list-style-type: disc;
         list-style-position: outside;
+        text-align: left;
       }
       
       .rf-summary-markdown li {
@@ -1193,6 +1221,7 @@ class SummaryOverlay {
         position: relative;
         display: list-item;
         list-style-type: disc;
+        text-align: left;
       }
       
       .rf-summary-markdown li::marker {
@@ -1204,6 +1233,7 @@ class SummaryOverlay {
         padding-left: 24px;
         list-style-type: decimal;
         list-style-position: outside;
+        text-align: left;
       }
       
       .rf-summary-markdown ol li {
@@ -1233,12 +1263,15 @@ class SummaryOverlay {
         color: #000000;
         font-size: 16px;
         font-weight: 600;
+        text-align: left;
       }
       
       .rf-topics-container {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+        text-align: left;
+        justify-content: flex-start;
       }
       
       .rf-topic-tag {
@@ -1255,6 +1288,7 @@ class SummaryOverlay {
         display: flex;
         flex-direction: column;
         gap: 16px;
+        text-align: left;
       }
       
       .rf-key-point {
@@ -1285,12 +1319,14 @@ class SummaryOverlay {
         color: #333333;
         line-height: 1.6;
         font-size: 15px;
+        text-align: left;
       }
       
       .rf-action-items-list {
         display: flex;
         flex-direction: column;
         gap: 12px;
+        text-align: left;
       }
       
       .rf-action-item {
@@ -1490,6 +1526,7 @@ class SummaryOverlay {
         border-radius: 12px;
         padding: 24px;
         border: 2px solid #d1d1d1;
+        text-align: left;
       }
       
       .rf-eli15-header {
@@ -1506,6 +1543,7 @@ class SummaryOverlay {
         color: #000000;
         font-size: 18px;
         font-weight: 600;
+        text-align: left;
       }
       
       .rf-eli15-icon {
@@ -1523,6 +1561,7 @@ class SummaryOverlay {
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         border-left: 4px solid #000000;
         border: 1px solid #e8e8e8;
+        text-align: left;
       }
       
       /* Concepts Tab Styles */
@@ -1530,6 +1569,7 @@ class SummaryOverlay {
         display: flex;
         flex-direction: column;
         gap: 20px;
+        text-align: left;
       }
       
       .rf-concept-item {
@@ -1556,6 +1596,7 @@ class SummaryOverlay {
         color: #000000;
         padding-bottom: 8px;
         border-bottom: 2px solid #d1d1d1;
+        text-align: left;
       }
       
       .rf-concept-icon {
@@ -1573,6 +1614,7 @@ class SummaryOverlay {
         border-radius: 8px;
         border-left: 3px solid #000000;
         border: 1px solid #e8e8e8;
+        text-align: left;
       }
       
       .rf-concept-analogy {
@@ -1585,6 +1627,7 @@ class SummaryOverlay {
         border-radius: 6px;
         border-left: 3px solid #666666;
         border: 1px solid #d1d1d1;
+        text-align: left;
       }
       
       .rf-concept-example {
@@ -1596,6 +1639,7 @@ class SummaryOverlay {
         border-radius: 6px;
         border-left: 3px solid #999999;
         border: 1px solid #d1d1d1;
+        text-align: left;
       }
       
       .rf-concept-analogy strong,

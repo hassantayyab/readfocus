@@ -1,17 +1,17 @@
 /* ReadFocus Popup Styles */
 
 :root {
-  --rf-primary: #2563eb;
-  --rf-primary-hover: #1d4ed8;
-  --rf-secondary: #64748b;
+  --rf-primary: #000000;
+  --rf-primary-hover: #333333;
+  --rf-secondary: #666666;
   --rf-background: #ffffff;
-  --rf-surface: #f8fafc;
-  --rf-border: #e2e8f0;
-  --rf-text: #0f172a;
-  --rf-text-muted: #64748b;
-  --rf-success: #10b981;
-  --rf-warning: #f59e0b;
-  --rf-error: #ef4444;
+  --rf-surface: #f8f8f8;
+  --rf-border: #d1d1d1;
+  --rf-text: #000000;
+  --rf-text-muted: #666666;
+  --rf-success: #000000;
+  --rf-warning: #666666;
+  --rf-error: #000000;
   --rf-radius: 8px;
   --rf-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --rf-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
@@ -45,8 +45,9 @@ body {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, var(--rf-primary), #3b82f6);
-  color: white;
+  background: white;
+  color: #000000;
+  border-bottom: 1px solid var(--rf-border);
 }
 
 .logo {
@@ -112,7 +113,7 @@ body {
 }
 
 .page-status.article-detected .status-title {
-  color: var(--rf-success);
+  color: #000000;
 }
 
 .page-status.no-article .status-icon::before {
@@ -120,7 +121,7 @@ body {
 }
 
 .page-status.no-article .status-title {
-  color: var(--rf-warning);
+  color: #666666;
 }
 
 /* Mode Selection */
@@ -235,13 +236,14 @@ body {
 }
 
 .badge {
-  background: linear-gradient(135deg, var(--rf-primary) 0%, var(--rf-primary-dark) 100%);
-  color: var(--rf-text);
+  background: #f5f5f5;
+  color: #000000;
   font-size: 11px;
   padding: 4px 8px;
   border-radius: 12px;
   font-weight: 500;
   line-height: 1.4;
+  border: 1px solid var(--rf-border);
 }
 
 /* API Status Section */
@@ -271,13 +273,13 @@ body {
 }
 
 .status-dot.connected {
-  background-color: var(--rf-success);
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  background-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
 }
 
 .status-dot.disconnected {
-  background-color: var(--rf-error);
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  background-color: #666666;
+  box-shadow: 0 0 0 2px rgba(102, 102, 102, 0.2);
 }
 
 .status-text {
@@ -327,24 +329,24 @@ body {
 }
 
 .summary-status.ready {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--rf-success);
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #000000;
 }
 
 .summary-status.processing {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: var(--rf-warning);
+  background-color: rgba(102, 102, 102, 0.1);
+  color: #666666;
   animation: pulse 2s infinite;
 }
 
 .summary-status.completed {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--rf-success);
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #000000;
 }
 
 .summary-status.error {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: var(--rf-error);
+  background-color: rgba(102, 102, 102, 0.1);
+  color: #666666;
 }
 
 .summary-description {
@@ -381,12 +383,12 @@ body {
 }
 
 .summary-button:not(.secondary) {
-  background: linear-gradient(135deg, #059669, #10b981);
+  background: #000000;
   color: white;
 }
 
 .summary-button:not(.secondary):hover:not(:disabled) {
-  background: linear-gradient(135deg, #047857, #059669);
+  background: #333333;
   transform: translateY(-1px);
 }
 
@@ -421,7 +423,7 @@ body {
   padding: 16px;
   border: none;
   border-radius: var(--rf-radius);
-  background: linear-gradient(135deg, var(--rf-primary), #3b82f6);
+  background: #000000;
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -430,7 +432,7 @@ body {
 }
 
 .focus-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--rf-primary-hover), #2563eb);
+  background: #333333;
   transform: translateY(-1px);
   box-shadow: var(--rf-shadow-lg);
 }
@@ -698,12 +700,12 @@ kbd {
 }
 
 .status-message {
-  background-color: var(--rf-success);
+  background-color: #000000;
   color: white;
 }
 
 .error-message {
-  background-color: var(--rf-error);
+  background-color: #666666;
   color: white;
 }
 
