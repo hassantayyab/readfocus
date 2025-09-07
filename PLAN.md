@@ -92,14 +92,6 @@
 - [x] **5-Tab Summary Interface**: Quick, Detailed, ELI15, Concepts, and Actions tabs
 - [x] **Feature Badges in Popup**: Visual indicators showcasing new Phase 1 capabilities
 
-**Remaining Features for Future Phases:**
-
-- [ ] **Content Type Detection**: Automatically detect article type (news, research, tutorial, etc.) and adapt summary style
-- [ ] **Smart Length Adjustment**: Automatically adjust summary length based on source content complexity
-- [ ] **Key Quote Extraction**: Identify and highlight the most important quotes from the original content
-- [ ] **Related Topics Suggestions**: AI-generated list of related topics to explore further
-- [ ] **Reading Time Estimates**: Add estimated reading times for each summary format
-
 **Technical Implementation (Completed):**
 
 - [x] Enhanced AI prompts for educational content with analogies and examples
@@ -325,7 +317,7 @@
 **Next Phase 2 Priorities:**
 
 1. **Summary History Dashboard** - View all previously generated summaries in organized list
-2. **Personal Summary Library** - Tag, organize, and search through saved summaries  
+2. **Personal Summary Library** - Tag, organize, and search through saved summaries
 3. **Project-Based Organization** - Create folders/projects to group related summaries
 4. **Custom Summary Styles** - User-defined templates (Academic, Business, Casual, Technical, ELI15)
 5. **Export Options** - Export summaries to Notion, Google Docs, Markdown files
