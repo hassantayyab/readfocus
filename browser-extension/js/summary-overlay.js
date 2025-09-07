@@ -176,14 +176,6 @@ class SummaryOverlay {
             <span class="rf-summary-icon">📄</span>
             <h2>Content Summary</h2>
           </div>
-          <div class="rf-summary-meta">
-            <span class="rf-summary-badge rf-badge-time">
-              ${currentSummary.estimatedReadTime || '2-3 min'} read
-            </span>
-            <span class="rf-summary-badge rf-badge-level">
-              ${currentSummary.difficultyLevel || 'Intermediate'}
-            </span>
-          </div>
           <button class="rf-summary-close" title="Close Summary">×</button>
         </div>
 
@@ -234,6 +226,7 @@ class SummaryOverlay {
           <div class="rf-summary-stats">
             <span>📊 ${currentSummary.metadata?.originalWordCount || 'N/A'} words analyzed</span>
             <span>🎓 ${currentSummary.mainTopics?.length || 0} main topics</span>
+            <span>⏱️ ${currentSummary.estimatedReadTime || '15 minutes'} read</span>
           </div>
           <div class="rf-summary-actions">
             <button class="rf-summary-btn rf-btn-primary" id="rf-start-reading">
