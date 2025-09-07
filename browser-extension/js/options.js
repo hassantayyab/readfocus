@@ -1,45 +1,26 @@
 /**
  * ReadFocus Options Page Controller
- * Handles settings UI, storage, and user preferences
+ * Handles AI summarization settings, storage, and user preferences
  */
 
 class ReadFocusOptions {
   constructor() {
     this.defaultSettings = {
-      // Reading Preferences
-      chunkSize: 150,
-      readingSpeed: 5,
-      autoStartReading: false,
-      keywordHighlighting: true,
-
-      // Typography & Display
-      fontFamily: 'system',
-      fontSize: 18,
-      lineHeight: 1.6,
-      theme: 'light',
-
-      // Quiz & Comprehension
-      quizFrequency: 5,
-      showQuizHints: true,
-      trackComprehension: true,
-
-      // Site Preferences
-      autoDetectArticles: true,
-      whitelist: [],
-      blacklist: [],
-
-      // AI Settings
+      // AI Configuration
       aiApiKey: '',
-      enableAiHighlighting: false,
-      fallbackFrequencyHighlighting: true,
+      summaryLength: 'medium',
+      autoSummarize: false,
 
-      // Privacy & Data
-      storeReadingHistory: true,
-      collectAnalytics: false,
+      // Summary Preferences
+      includeKeyPoints: true,
+      includeActionItems: true,
+      includeConcepts: true,
+
+      // Storage & Data
+      cacheSummaries: true,
     };
 
     this.currentSettings = { ...this.defaultSettings };
-    this.aiClient = null;
     this.init();
   }
 
@@ -47,8 +28,7 @@ class ReadFocusOptions {
     await this.loadSettings();
     this.bindEvents();
     this.updateUI();
-    this.setupRangeSliders();
-    this.initializeAI();
+    this.updateUsageStats();
   }
 
   /**
@@ -70,11 +50,25 @@ class ReadFocusOptions {
   /**
    * Save settings to Chrome storage
    */
-  async saveSettings() {
+  async saveSettings(clearCache = false) {
     try {
+      // Load previous settings from storage to compare
+      const result = await chrome.storage.sync.get('readfocusSettings');
+      const previousSettings = result.readfocusSettings || {};
+      
       await chrome.storage.sync.set({ readfocusSettings: this.currentSettings });
       console.log('Settings saved:', this.currentSettings);
-      this.showNotification('Settings saved successfully!', 'success');
+
+      // Check if summary-related settings changed
+      const summarySettingsChanged = this.checkIfSummarySettingsChanged(previousSettings);
+      
+      if (summarySettingsChanged || clearCache) {
+        console.log('Summary settings changed, clearing cached summaries...');
+        await this.clearCachedSummaries(false); // Don't show confirmation dialog
+        this.showNotification('Settings saved! Cached summaries cleared for new settings.', 'success');
+      } else {
+        this.showNotification('Settings saved successfully!', 'success');
+      }
 
       // Notify content scripts of settings change
       this.broadcastSettingsUpdate();
@@ -85,75 +79,53 @@ class ReadFocusOptions {
   }
 
   /**
+   * Check if summary-related settings have changed
+   * @param {Object} previousSettings - Previous settings state
+   * @returns {boolean} - True if summary settings changed
+   */
+  checkIfSummarySettingsChanged(previousSettings) {
+    const summaryKeys = [
+      'includeKeyPoints',
+      'includeActionItems', 
+      'includeConcepts',
+      'summaryLength',
+      'autoSummarize'
+    ];
+    
+    return summaryKeys.some(key => 
+      previousSettings[key] !== this.currentSettings[key]
+    );
+  }
+
+  /**
    * Update UI elements with current settings
    */
   updateUI() {
-    // Reading Preferences
-    this.setElementValue('chunk-size', this.currentSettings.chunkSize);
-    this.setElementValue('reading-speed', this.currentSettings.readingSpeed);
-    this.setElementValue('auto-start-reading', this.currentSettings.autoStartReading);
-    this.setElementValue('keyword-highlighting', this.currentSettings.keywordHighlighting);
-
-    // Typography & Display
-    this.setElementValue('font-family', this.currentSettings.fontFamily);
-    this.setElementValue('font-size', this.currentSettings.fontSize);
-    this.setElementValue('line-height', this.currentSettings.lineHeight);
-    this.setElementValue('theme', this.currentSettings.theme);
-
-    // Quiz & Comprehension
-    this.setElementValue('quiz-frequency', this.currentSettings.quizFrequency);
-    this.setElementValue('show-quiz-hints', this.currentSettings.showQuizHints);
-    this.setElementValue('track-comprehension', this.currentSettings.trackComprehension);
-
-    // Site Preferences
-    this.setElementValue('auto-detect-articles', this.currentSettings.autoDetectArticles);
-    this.setElementValue('whitelist', this.currentSettings.whitelist.join('\n'));
-    this.setElementValue('blacklist', this.currentSettings.blacklist.join('\n'));
-
-    // AI Settings
+    // AI Configuration
     this.setElementValue('ai-api-key', this.currentSettings.aiApiKey);
-    this.setElementValue('enable-ai-highlighting', this.currentSettings.enableAiHighlighting);
-    this.setElementValue(
-      'fallback-frequency-highlighting',
-      this.currentSettings.fallbackFrequencyHighlighting
-    );
+    this.setElementValue('summary-length', this.currentSettings.summaryLength);
+    this.setElementValue('auto-summarize', this.currentSettings.autoSummarize);
 
-    // Privacy & Data
-    this.setElementValue('store-reading-history', this.currentSettings.storeReadingHistory);
-    this.setElementValue('collect-analytics', this.currentSettings.collectAnalytics);
+    // Summary Preferences
+    this.setElementValue('include-key-points', this.currentSettings.includeKeyPoints);
+    this.setElementValue('include-action-items', this.currentSettings.includeActionItems);
+    this.setElementValue('include-concepts', this.currentSettings.includeConcepts);
+
+    // Storage & Data
+    this.setElementValue('cache-summaries', this.currentSettings.cacheSummaries);
   }
 
   /**
    * Bind event listeners
    */
   bindEvents() {
-    // Range sliders
-    const rangeInputs = [
-      'chunk-size',
-      'reading-speed',
-      'font-size',
-      'line-height',
-      'quiz-frequency',
-    ];
-    rangeInputs.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.addEventListener('input', (e) => this.handleRangeChange(e));
-        element.addEventListener('change', (e) => this.updateSetting(e));
-      }
-    });
-
     // Checkboxes
     const checkboxes = [
-      'auto-start-reading',
-      'keyword-highlighting',
-      'show-quiz-hints',
-      'track-comprehension',
-      'auto-detect-articles',
-      'store-reading-history',
-      'collect-analytics',
-      'enable-ai-highlighting',
-      'fallback-frequency-highlighting',
+      'auto-summarize',
+      'include-key-points',
+      'include-action-items',
+      'include-concepts',
+      'cache-summaries',
     ];
     checkboxes.forEach((id) => {
       const element = document.getElementById(id);
@@ -163,20 +135,11 @@ class ReadFocusOptions {
     });
 
     // Select dropdowns
-    const selects = ['font-family', 'theme'];
+    const selects = ['summary-length'];
     selects.forEach((id) => {
       const element = document.getElementById(id);
       if (element) {
         element.addEventListener('change', (e) => this.updateSetting(e));
-      }
-    });
-
-    // Textareas
-    const textareas = ['whitelist', 'blacklist'];
-    textareas.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.addEventListener('blur', (e) => this.updateSetting(e));
       }
     });
 
@@ -187,6 +150,9 @@ class ReadFocusOptions {
     document
       .getElementById('reset-defaults-btn')
       ?.addEventListener('click', () => this.resetToDefaults());
+    document
+      .getElementById('clear-data-btn')
+      ?.addEventListener('click', () => this.clearCachedSummaries());
 
     // AI Settings
     document.getElementById('test-api-key')?.addEventListener('click', () => this.testApiKey());
@@ -196,24 +162,6 @@ class ReadFocusOptions {
       this.currentSettings.aiApiKey = e.target.value.trim();
       this.saveSettings();
     });
-    document.getElementById('clear-data-btn')?.addEventListener('click', () => this.clearAllData());
-  }
-
-  /**
-   * Handle range slider input changes (real-time updates)
-   */
-  handleRangeChange(event) {
-    const { id, value } = event.target;
-    const valueDisplay = document.getElementById(`${id}-value`);
-
-    if (valueDisplay) {
-      let displayValue = value;
-      if (id === 'font-size') displayValue = `${value}px`;
-      if (id === 'line-height') displayValue = parseFloat(value).toFixed(1);
-      if (id === 'reading-speed') displayValue = `${value}s`;
-
-      valueDisplay.textContent = displayValue;
-    }
   }
 
   /**
@@ -229,17 +177,20 @@ class ReadFocusOptions {
     // Handle different input types
     if (type === 'checkbox') {
       settingValue = checked;
-    } else if (type === 'range') {
-      settingValue = parseFloat(value);
-    } else if (id === 'whitelist' || id === 'blacklist') {
-      settingValue = value
-        .split('\n')
-        .filter((line) => line.trim())
-        .map((line) => line.trim());
     }
+
+    // Store old value to check if it changed
+    const oldValue = this.currentSettings[settingName];
 
     // Update current settings
     this.currentSettings[settingName] = settingValue;
+
+    // Auto-save for summary-related settings and clear cache if needed
+    const summaryKeys = ['includeKeyPoints', 'includeActionItems', 'includeConcepts', 'summaryLength', 'autoSummarize'];
+    if (summaryKeys.includes(settingName) && oldValue !== settingValue) {
+      console.log(`Summary setting ${settingName} changed from ${oldValue} to ${settingValue}, auto-saving and clearing cache`);
+      this.saveSettings(); // This will automatically clear cache due to setting change
+    }
 
     // Visual feedback
     this.markSettingChanged(event.target);
@@ -256,26 +207,9 @@ class ReadFocusOptions {
 
     if (element.type === 'checkbox') {
       element.checked = value;
-    } else if (element.tagName === 'TEXTAREA' && Array.isArray(value)) {
-      element.value = value.join('\n');
     } else {
       element.value = value;
     }
-
-    // Update range slider displays
-    if (element.type === 'range') {
-      this.handleRangeChange({ target: element });
-    }
-  }
-
-  /**
-   * Setup range slider value displays
-   */
-  setupRangeSliders() {
-    const rangeInputs = document.querySelectorAll('input[type="range"]');
-    rangeInputs.forEach((input) => {
-      this.handleRangeChange({ target: input });
-    });
   }
 
   /**
@@ -304,25 +238,43 @@ class ReadFocusOptions {
   }
 
   /**
-   * Clear all stored data
+   * Clear cached summaries
+   * @param {boolean} showConfirmation - Whether to show confirmation dialog
    */
-  async clearAllData() {
-    if (
-      confirm(
-        'Clear all ReadFocus data including reading history and settings? This cannot be undone.'
-      )
-    ) {
+  async clearCachedSummaries(showConfirmation = true) {
+    const shouldProceed = !showConfirmation || confirm('Clear all cached summaries? This cannot be undone.');
+    
+    if (shouldProceed) {
       try {
-        await chrome.storage.local.clear();
-        await chrome.storage.sync.clear();
-        this.currentSettings = { ...this.defaultSettings };
-        this.updateUI();
-        this.showNotification('All data cleared successfully', 'success');
+        // Clear only summary-related data, keep settings
+        const result = await chrome.storage.local.get(null);
+        const keysToRemove = Object.keys(result).filter(key => 
+          key.startsWith('summary_') || key.startsWith('readfocus_summary_')
+        );
+        
+        if (keysToRemove.length > 0) {
+          await chrome.storage.local.remove(keysToRemove);
+          if (showConfirmation) {
+            this.showNotification(`Cleared ${keysToRemove.length} cached summaries`, 'success');
+          }
+          console.log(`Cleared ${keysToRemove.length} cached summaries`);
+        } else {
+          if (showConfirmation) {
+            this.showNotification('No cached summaries found', 'info');
+          }
+          console.log('No cached summaries found to clear');
+        }
+        
+        return keysToRemove.length;
       } catch (error) {
-        console.error('Error clearing data:', error);
-        this.showNotification('Error clearing data', 'error');
+        console.error('Error clearing cached summaries:', error);
+        if (showConfirmation) {
+          this.showNotification('Error clearing cached summaries', 'error');
+        }
+        return 0;
       }
     }
+    return 0;
   }
 
   /**
@@ -368,55 +320,32 @@ class ReadFocusOptions {
   }
 
   /**
-   * Initialize AI Client
-   */
-  async initializeAI() {
-    try {
-      // Create AI client instance
-      this.aiClient = new AIClient();
-
-      // Initialize with saved API key if available
-      if (this.currentSettings.aiApiKey) {
-        try {
-          await this.aiClient.initialize(this.currentSettings.aiApiKey);
-          this.updateAIStatus('connected', 'Connected');
-        } catch (error) {
-          console.warn('AI Client initialization failed:', error.message);
-          this.updateAIStatus('disconnected', 'Invalid API key');
-        }
-      } else {
-        this.updateAIStatus('disconnected', 'Not configured');
-      }
-
-      this.updateUsageStats();
-    } catch (error) {
-      console.error('Failed to initialize AI client:', error);
-      this.updateAIStatus('disconnected', 'Error initializing');
-    }
-  }
-
-  /**
-   * Update AI status display
-   */
-  updateAIStatus(status, message) {
-    const statusEl = document.getElementById('ai-status');
-    if (statusEl) {
-      statusEl.textContent = message;
-      statusEl.className = status;
-    }
-  }
-
-  /**
    * Update AI usage statistics
    */
-  updateUsageStats() {
-    if (!this.aiClient) return;
+  async updateUsageStats() {
+    try {
+      // Get usage stats from storage
+      const result = await chrome.storage.local.get(['apiUsageStats']);
+      const stats = result.apiUsageStats || { requestCount: 0, lastReset: Date.now() };
+      
+      const requestsEl = document.getElementById('requests-count');
+      const statusEl = document.getElementById('ai-status');
 
-    const stats = this.aiClient.getUsageStats();
-    const requestsEl = document.getElementById('requests-count');
+      if (requestsEl) {
+        requestsEl.textContent = `${stats.requestCount} requests this hour`;
+      }
 
-    if (requestsEl) {
-      requestsEl.textContent = `${stats.requestCount} / ${stats.maxRequestsPerHour}`;
+      if (statusEl) {
+        if (this.currentSettings.aiApiKey) {
+          statusEl.textContent = 'API key configured';
+          statusEl.className = 'connected';
+        } else {
+          statusEl.textContent = 'No API key';
+          statusEl.className = 'disconnected';
+        }
+      }
+    } catch (error) {
+      console.error('Error updating usage stats:', error);
     }
   }
 
@@ -440,27 +369,24 @@ class ReadFocusOptions {
     this.showApiStatus('testing', 'Testing API connection...');
 
     try {
-      // Create temporary client for testing
-      const testClient = new AIClient();
-      await testClient.initialize(apiKey);
+      // Send test message to background script
+      const response = await chrome.runtime.sendMessage({
+        type: 'TEST_API_CONNECTION',
+        apiKey: apiKey
+      });
 
-      // Explicitly test the connection
-      await testClient.testConnection();
-
-      // Test successful - save the key
-      this.currentSettings.aiApiKey = apiKey;
-      await this.saveSettings();
-
-      // Update main client
-      this.aiClient = testClient;
-
-      this.showApiStatus('success', 'API key verified and saved successfully!');
-      this.updateAIStatus('connected', 'Connected');
-      this.updateUsageStats();
+      if (response && response.success) {
+        // Test successful - save the key
+        this.currentSettings.aiApiKey = apiKey;
+        await this.saveSettings();
+        this.showApiStatus('success', 'API key verified and saved successfully!');
+        this.updateUsageStats();
+      } else {
+        throw new Error(response?.error || 'API test failed');
+      }
     } catch (error) {
       console.error('API key test failed:', error);
       this.showApiStatus('error', `Test failed: ${error.message}`);
-      this.updateAIStatus('disconnected', 'Test failed');
     } finally {
       testButton.disabled = false;
       testButton.textContent = 'Test';

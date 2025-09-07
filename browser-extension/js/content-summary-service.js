@@ -51,6 +51,10 @@ class ContentSummaryService {
 
       console.log('📄 [SummaryService] Starting content summarization...');
 
+      // Load user settings to determine what to generate
+      const settings = await this.loadUserSettings();
+      console.log('📄 [SummaryService] Loaded user settings:', settings);
+
       // Extract and analyze content
       const contentElement = this.findMainContent();
       if (!contentElement) {
@@ -76,11 +80,19 @@ class ContentSummaryService {
 
       console.log('📄 [SummaryService] NO stored summary found, will call API');
 
+      // Merge user settings with options
+      const summaryOptions = {
+        ...options,
+        includeKeyPoints: settings.includeKeyPoints !== false,
+        includeActionItems: settings.includeActionItems !== false,
+        includeConcepts: settings.includeConcepts !== false,
+      };
+
       // Generate multiple summary formats
       const summaryResult = await this.generateMultiFormatSummary(
         analysisResult.processedContent,
         analysisResult.metadata,
-        options
+        summaryOptions
       );
 
       // Store the result permanently in local storage
@@ -106,6 +118,31 @@ class ContentSummaryService {
   }
 
   /**
+   * Load user settings from Chrome storage
+   * @returns {Object} - User settings object
+   */
+  async loadUserSettings() {
+    try {
+      const result = await chrome.storage.sync.get(['readfocusSettings']);
+      return result.readfocusSettings || {
+        includeKeyPoints: true,
+        includeActionItems: true,
+        includeConcepts: true,
+        summaryLength: 'medium'
+      };
+    } catch (error) {
+      console.error('❌ [SummaryService] Failed to load settings:', error);
+      // Return defaults if loading fails
+      return {
+        includeKeyPoints: true,
+        includeActionItems: true,
+        includeConcepts: true,
+        summaryLength: 'medium'
+      };
+    }
+  }
+
+  /**
    * Generate multiple summary formats
    * @param {string} content - Processed content text
    * @param {Object} metadata - Content metadata
@@ -118,10 +155,15 @@ class ContentSummaryService {
       includeQuickSummary = true,
       includeDetailedSummary = true,
       includeActionItems = true,
+      includeConcepts = true,
       maxLength = 'medium',
     } = options;
 
-    console.log('📄 [SummaryService] Generating multi-format summary...');
+    console.log('📄 [SummaryService] Generating multi-format summary with options:', {
+      includeKeyPoints,
+      includeActionItems,
+      includeConcepts
+    });
 
     // Build comprehensive prompt
     const prompt = this.buildSummaryPrompt(content, metadata, {
@@ -129,6 +171,7 @@ class ContentSummaryService {
       includeQuickSummary,
       includeDetailedSummary,
       includeActionItems,
+      includeConcepts,
       maxLength,
     });
 
@@ -175,6 +218,7 @@ class ContentSummaryService {
       includeQuickSummary,
       includeDetailedSummary,
       includeActionItems,
+      includeConcepts,
       maxLength,
     } = options;
 
@@ -253,11 +297,11 @@ ${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways' : '❌ Sk
    - Compare complex concepts to familiar things (like comparing databases to filing cabinets)
    - Focus on the "why it matters" in simple terms
 
-✅ ALWAYS Include CONCEPT_DICTIONARY: Identify and explain technical terms with:
+${includeConcepts !== false ? '✅ Include CONCEPT_DICTIONARY: Identify and explain technical terms with:' : '❌ Skip CONCEPT_DICTIONARY'}${includeConcepts !== false ? `
    - Simple definitions in everyday language
    - Analogies to familiar concepts when possible
    - Real-world examples
-   - Focus on terms that might confuse readers
+   - Focus on terms that might confuse readers` : ''}
 
 - Focus on educational value and practical insights
 - Make everything accessible and easy to understand

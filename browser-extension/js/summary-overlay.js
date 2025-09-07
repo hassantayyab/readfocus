@@ -10,6 +10,7 @@ class SummaryOverlay {
     this.currentSummary = null;
     this.activeTab = 'quick';
     this.animationDuration = 300;
+    this.settings = null;
   }
 
   /**
@@ -21,6 +22,12 @@ class SummaryOverlay {
       console.log('📄 [SummaryOverlay] Displaying summary overlay...');
       
       this.currentSummary = summaryData;
+      
+      // Load settings to determine which tabs to show
+      await this.loadSettings();
+      
+      // Ensure active tab is still visible after loading settings
+      this.validateActiveTab();
       
       // Remove existing overlay
       if (this.overlay) {
@@ -71,6 +78,61 @@ class SummaryOverlay {
       this.overlay = null;
       this.isVisible = false;
     }, this.animationDuration);
+  }
+
+  /**
+   * Load user settings to determine tab visibility
+   */
+  async loadSettings() {
+    try {
+      const result = await chrome.storage.sync.get(['readfocusSettings']);
+      this.settings = result.readfocusSettings || {
+        includeKeyPoints: true,
+        includeActionItems: true,
+        includeConcepts: true
+      };
+      console.log('📄 [SummaryOverlay] Loaded settings:', this.settings);
+    } catch (error) {
+      console.error('❌ [SummaryOverlay] Failed to load settings:', error);
+      // Use defaults if settings can't be loaded
+      this.settings = {
+        includeKeyPoints: true,
+        includeActionItems: true,
+        includeConcepts: true
+      };
+    }
+  }
+
+  /**
+   * Validate that the current active tab is still visible based on settings
+   */
+  validateActiveTab() {
+    const visibleTabs = this.getVisibleTabs();
+    
+    // If current active tab is not in visible tabs, switch to first visible tab
+    if (!visibleTabs.includes(this.activeTab)) {
+      this.activeTab = visibleTabs[0] || 'quick';
+      console.log('📄 [SummaryOverlay] Active tab changed to:', this.activeTab);
+    }
+  }
+
+  /**
+   * Get list of tabs that should be visible based on settings
+   */
+  getVisibleTabs() {
+    const visibleTabs = ['quick', 'detailed', 'eli15']; // Always show these basic tabs
+    
+    if (this.settings?.includeConcepts !== false) {
+      visibleTabs.push('concepts');
+    }
+    if (this.settings?.includeKeyPoints !== false) {
+      visibleTabs.push('points');
+    }
+    if (this.settings?.includeActionItems !== false) {
+      visibleTabs.push('actions');
+    }
+    
+    return visibleTabs;
   }
 
   /**
@@ -140,15 +202,18 @@ class SummaryOverlay {
           <button class="rf-summary-tab ${this.activeTab === 'eli15' ? 'active' : ''}" data-tab="eli15">
             <span class="rf-tab-icon">👶</span>ELI15
           </button>
+          ${this.settings?.includeConcepts !== false ? `
           <button class="rf-summary-tab ${this.activeTab === 'concepts' ? 'active' : ''}" data-tab="concepts">
             <span class="rf-tab-icon">📚</span>Concepts
-          </button>
+          </button>` : ''}
+          ${this.settings?.includeKeyPoints !== false ? `
           <button class="rf-summary-tab ${this.activeTab === 'points' ? 'active' : ''}" data-tab="points">
             <span class="rf-tab-icon">📌</span>Key Points
-          </button>
+          </button>` : ''}
+          ${this.settings?.includeActionItems !== false ? `
           <button class="rf-summary-tab ${this.activeTab === 'actions' ? 'active' : ''}" data-tab="actions">
             <span class="rf-tab-icon">🎯</span>Actions
-          </button>
+          </button>` : ''}
         </div>
 
         <!-- Content Area -->
@@ -183,6 +248,12 @@ class SummaryOverlay {
   buildTabContent() {
     const { currentSummary, activeTab } = this;
     
+    // Check if the active tab should be visible based on settings
+    const visibleTabs = this.getVisibleTabs();
+    if (!visibleTabs.includes(activeTab)) {
+      return '<div class="rf-summary-empty">This section is disabled in your settings.</div>';
+    }
+    
     switch (activeTab) {
       case 'quick':
         return this.buildQuickSummaryTab();
@@ -191,11 +262,14 @@ class SummaryOverlay {
       case 'eli15':
         return this.buildELI15Tab();
       case 'concepts':
-        return this.buildConceptsTab();
+        return this.settings?.includeConcepts !== false ? this.buildConceptsTab() : 
+               '<div class="rf-summary-empty">Concept dictionary is disabled in settings.</div>';
       case 'points':
-        return this.buildKeyPointsTab();
+        return this.settings?.includeKeyPoints !== false ? this.buildKeyPointsTab() : 
+               '<div class="rf-summary-empty">Key points are disabled in settings.</div>';
       case 'actions':
-        return this.buildActionItemsTab();
+        return this.settings?.includeActionItems !== false ? this.buildActionItemsTab() : 
+               '<div class="rf-summary-empty">Action items are disabled in settings.</div>';
       default:
         return this.buildQuickSummaryTab();
     }
