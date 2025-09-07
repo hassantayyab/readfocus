@@ -177,9 +177,6 @@ class SummaryOverlay {
             <h2>Content Summary</h2>
           </div>
           <div class="rf-summary-meta">
-            <span class="rf-summary-badge rf-badge-${this.getBadgeType(currentSummary.contentQuality)}">
-              ${currentSummary.contentQuality || 'Standard'} Quality
-            </span>
             <span class="rf-summary-badge rf-badge-time">
               ${currentSummary.estimatedReadTime || '2-3 min'} read
             </span>
@@ -237,12 +234,8 @@ class SummaryOverlay {
           <div class="rf-summary-stats">
             <span>📊 ${currentSummary.metadata?.originalWordCount || 'N/A'} words analyzed</span>
             <span>🎓 ${currentSummary.mainTopics?.length || 0} main topics</span>
-            <span>⏱️ Generated ${this.formatTimestamp(currentSummary.timestamp)}</span>
           </div>
           <div class="rf-summary-actions">
-            <button class="rf-summary-btn rf-btn-secondary" id="rf-regenerate-summary">
-              🔄 Regenerate
-            </button>
             <button class="rf-summary-btn rf-btn-primary" id="rf-start-reading">
               📚 Start Reading Mode
             </button>
@@ -360,14 +353,16 @@ class SummaryOverlay {
     }
 
     const pointsHTML = keyPoints
-      .map(
-        (point, index) => `
+      .map((point, index) => {
+        // Remove leading bullet points, dashes, or asterisks from the point text
+        const cleanedPoint = point.replace(/^[•·\-*]\s*/, '');
+        return `
       <div class="rf-key-point">
         <div class="rf-point-number">${index + 1}</div>
-        <div class="rf-point-text">${point}</div>
+        <div class="rf-point-text">${cleanedPoint}</div>
       </div>
-    `
-      )
+    `;
+      })
       .join('');
 
     return `
@@ -820,7 +815,7 @@ class SummaryOverlay {
 
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i].trim();
-      
+
       // Skip empty lines but close lists
       if (!line) {
         if (inList) {
@@ -870,7 +865,9 @@ class SummaryOverlay {
       // Nested list items (with indentation)
       else if (line.match(/^\s{2,}[-•*] /)) {
         const content = line.replace(/^\s+[-•*] /, '');
-        listItems.push(`<li style="margin-left: 20px;">${this.processInlineMarkdown(content)}</li>`);
+        listItems.push(
+          `<li style="margin-left: 20px;">${this.processInlineMarkdown(content)}</li>`
+        );
         inList = true;
       }
       // Blockquotes
@@ -912,14 +909,16 @@ class SummaryOverlay {
    */
   processInlineMarkdown(text) {
     if (!text) return '';
-    
-    return text
-      // Bold text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      // Italic text  
-      .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
-      // Inline code
-      .replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    return (
+      text
+        // Bold text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic text
+        .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+        // Inline code
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+    );
   }
 
   /**
@@ -1291,6 +1290,22 @@ class SummaryOverlay {
         text-align: left;
       }
       
+      .rf-key-points-list ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .rf-key-points-list li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .rf-key-points-list li::marker {
+        display: none;
+      }
+      
       .rf-key-point {
         display: flex;
         gap: 16px;
@@ -1299,6 +1314,22 @@ class SummaryOverlay {
         border-radius: 12px;
         border-left: 4px solid #000000;
         border: 1px solid #e8e8e8;
+      }
+      
+      .rf-key-point ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .rf-key-point li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .rf-key-point li::marker {
+        display: none;
       }
       
       .rf-point-number {
@@ -1320,6 +1351,27 @@ class SummaryOverlay {
         line-height: 1.6;
         font-size: 15px;
         text-align: left;
+      }
+      
+      .rf-point-text ul {
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      .rf-point-text li {
+        list-style: none !important;
+        list-style-type: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      .rf-point-text li::marker {
+        display: none !important;
+      }
+      
+      .rf-point-text li::before {
+        display: none !important;
       }
       
       .rf-action-items-list {
@@ -1578,12 +1630,6 @@ class SummaryOverlay {
         border-radius: 12px;
         padding: 20px;
         transition: all 0.2s ease;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      }
-      
-      .rf-concept-item:hover {
-        border-color: #d1d1d1;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       }
       
       .rf-concept-term {
