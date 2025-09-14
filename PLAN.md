@@ -103,6 +103,7 @@
 
 **Discovered During Work:**
 
+- [x] **Storage Key Consistency Fix**: Simplified storage key generation to use URL-only instead of complex content/options hashing, eliminating cache misses and ensuring summaries are properly retrieved from local storage
 - [x] **Plasmo Build Issues**: Node.js "node:module" compatibility issue identified - extension functionality works but development server has build errors
 - [x] **Icon Generation System**: Created automated PNG icon generation from SVG for all required sizes (16, 32, 48, 64, 128px)
 - [x] **Enhanced Storage System**: Refined local storage approach for better summary persistence and retrieval
@@ -110,6 +111,17 @@
 - [x] **Enhanced Detailed Summary (Production JS Version)**: Updated the ACTIVE production JS file `browser-extension/js/content-summary-service.js` with comprehensive detailed summary structure for immediate deployment
 - [x] **Extension Structure Cleanup**: Removed duplicate TypeScript files and Plasmo development files to eliminate confusion. The project now uses a single production-ready JavaScript version in `browser-extension/` folder
 - [x] **Dialog Error Fixes**: Fixed critical null reference errors in summary overlay that were preventing the dialog from opening, added proper error handling and null checks
+- [x] **Popup Stability and Reliability Fixes**: Major overhaul of popup.js to fix hanging, closing, and unresponsive button issues:
+  - Fixed race conditions in popup initialization with proper timeout management
+  - Added comprehensive error handling and graceful degradation for failed operations
+  - Implemented content script injection verification and retry logic
+  - Added timeout protection for all async operations (summary generation, content script communication)
+  - Fixed button state management and click event handling
+  - Added proper URL validation to prevent extension errors on invalid pages
+  - Implemented user feedback system with success/error messages
+  - Added PING mechanism to verify content script availability before operations
+  - Fixed window.close() timing issues with proper async handling
+  - Enhanced popup robustness to handle content script loading failures gracefully
 
 ---
 

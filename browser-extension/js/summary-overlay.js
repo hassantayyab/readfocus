@@ -69,7 +69,6 @@ class SummaryOverlay {
       this.isVisible = true;
     } catch (error) {
       console.error('❌ [SummaryOverlay] Failed to show overlay:', error);
-      this.showError('Failed to display summary');
     }
   }
 
@@ -706,12 +705,9 @@ class SummaryOverlay {
 
       if (response && response.success) {
         this.show(response.summary);
-      } else {
-        this.showError('Failed to regenerate summary');
       }
     } catch (error) {
       console.error('❌ [SummaryOverlay] Failed to regenerate:', error);
-      this.showError('Failed to regenerate summary');
     }
   }
 
@@ -765,21 +761,6 @@ class SummaryOverlay {
    * Show error message
    * @param {string} message - Error message
    */
-  showError(message) {
-    if (!this.overlay) return;
-
-    const contentArea = this.overlay.querySelector('.rf-summary-content');
-    if (contentArea) {
-      contentArea.innerHTML = `
-        <div class="rf-summary-error">
-          <p class="rf-error-message">❌ ${message}</p>
-          <button class="rf-summary-btn rf-btn-primary" onclick="location.reload()">
-            🔄 Reload Page
-          </button>
-        </div>
-      `;
-    }
-  }
 
   /**
    * Get badge type for content quality

@@ -20,11 +20,11 @@ class ReadFocusContentScript {
   constructor() {
     this.settings = {};
     this.isExtensionUrl = false;
-    
+
     // Summary service integration
     this.summaryService = null;
     this.summaryOverlay = null;
-    
+
     // Pre-loaded summary cache
     this.preloadedSummary = null;
     this.isGeneratingSummary = false;
@@ -62,7 +62,7 @@ class ReadFocusContentScript {
       });
 
       console.log('🎉 [ContentScript] ReadFocus content script initialized successfully!');
-      
+
       // Start background summary generation after page is ready
       if (document.readyState === 'complete') {
         this.startBackgroundSummaryGeneration();
@@ -88,7 +88,7 @@ class ReadFocusContentScript {
       this.settings = this.getDefaultSettings();
     }
   }
-  
+
   /**
    * Start generating summary in the background without showing overlay
    */
@@ -96,41 +96,56 @@ class ReadFocusContentScript {
     try {
       // Skip if already generating or if we already have a summary
       if (this.isGeneratingSummary || this.preloadedSummary) {
-        console.log('⏭️ [ContentScript] Skipping background generation - already in progress or completed');
+        console.log(
+          '⏭️ [ContentScript] Skipping background generation - already in progress or completed'
+        );
         return;
       }
-      
-      console.log('🔄 [ContentScript] Starting background summary generation...');
-      this.isGeneratingSummary = true;
-      
+
+      console.log('🔄 [ContentScript] Checking for cached summary before background generation...');
+
       // Initialize summary service if needed
       if (!this.summaryService) {
         const initialized = await this.initializeSummaryService();
         if (!initialized) {
-          console.error('❌ [ContentScript] Failed to initialize summary service for background generation');
-          this.isGeneratingSummary = false;
+          console.error(
+            '❌ [ContentScript] Failed to initialize summary service for background generation'
+          );
           return;
         }
       }
-      
+
+      // CHECK CACHE FIRST - DO NOT CALL API IF DATA EXISTS
+      const hasCachedSummary = await this.summaryService.hasSummaryForCurrentPage();
+      if (hasCachedSummary) {
+        console.log('✅ [ContentScript] CACHED SUMMARY FOUND - SKIPPING API CALL');
+        console.log('✅ [ContentScript] No background generation needed - using cached data');
+        return;
+      }
+
+      console.log('❌ [ContentScript] No cached summary found - proceeding with background generation');
+      this.isGeneratingSummary = true;
+
       // Generate summary silently in the background
       const summaryResult = await this.summaryService.generateSummary({
         includeKeyPoints: true,
         includeQuickSummary: true,
         includeDetailedSummary: true,
         includeActionItems: true,
-        maxLength: 'medium'
+        maxLength: 'medium',
       });
-      
+
       if (summaryResult.success) {
         console.log('✅ [ContentScript] Background summary generated successfully');
         this.preloadedSummary = summaryResult;
       } else {
-        console.error('❌ [ContentScript] Background summary generation failed:', summaryResult.error);
+        console.error(
+          '❌ [ContentScript] Background summary generation failed:',
+          summaryResult.error
+        );
       }
-      
+
       this.isGeneratingSummary = false;
-      
     } catch (error) {
       console.error('❌ [ContentScript] Error in background summary generation:', error);
       this.isGeneratingSummary = false;
@@ -214,10 +229,10 @@ class ReadFocusContentScript {
           break;
 
         case 'GENERATE_SUMMARY':
-          // If we have a pre-loaded summary, show it immediately
+          // First check if we have a pre-loaded summary
           if (this.preloadedSummary && !this.isGeneratingSummary) {
             console.log('🚀 [ContentScript] Using pre-loaded summary for instant display');
-            const showResult = await this.showSummaryOverlay(this.preloadedSummary.summary);
+            await this.showSummaryOverlay(this.preloadedSummary);
             sendResponse({ ...this.preloadedSummary, instantLoad: true });
           } else if (this.isGeneratingSummary) {
             // Wait for background generation to complete
@@ -229,7 +244,7 @@ class ReadFocusContentScript {
               if (this.preloadedSummary || waitCount >= maxWait) {
                 clearInterval(checkInterval);
                 if (this.preloadedSummary) {
-                  const showResult = await this.showSummaryOverlay(this.preloadedSummary.summary);
+                  await this.showSummaryOverlay(this.preloadedSummary);
                   sendResponse({ ...this.preloadedSummary, instantLoad: true });
                 } else {
                   // Fallback to regular generation
@@ -239,15 +254,42 @@ class ReadFocusContentScript {
               }
             }, 500);
           } else {
-            // Generate normally if no pre-loaded summary
-            const summaryResult = await this.generateContentSummary(request.options);
-            sendResponse(summaryResult);
+            // CHECK CACHE FIRST BEFORE GENERATING
+            console.log('🔍 [ContentScript] Checking cache before generating summary...');
+
+            // Initialize summary service if needed
+            if (!this.summaryService) {
+              const initialized = await this.initializeSummaryService();
+              if (!initialized) {
+                sendResponse({ success: false, error: 'Failed to initialize summary service' });
+                break;
+              }
+            }
+
+            // Check if we have cached data
+            const hasCached = await this.summaryService.hasSummaryForCurrentPage();
+            if (hasCached) {
+              console.log('✅ [ContentScript] CACHED SUMMARY EXISTS - USING CACHED DATA');
+              // Get the cached summary by calling generateSummary which will return cached data
+              const cachedResult = await this.summaryService.generateSummary(request.options);
+              if (cachedResult.success) {
+                await this.showSummaryOverlay(cachedResult);
+                sendResponse({ ...cachedResult, fromCache: true });
+              } else {
+                sendResponse(cachedResult);
+              }
+            } else {
+              console.log('❌ [ContentScript] No cached summary - generating new one');
+              const summaryResult = await this.generateContentSummary(request.options);
+              sendResponse(summaryResult);
+            }
           }
           break;
 
         case 'SHOW_SUMMARY':
           // Use pre-loaded summary if available and no data provided
-          const summaryData = request.summaryData || (this.preloadedSummary ? this.preloadedSummary.summary : null);
+          const summaryData =
+            request.summaryData || (this.preloadedSummary ? this.preloadedSummary.summary : null);
           const showResult = await this.showSummaryOverlay(summaryData);
           sendResponse(showResult);
           break;
@@ -272,14 +314,35 @@ class ReadFocusContentScript {
         case 'CHECK_SUMMARY_EXISTS':
           // Check if we have a pre-loaded summary or cached summary
           const hasPreloaded = !!this.preloadedSummary;
-          const hasCached = this.summaryService ? await this.summaryService.hasCachedSummary() : false;
-          const isGenerating = this.isGeneratingSummary;
-          
-          sendResponse({ 
+          let hasCached = false;
+          let isGenerating = this.isGeneratingSummary;
+
+          // Check cached summary and active generation state from summary service
+          if (this.summaryService) {
+            hasCached = await this.summaryService.hasSummaryForCurrentPage();
+            // Also check if summary service has active requests
+            const serviceGenerating = this.summaryService.isActivelyGenerating();
+            isGenerating = isGenerating || serviceGenerating;
+          }
+
+          console.log('📄 [ContentScript] Summary status check:', {
+            hasPreloaded,
+            hasCached,
+            isGenerating,
+            isGeneratingSummary: this.isGeneratingSummary,
+            serviceGenerating: this.summaryService?.isActivelyGenerating() || false,
+          });
+
+          sendResponse({
             exists: hasPreloaded || hasCached,
             isGenerating: isGenerating,
-            preloaded: hasPreloaded
+            preloaded: hasPreloaded,
           });
+          break;
+
+        case 'PING':
+          // Simple ping to check if content script is responsive
+          sendResponse({ success: true });
           break;
 
         default:
@@ -1299,7 +1362,6 @@ class ReadFocusContentScript {
         await this.startFocusMode(this.settings, this.pageAnalysis);
       }
     } else {
-      this.showNotification('No article detected on this page', 'warning');
     }
   }
 
@@ -1327,7 +1389,6 @@ class ReadFocusContentScript {
 
       if (!this.pageAnalysis) {
         console.error('❌ [ContentScript] No page analysis available');
-        this.showNotification('No page analysis available for Focus Mode', 'error');
         return false;
       }
 
@@ -1338,7 +1399,6 @@ class ReadFocusContentScript {
           wordCount: this.pageAnalysis.wordCount,
           confidence: this.pageAnalysis.confidence,
         });
-        this.showNotification('This page is not suitable for Focus Mode', 'error');
         return false;
       }
 
@@ -1382,12 +1442,10 @@ class ReadFocusContentScript {
             this.pageAnalysis.mainContent = validatedContentElement;
           } else {
             console.error('❌ [ContentScript] Re-extracted content failed validation');
-            this.showNotification('Unable to find valid readable content on this page', 'error');
             return false;
           }
         } else {
           console.error('❌ [ContentScript] Failed to re-extract content');
-          this.showNotification('Unable to find readable content on this page', 'error');
           return false;
         }
       }
@@ -1399,7 +1457,6 @@ class ReadFocusContentScript {
       );
       if (!validatedContent) {
         console.error('❌ [ContentScript] Main content failed validation in startFocusMode');
-        this.showNotification('Invalid content element detected', 'error');
         return false;
       }
 
@@ -1474,7 +1531,6 @@ class ReadFocusContentScript {
           console.error('❌ [ContentScript] All content extraction methods failed');
           console.error('🔍 [ContentScript] Alternative content was:', alternativeContent);
           console.error('🔍 [ContentScript] Is Element?', alternativeContent instanceof Element);
-          this.showNotification('Content element contains no readable text', 'error');
           return false;
         }
       }
@@ -1484,7 +1540,6 @@ class ReadFocusContentScript {
       // Check if FocusModeOverlay class is available
       if (typeof FocusModeOverlay === 'undefined') {
         console.error('❌ [ContentScript] FocusModeOverlay class not available');
-        this.showNotification('Focus Mode components not loaded', 'error');
         return false;
       }
 
@@ -1504,8 +1559,6 @@ class ReadFocusContentScript {
         name: error.name,
       });
 
-      const errorMessage = error.message || 'Unknown error occurred';
-      this.showNotification(`Failed to start Focus Mode: ${errorMessage}`, 'error');
       return false;
     }
   }
@@ -1544,7 +1597,6 @@ class ReadFocusContentScript {
       // Validate content exists
       if (!this.pageAnalysis?.mainContent) {
         console.error('❌ [ContentScript] No main content found for Reading Helper');
-        this.showNotification('No readable content found on this page', 'error');
         return false;
       }
 
@@ -1574,7 +1626,6 @@ class ReadFocusContentScript {
           this.pageAnalysis.mainContent = alternativeContent;
         } else {
           console.error('❌ [ContentScript] Reading Helper: Alternative content extraction failed');
-          this.showNotification('Unable to extract readable content from this page', 'error');
           return false;
         }
       }
@@ -1604,7 +1655,6 @@ class ReadFocusContentScript {
           console.error(
             '❌ [ContentScript] Reading Helper: All content extraction attempts failed'
           );
-          this.showNotification('Invalid content element detected', 'error');
           return false;
         }
       } else {
@@ -1672,7 +1722,6 @@ class ReadFocusContentScript {
           '❌ [ContentScript] Available window properties:',
           Object.keys(window).slice(0, 20)
         );
-        this.showNotification('Reading Helper components not loaded', 'error');
         return false;
       }
 
@@ -1682,14 +1731,12 @@ class ReadFocusContentScript {
 
       if (result.success) {
         console.log('✅ [ContentScript] Reading Helper activated successfully');
-        this.showNotification('Reading Helper activated!', 'success');
         return true;
       } else {
         throw new Error('Failed to activate Reading Helper overlay');
       }
     } catch (error) {
       console.error('❌ [ContentScript] Error starting Reading Helper:', error);
-      this.showNotification('Failed to start Reading Helper. Please try again.', 'error');
       this.exitReadingHelper(); // Clean up on failure
       return false;
     }
@@ -1851,7 +1898,9 @@ class ReadFocusContentScript {
       }
 
       if (!apiKey) {
-        throw new Error('API key not configured. Please set up your Claude API key in extension settings.');
+        throw new Error(
+          'API key not configured. Please set up your Claude API key in extension settings.'
+        );
       }
 
       // Initialize the service
@@ -1887,21 +1936,18 @@ class ReadFocusContentScript {
 
       if (summaryResult.success) {
         console.log('✅ [ContentScript] Summary generated successfully');
-        this.showNotification('Content summary generated!', 'success');
       } else {
         throw new Error(summaryResult.error || 'Summary generation failed');
       }
 
       return summaryResult;
-
     } catch (error) {
       console.error('❌ [ContentScript] Failed to generate summary:', error);
-      this.showNotification('Failed to generate summary', 'error');
-      
+
       return {
         success: false,
         error: error.message,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     }
   }
@@ -1948,14 +1994,12 @@ class ReadFocusContentScript {
       console.log('✅ [ContentScript] Summary overlay displayed');
 
       return { success: true };
-
     } catch (error) {
       console.error('❌ [ContentScript] Failed to show summary overlay:', error);
-      this.showNotification(`Failed to show summary: ${error.message}`, 'error');
-      
+
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -1991,7 +2035,7 @@ class ReadFocusContentScript {
       // Generate new summary
       const summaryResult = await this.generateContentSummary({
         ...options,
-        forceRegenerate: true
+        forceRegenerate: true,
       });
 
       if (summaryResult.success) {
@@ -2002,19 +2046,17 @@ class ReadFocusContentScript {
 
         return {
           success: true,
-          summary: summaryResult
+          summary: summaryResult,
         };
       } else {
         throw new Error(summaryResult.error);
       }
-
     } catch (error) {
       console.error('❌ [ContentScript] Failed to regenerate summary:', error);
-      this.showNotification('Failed to regenerate summary', 'error');
-      
+
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -2028,7 +2070,7 @@ class ReadFocusContentScript {
       serviceInitialized: !!this.summaryService,
       overlayInitialized: !!this.summaryOverlay,
       overlayVisible: this.summaryOverlay?.isShowing() || false,
-      serviceStatus: this.summaryService?.getStatus() || null
+      serviceStatus: this.summaryService?.getStatus() || null,
     };
   }
 }

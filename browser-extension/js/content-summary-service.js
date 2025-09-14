@@ -11,6 +11,7 @@ class ContentSummaryService {
     this.storageKey = 'readfocus_summaries';
     this.maxStorageItems = 100;
     this.currentContent = null;
+    this.activeRequests = new Map(); // Track active API requests to prevent duplicates
   }
 
   /**
@@ -69,16 +70,56 @@ class ContentSummaryService {
 
       // Check local storage first - ALWAYS
       const storageKey = this.generateStorageKey(analysisResult.processedContent, options);
-      console.log('📄 [SummaryService] Checking storage with key:', storageKey);
+      console.log('📄 [SummaryService] 🔍 Storage key generated:', storageKey);
+      console.log('📄 [SummaryService] 🔍 Current URL:', window.location.href);
 
       const storedSummary = await this.getStoredSummary(storageKey);
       if (storedSummary) {
-        console.log('📄 [SummaryService] FOUND stored summary, returning it NOW');
-        console.log('📄 [SummaryService] Stored summary data:', storedSummary);
+        console.log('📄 [SummaryService] ✅ FOUND stored summary - returning cached data');
+        console.log('📄 [SummaryService] ✅ Summary timestamp:', storedSummary.timestamp);
         return storedSummary;
       }
 
-      console.log('📄 [SummaryService] NO stored summary found, will call API');
+      console.log('📄 [SummaryService] ❌ NO stored summary found - calling Claude API');
+
+      // Check if there's already an active request for this key
+      if (this.activeRequests.has(storageKey)) {
+        console.log('📄 [SummaryService] ⏳ Request already in progress, waiting for it...');
+        return await this.activeRequests.get(storageKey);
+      }
+
+      // Create and store the API request promise
+      const requestPromise = this.performSummaryGeneration(analysisResult, options, storageKey);
+      this.activeRequests.set(storageKey, requestPromise);
+
+      try {
+        const result = await requestPromise;
+        return result;
+      } finally {
+        // Clean up the active request
+        this.activeRequests.delete(storageKey);
+      }
+    } catch (error) {
+      console.error('❌ [SummaryService] Summary generation failed:', error);
+      return {
+        success: false,
+        error: error.message,
+        timestamp: Date.now(),
+      };
+    }
+  }
+
+  /**
+   * Perform the actual summary generation (extracted for deduplication)
+   * @param {Object} analysisResult - Content analysis result
+   * @param {Object} options - Summary options
+   * @param {string} storageKey - Storage key for caching
+   * @returns {Object} - Summary result
+   */
+  async performSummaryGeneration(analysisResult, options, storageKey) {
+    try {
+      // Load user settings
+      const settings = await this.loadUserSettings();
 
       // Merge user settings with options
       const summaryOptions = {
@@ -96,6 +137,7 @@ class ContentSummaryService {
       );
 
       // Store the result permanently in local storage
+      console.log('📄 [SummaryService] 💾 Storing new summary with key:', storageKey);
       await this.storeSummary(storageKey, summaryResult);
 
       // Store current content for future reference
@@ -124,12 +166,14 @@ class ContentSummaryService {
   async loadUserSettings() {
     try {
       const result = await chrome.storage.sync.get(['readfocusSettings']);
-      return result.readfocusSettings || {
-        includeKeyPoints: true,
-        includeActionItems: true,
-        includeConcepts: true,
-        summaryLength: 'medium'
-      };
+      return (
+        result.readfocusSettings || {
+          includeKeyPoints: true,
+          includeActionItems: true,
+          includeConcepts: true,
+          summaryLength: 'medium',
+        }
+      );
     } catch (error) {
       console.error('❌ [SummaryService] Failed to load settings:', error);
       // Return defaults if loading fails
@@ -137,7 +181,7 @@ class ContentSummaryService {
         includeKeyPoints: true,
         includeActionItems: true,
         includeConcepts: true,
-        summaryLength: 'medium'
+        summaryLength: 'medium',
       };
     }
   }
@@ -162,7 +206,7 @@ class ContentSummaryService {
     console.log('📄 [SummaryService] Generating multi-format summary with options:', {
       includeKeyPoints,
       includeActionItems,
-      includeConcepts
+      includeConcepts,
     });
 
     // Build comprehensive prompt
@@ -300,11 +344,15 @@ ${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways' : '❌ Sk
    - Compare complex concepts to familiar things (like comparing databases to filing cabinets)
    - Focus on the "why it matters" in simple terms
 
-${includeConcepts !== false ? '✅ Include CONCEPT_DICTIONARY: Identify and explain technical terms with:' : '❌ Skip CONCEPT_DICTIONARY'}${includeConcepts !== false ? `
+${includeConcepts !== false ? '✅ Include CONCEPT_DICTIONARY: Identify and explain technical terms with:' : '❌ Skip CONCEPT_DICTIONARY'}${
+      includeConcepts !== false
+        ? `
    - Simple definitions in everyday language
    - Analogies to familiar concepts when possible
    - Real-world examples
-   - Focus on terms that might confuse readers` : ''}
+   - Focus on terms that might confuse readers`
+        : ''
+    }
 
 - Focus on educational value and practical insights
 - Make everything accessible and easy to understand
@@ -489,16 +537,26 @@ Return only the JSON object, no additional text.`;
 
   /**
    * Generate cache key for summary
-   * @param {string} content - Content text
-   * @param {Object} options - Summary options
-   * @returns {string} - Cache key
+   * @param {string} content - Content text (unused but kept for compatibility)
+   * @param {Object} options - Summary options for deduplication
+   * @returns {string} - Cache key based on URL and options
    */
-  generateStorageKey(content, options) {
-    // Use URL as primary key - ignore content changes from page refreshes
+  generateStorageKey(content, options = {}) {
+    // Use clean URL as base
     const url = window.location.href.split('#')[0].split('?')[0]; // Remove hash and query params
-    const urlHash = this.simpleHash(url);
-    const optionsHash = this.simpleHash(JSON.stringify(options));
-    return `${urlHash}_${optionsHash}`;
+
+    // Create options signature for deduplication
+    const optionsSignature = {
+      includeKeyPoints: options.includeKeyPoints,
+      includeQuickSummary: options.includeQuickSummary,
+      includeDetailedSummary: options.includeDetailedSummary,
+      includeActionItems: options.includeActionItems,
+      includeConcepts: options.includeConcepts,
+      maxLength: options.maxLength
+    };
+
+    const optionsHash = this.simpleHash(JSON.stringify(optionsSignature));
+    return `${url}_${optionsHash}`;
   }
 
   /**
@@ -515,6 +573,7 @@ Return only the JSON object, no additional text.`;
     }
     return Math.abs(hash).toString(36);
   }
+
 
   /**
    * Store summary result in Chrome storage
@@ -590,17 +649,19 @@ Return only the JSON object, no additional text.`;
   async getStoredSummary(key) {
     try {
       const summaries = await this.getAllStoredSummaries();
-      console.log('📄 [SummaryService] All stored keys:', Object.keys(summaries));
-      console.log('📄 [SummaryService] Looking for key:', key);
+      const storedKeys = Object.keys(summaries);
+      console.log('📄 [SummaryService] 🗄️ Total cached summaries:', storedKeys.length);
+      console.log('📄 [SummaryService] 🗄️ All stored keys:', storedKeys);
+      console.log('📄 [SummaryService] 🔍 Looking for exact key:', key);
 
       const summary = summaries[key];
 
       if (summary) {
-        console.log(`📄 [SummaryService] ✅ FOUND stored summary for key: ${key}`);
+        console.log(`📄 [SummaryService] ✅ EXACT MATCH found for key: ${key}`);
         return summary;
       }
 
-      console.log(`📄 [SummaryService] ❌ NO summary found for key: ${key}`);
+      console.log(`📄 [SummaryService] ❌ NO EXACT MATCH found for key: ${key}`);
       return null;
     } catch (error) {
       console.error('❌ [SummaryService] Error retrieving stored summary:', error);
@@ -645,6 +706,38 @@ Return only the JSON object, no additional text.`;
   }
 
   /**
+   * Check if there's an active summary generation request
+   * @returns {boolean} - True if actively generating
+   */
+  isActivelyGenerating() {
+    return this.activeRequests.size > 0;
+  }
+
+  /**
+   * Get current storage key for the current page
+   * @returns {string} - Storage key for current page
+   */
+  getCurrentStorageKey() {
+    return this.generateStorageKey('', {
+      includeKeyPoints: true,
+      includeQuickSummary: true,
+      includeDetailedSummary: true,
+      includeActionItems: true,
+      maxLength: 'medium',
+    });
+  }
+
+  /**
+   * Check if summary exists for current page
+   * @returns {boolean} - True if summary exists in storage
+   */
+  async hasSummaryForCurrentPage() {
+    const key = this.getCurrentStorageKey();
+    const summary = await this.getStoredSummary(key);
+    return !!summary;
+  }
+
+  /**
    * Get service status
    * @returns {Object} - Service status information
    */
@@ -652,7 +745,8 @@ Return only the JSON object, no additional text.`;
     return {
       initialized: this.initialized,
       hasContent: !!this.currentContent,
-      cacheSize: this.summaryCache.size,
+      activeRequestCount: this.activeRequests.size,
+      isGenerating: this.activeRequests.size > 0,
       aiClientReady: !!(this.aiClient && this.aiClient.apiKey),
       lastProcessed: this.currentContent?.timestamp,
     };

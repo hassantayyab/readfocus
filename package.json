@@ -23,6 +23,7 @@
   "author": "Hassan Tayyab",
   "license": "MIT",
   "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.112",
     "@plasmohq/messaging": "^0.7.2",
     "@plasmohq/storage": "^1.15.0",
     "@types/node": "^24.3.0",
