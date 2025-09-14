@@ -246,7 +246,7 @@ class SummaryOverlay {
           </div>
           <div class="rf-summary-actions">
             <button class="rf-summary-btn rf-btn-primary" id="rf-start-reading">
-              📚 Start Reading Mode
+              📚 Continue Reading
             </button>
           </div>
         </div>
