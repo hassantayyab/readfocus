@@ -441,7 +441,7 @@ class ReadFocusPopup {
       const { type, title, description, email, url, timestamp, version, context } = feedbackData;
 
       // GitHub API configuration - Add your token here locally
-      const GITHUB_TOKEN = process.env.GITHUB_TOKEN || 'YOUR_TOKEN_HERE';
+      const GITHUB_TOKEN = 'YOUR_TOKEN_HERE';
       const GITHUB_REPO = 'hassantayyab/readfocus';
 
       if (!GITHUB_TOKEN || GITHUB_TOKEN === 'YOUR_TOKEN_HERE') {

@@ -18,11 +18,11 @@ async function testGitHubAPI() {
 
   try {
     // GitHub API configuration - Add your token here locally
-    const GITHUB_TOKEN = process.env.GITHUB_TOKEN || 'YOUR_TOKEN_HERE';
+    const GITHUB_TOKEN = 'YOUR_TOKEN_HERE';
     const GITHUB_REPO = 'hassantayyab/readfocus';
 
     if (!GITHUB_TOKEN || GITHUB_TOKEN === 'YOUR_TOKEN_HERE') {
-      throw new Error('Please set GITHUB_TOKEN environment variable or replace YOUR_TOKEN_HERE');
+      throw new Error('Please replace YOUR_TOKEN_HERE with your actual token');
     }
 
     // Create issue title with emoji
