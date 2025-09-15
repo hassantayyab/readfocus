@@ -1,10 +1,7 @@
 {
   "functions": {
-    "api/claude.js": {
+    "api/*.js": {
       "maxDuration": 30
-    },
-    "api/github-feedback.js": {
-      "maxDuration": 10
     }
   },
   "headers": [
