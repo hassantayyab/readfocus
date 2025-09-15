@@ -434,80 +434,32 @@ class ReadFocusPopup {
   }
 
   /**
-   * Create GitHub issue directly via API
+   * Create GitHub issue via proxy API
    */
   async createGitHubIssue(feedbackData) {
     try {
-      const { type, title, description, email, url, timestamp, version, context } = feedbackData;
+      const proxyURL =
+        'https://readfocus-9lvsu6bxn-helloappaddles-projects.vercel.app/api/github-feedback'; // Update with your actual Vercel URL
 
-      // GitHub API configuration - Get token from settings
-      const result = await chrome.storage.sync.get('readfocusSettings');
-      const settings = result.readfocusSettings || {};
-      const GITHUB_TOKEN = settings.githubToken;
-      const GITHUB_REPO = 'hassantayyab/readfocus';
-
-      if (!GITHUB_TOKEN || GITHUB_TOKEN.trim() === '') {
-        throw new Error('GitHub token not configured. Please set it in extension settings.');
-      }
-
-      // Create issue title with emoji
-      const typeEmojis = {
-        bug: '🐛',
-        feature: '💡',
-        improvement: '⚡',
-        settings: '⚙️',
-        general: '💬',
-      };
-
-      const emoji = typeEmojis[type] || '💬';
-      const issueTitle = `[${emoji}] ${title}`;
-
-      // Create issue body
-      let issueBody = `## ${type.charAt(0).toUpperCase() + type.slice(1)} Report\n\n`;
-      issueBody += `**Description:**\n${description}\n\n`;
-
-      if (email) {
-        issueBody += `**Contact:** ${email}\n\n`;
-      }
-
-      issueBody += `---\n**Technical Information:**\n`;
-      issueBody += `- Extension Version: ${version}\n`;
-      issueBody += `- Context: ${context || 'extension'}\n`;
-      issueBody += `- Page URL: ${url || 'N/A'}\n`;
-      issueBody += `- Timestamp: ${new Date(timestamp).toLocaleString()}\n`;
-
-      // Add labels based on type
-      const labels = ['feedback'];
-      if (type === 'bug') labels.push('bug');
-      if (type === 'feature') labels.push('enhancement');
-      if (type === 'improvement') labels.push('enhancement');
-
-      // Create GitHub issue
-      const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/issues`, {
+      const response = await fetch(proxyURL, {
         method: 'POST',
         headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
           'Content-Type': 'application/json',
-          Accept: 'application/vnd.github.v3+json',
         },
-        body: JSON.stringify({
-          title: issueTitle,
-          body: issueBody,
-          labels: labels,
-        }),
+        body: JSON.stringify(feedbackData),
       });
 
       if (response.ok) {
-        const issue = await response.json();
-        console.log(`✅ Created GitHub issue #${issue.number}: ${issueTitle}`);
+        const result = await response.json();
+        console.log(`✅ Created GitHub issue via proxy: ${result.message}`);
         return true;
       } else {
-        const error = await response.text();
-        console.error('❌ GitHub API error:', error);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ Proxy API error:', errorData);
         return false;
       }
     } catch (error) {
-      console.error('❌ Error creating GitHub issue:', error);
+      console.error('❌ Error submitting feedback via proxy:', error);
       return false;
     }
   }
