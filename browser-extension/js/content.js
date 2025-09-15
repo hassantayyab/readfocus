@@ -63,13 +63,18 @@ class ReadFocusContentScript {
 
       console.log('🎉 [ContentScript] ReadFocus content script initialized successfully!');
 
-      // Start background summary generation after page is ready
-      if (document.readyState === 'complete') {
-        this.startBackgroundSummaryGeneration();
-      } else {
-        window.addEventListener('load', () => {
+      // Start background summary generation after page is ready (only if auto-summarize is enabled)
+      if (this.settings.autoSummarize) {
+        console.log('✅ [ContentScript] Auto-summarize enabled, starting background generation');
+        if (document.readyState === 'complete') {
           this.startBackgroundSummaryGeneration();
-        });
+        } else {
+          window.addEventListener('load', () => {
+            this.startBackgroundSummaryGeneration();
+          });
+        }
+      } else {
+        console.log('⏭️ [ContentScript] Auto-summarize disabled, skipping background generation');
       }
     } catch (error) {
       console.error('Error initializing ReadFocus content script:', error);
@@ -169,6 +174,7 @@ class ReadFocusContentScript {
       showQuizHints: true,
       trackComprehension: true,
       autoDetectArticles: true,
+      autoSummarize: false, // Added to match options.js default
     };
   }
 
@@ -224,7 +230,24 @@ class ReadFocusContentScript {
     try {
       switch (request.type) {
         case 'SETTINGS_UPDATED':
+          const oldAutoSummarize = this.settings.autoSummarize;
           this.settings = request.settings;
+
+          // If auto-summarize was just enabled and we don't have a pre-loaded summary, start background generation
+          if (this.settings.autoSummarize && !oldAutoSummarize && !this.preloadedSummary && !this.isGeneratingSummary) {
+            console.log('✅ [ContentScript] Auto-summarize just enabled, starting background generation');
+            this.startBackgroundSummaryGeneration();
+          }
+          // If auto-summarize was disabled, stop any ongoing generation and clear pre-loaded summary
+          else if (!this.settings.autoSummarize && oldAutoSummarize) {
+            console.log('⏹️ [ContentScript] Auto-summarize disabled, stopping background generation');
+            this.isGeneratingSummary = false;
+            this.preloadedSummary = null;
+            if (this.summaryService) {
+              this.summaryService.clearCache();
+            }
+          }
+
           sendResponse({ success: true });
           break;
 
