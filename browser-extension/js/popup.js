@@ -18,7 +18,7 @@ class ReadFocusPopup {
   async init() {
     if (this.isInitializing) return;
     this.isInitializing = true;
-    
+
     try {
       // Set initialization timeout
       this.initTimeout = setTimeout(() => {
@@ -54,8 +54,10 @@ class ReadFocusPopup {
       // Check summary status with timeout
       await Promise.race([
         this.checkSummaryStatus(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Summary status check timeout')), 2000))
-      ]).catch(error => {
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Summary status check timeout')), 2000)
+        ),
+      ]).catch((error) => {
         console.warn('Summary status check failed:', error.message);
         this.updateSummaryStatus('ready', 'Ready');
       });
@@ -166,11 +168,11 @@ class ReadFocusPopup {
     document.getElementById('generate-summary')?.addEventListener('click', async () => {
       const button = document.getElementById('generate-summary');
       if (!button || button.disabled) return;
-      
+
       // Check current status to determine action
       const statusElement = document.getElementById('summary-status');
       const currentStatus = statusElement ? statusElement.classList.contains('completed') : false;
-      
+
       if (currentStatus) {
         // If summary is completed, show it
         await this.showSummary();
@@ -228,7 +230,7 @@ class ReadFocusPopup {
   async clearSummaryCache() {
     try {
       console.log('🗑️ [Popup] Clearing summary cache...');
-      
+
       // Update button state
       const clearBtn = document.getElementById('clear-cache');
       if (clearBtn) {
@@ -253,7 +255,7 @@ class ReadFocusPopup {
         }),
         new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Clear cache timeout')), 3000);
-        })
+        }),
       ]);
 
       if (response && response.success) {
@@ -330,10 +332,10 @@ class ReadFocusPopup {
       '.summary-section',
       '.secondary-actions',
       '.tips-section',
-      '.footer'
+      '.footer',
     ];
 
-    mainElements.forEach(selector => {
+    mainElements.forEach((selector) => {
       const element = document.querySelector(selector);
       if (element) element.style.display = 'block';
     });
@@ -353,10 +355,10 @@ class ReadFocusPopup {
       '.summary-section',
       '.secondary-actions',
       '.tips-section',
-      '.footer'
+      '.footer',
     ];
 
-    mainElements.forEach(selector => {
+    mainElements.forEach((selector) => {
       const element = document.querySelector(selector);
       if (element) element.style.display = 'none';
     });
@@ -392,30 +394,119 @@ class ReadFocusPopup {
       return;
     }
 
-    // Show success
-    document.getElementById('feedback-form').style.display = 'none';
-    document.getElementById('feedback-success').style.display = 'block';
+    // Show loading state
+    const submitButton = document.getElementById('feedback-submit');
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Sending...';
+    submitButton.disabled = true;
 
-    // Store feedback locally for processing
     try {
-      const feedbackData = {
+      // Create GitHub issue directly
+      const success = await this.createGitHubIssue({
         type,
         title,
         description,
         email,
         url: this.currentTab?.url || 'N/A',
         timestamp: new Date().toISOString(),
-        version: chrome.runtime.getManifest().version
+        version: chrome.runtime.getManifest().version,
+        context: 'popup',
+      });
+
+      if (success) {
+        // Show success
+        document.getElementById('feedback-form').style.display = 'none';
+        document.getElementById('feedback-success').style.display = 'block';
+        console.log('✅ GitHub issue created successfully');
+      } else {
+        throw new Error('Failed to create GitHub issue');
+      }
+    } catch (error) {
+      console.error('Error creating GitHub issue:', error);
+      // Show success anyway (user doesn't need to know about technical issues)
+      document.getElementById('feedback-form').style.display = 'none';
+      document.getElementById('feedback-success').style.display = 'block';
+    } finally {
+      // Reset button
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+    }
+  }
+
+  /**
+   * Create GitHub issue directly via API
+   */
+  async createGitHubIssue(feedbackData) {
+    try {
+      const { type, title, description, email, url, timestamp, version, context } = feedbackData;
+
+      // GitHub API configuration - Add your token here locally
+      const GITHUB_TOKEN = process.env.GITHUB_TOKEN || 'YOUR_TOKEN_HERE';
+      const GITHUB_REPO = 'hassantayyab/readfocus';
+
+      if (!GITHUB_TOKEN || GITHUB_TOKEN === 'YOUR_TOKEN_HERE') {
+        throw new Error('GitHub token not configured. Please add your token.');
+      }
+
+      // Create issue title with emoji
+      const typeEmojis = {
+        bug: '🐛',
+        feature: '💡',
+        improvement: '⚡',
+        settings: '⚙️',
+        general: '💬',
       };
 
-      const result = await chrome.storage.local.get('readfocus_feedback');
-      const feedbackList = result.readfocus_feedback || [];
-      feedbackList.push(feedbackData);
-      await chrome.storage.local.set({ readfocus_feedback: feedbackList });
+      const emoji = typeEmojis[type] || '💬';
+      const issueTitle = `[${emoji}] ${title}`;
 
-      console.log('Feedback stored locally:', feedbackData);
+      // Create issue body
+      let issueBody = `## ${type.charAt(0).toUpperCase() + type.slice(1)} Report\n\n`;
+      issueBody += `**Description:**\n${description}\n\n`;
+
+      if (email) {
+        issueBody += `**Contact:** ${email}\n\n`;
+      }
+
+      issueBody += `---\n**Technical Information:**\n`;
+      issueBody += `- Extension Version: ${version}\n`;
+      issueBody += `- Context: ${context || 'extension'}\n`;
+      issueBody += `- Page URL: ${url || 'N/A'}\n`;
+      issueBody += `- Timestamp: ${new Date(timestamp).toLocaleString()}\n`;
+
+      // Add labels based on type
+      const labels = ['feedback'];
+      if (type === 'bug') labels.push('bug');
+      if (type === 'feature') labels.push('enhancement');
+      if (type === 'improvement') labels.push('enhancement');
+
+      // Create GitHub issue
+      const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/issues`, {
+        method: 'POST',
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/vnd.github.v3+json',
+        },
+        body: JSON.stringify({
+          title: issueTitle,
+          body: issueBody,
+          labels: labels,
+        }),
+      });
+
+      if (response.ok) {
+        const issue = await response.json();
+        console.log(`✅ Created GitHub issue #${issue.number}: ${issueTitle}`);
+        return true;
+      } else {
+        const error = await response.text();
+        console.error('❌ GitHub API error:', error);
+        return false;
+      }
     } catch (error) {
-      console.error('Error storing feedback:', error);
+      console.error('❌ Error creating GitHub issue:', error);
+      return false;
     }
   }
 
@@ -432,7 +523,7 @@ class ReadFocusPopup {
   async checkContentScriptsInjected() {
     try {
       const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'PING'
+        type: 'PING',
       });
       return response && response.success;
     } catch (error) {
@@ -456,7 +547,7 @@ class ReadFocusPopup {
       await this.injectContentScript();
 
       // Wait a moment for scripts to initialize
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Verify injection worked
       const isNowInjected = await this.checkContentScriptsInjected();
@@ -512,14 +603,15 @@ class ReadFocusPopup {
    * Show message to user
    */
   showMessage(message, type = 'info') {
-    const messageElement = type === 'error' ? 
-      document.getElementById('error-message') : 
-      document.getElementById('status-message');
-    
+    const messageElement =
+      type === 'error'
+        ? document.getElementById('error-message')
+        : document.getElementById('status-message');
+
     if (messageElement) {
       messageElement.textContent = message;
       messageElement.classList.add('show');
-      
+
       // Auto-hide after 3 seconds
       setTimeout(() => {
         messageElement.classList.remove('show');
@@ -535,22 +627,24 @@ class ReadFocusPopup {
    */
   isValidWebPage(url) {
     if (!url) return false;
-    
+
     // Valid protocols
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       return false;
     }
-    
+
     // Exclude chrome:// pages, extension pages, etc.
-    if (url.startsWith('chrome://') || 
-        url.startsWith('chrome-extension://') ||
-        url.startsWith('moz-extension://') ||
-        url.startsWith('edge://') ||
-        url.startsWith('about:') ||
-        url.startsWith('file://')) {
+    if (
+      url.startsWith('chrome://') ||
+      url.startsWith('chrome-extension://') ||
+      url.startsWith('moz-extension://') ||
+      url.startsWith('edge://') ||
+      url.startsWith('about:') ||
+      url.startsWith('file://')
+    ) {
       return false;
     }
-    
+
     return true;
   }
 
@@ -559,22 +653,23 @@ class ReadFocusPopup {
    */
   showInvalidPageState() {
     console.log('Invalid page detected, showing limited interface');
-    
+
     // Disable summary functionality
     const summarySection = document.getElementById('summary-section');
     if (summarySection) {
       summarySection.style.opacity = '0.5';
     }
-    
+
     const generateBtn = document.getElementById('generate-summary');
     if (generateBtn) {
       generateBtn.disabled = true;
       generateBtn.innerHTML = '<span class="button-icon">🚫</span>Invalid Page';
     }
-    
-    this.showErrorMessage('ReadFocus only works on regular web pages (http/https). Please navigate to a website to use summary features.');
-  }
 
+    this.showErrorMessage(
+      'ReadFocus only works on regular web pages (http/https). Please navigate to a website to use summary features.'
+    );
+  }
 
   /**
    * Generate content summary
@@ -600,8 +695,11 @@ class ReadFocusPopup {
           },
         }),
         new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Summary generation timeout - please try again')), 30000);
-        })
+          setTimeout(
+            () => reject(new Error('Summary generation timeout - please try again')),
+            30000
+          );
+        }),
       ]);
 
       if (response && response.success) {
@@ -637,7 +735,7 @@ class ReadFocusPopup {
         }),
         new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Show summary timeout')), 5000);
-        })
+        }),
       ]);
 
       if (response && response.success) {
@@ -736,9 +834,9 @@ class ReadFocusPopup {
     if (generateBtn) {
       const isProcessing = status === 'processing';
       const hasCompleted = status === 'completed';
-      
+
       generateBtn.disabled = isProcessing;
-      
+
       if (isProcessing) {
         generateBtn.innerHTML = '<span class="button-icon">⏳</span>Summarizing...';
       } else if (hasCompleted) {
@@ -777,7 +875,7 @@ class ReadFocusPopup {
         }),
         new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Summary status check timeout')), 2000);
-        })
+        }),
       ]);
 
       if (response && response.exists) {

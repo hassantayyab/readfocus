@@ -57,17 +57,20 @@ class ReadFocusOptions {
       // Load previous settings from storage to compare
       const result = await chrome.storage.sync.get('readfocusSettings');
       const previousSettings = result.readfocusSettings || {};
-      
+
       await chrome.storage.sync.set({ readfocusSettings: this.currentSettings });
       console.log('Settings saved:', this.currentSettings);
 
       // Check if summary-related settings changed
       const summarySettingsChanged = this.checkIfSummarySettingsChanged(previousSettings);
-      
+
       if (summarySettingsChanged || clearCache) {
         console.log('Summary settings changed, clearing cached summaries...');
         await this.clearCachedSummaries(false); // Don't show confirmation dialog
-        this.showNotification('Settings saved! Cached summaries cleared for new settings.', 'success');
+        this.showNotification(
+          'Settings saved! Cached summaries cleared for new settings.',
+          'success'
+        );
       } else {
         this.showNotification('Settings saved successfully!', 'success');
       }
@@ -88,15 +91,13 @@ class ReadFocusOptions {
   checkIfSummarySettingsChanged(previousSettings) {
     const summaryKeys = [
       'includeKeyPoints',
-      'includeActionItems', 
+      'includeActionItems',
       'includeConcepts',
       'summaryLength',
-      'autoSummarize'
+      'autoSummarize',
     ];
-    
-    return summaryKeys.some(key => 
-      previousSettings[key] !== this.currentSettings[key]
-    );
+
+    return summaryKeys.some((key) => previousSettings[key] !== this.currentSettings[key]);
   }
 
   /**
@@ -191,9 +192,17 @@ class ReadFocusOptions {
     this.currentSettings[settingName] = settingValue;
 
     // Auto-save for summary-related settings and clear cache if needed
-    const summaryKeys = ['includeKeyPoints', 'includeActionItems', 'includeConcepts', 'summaryLength', 'autoSummarize'];
+    const summaryKeys = [
+      'includeKeyPoints',
+      'includeActionItems',
+      'includeConcepts',
+      'summaryLength',
+      'autoSummarize',
+    ];
     if (summaryKeys.includes(settingName) && oldValue !== settingValue) {
-      console.log(`Summary setting ${settingName} changed from ${oldValue} to ${settingValue}, auto-saving and clearing cache`);
+      console.log(
+        `Summary setting ${settingName} changed from ${oldValue} to ${settingValue}, auto-saving and clearing cache`
+      );
       this.saveSettings(); // This will automatically clear cache due to setting change
     }
 
@@ -247,16 +256,17 @@ class ReadFocusOptions {
    * @param {boolean} showConfirmation - Whether to show confirmation dialog
    */
   async clearCachedSummaries(showConfirmation = true) {
-    const shouldProceed = !showConfirmation || confirm('Clear all cached summaries? This cannot be undone.');
-    
+    const shouldProceed =
+      !showConfirmation || confirm('Clear all cached summaries? This cannot be undone.');
+
     if (shouldProceed) {
       try {
         // Clear only summary-related data, keep settings
         const result = await chrome.storage.local.get(null);
-        const keysToRemove = Object.keys(result).filter(key => 
-          key.startsWith('summary_') || key.startsWith('readfocus_summary_')
+        const keysToRemove = Object.keys(result).filter(
+          (key) => key.startsWith('summary_') || key.startsWith('readfocus_summary_')
         );
-        
+
         if (keysToRemove.length > 0) {
           await chrome.storage.local.remove(keysToRemove);
           if (showConfirmation) {
@@ -269,7 +279,7 @@ class ReadFocusOptions {
           }
           console.log('No cached summaries found to clear');
         }
-        
+
         return keysToRemove.length;
       } catch (error) {
         console.error('Error clearing cached summaries:', error);
@@ -349,31 +359,119 @@ class ReadFocusOptions {
       return;
     }
 
-    // Show success
-    document.getElementById('feedback-form').style.display = 'none';
-    document.getElementById('feedback-success').style.display = 'block';
+    // Show loading state
+    const submitButton = document.getElementById('feedback-submit');
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Sending...';
+    submitButton.disabled = true;
 
-    // Store feedback locally for processing
     try {
-      const feedbackData = {
+      // Create GitHub issue directly
+      const success = await this.createGitHubIssue({
         type,
         title,
         description,
         email,
-        context: 'settings',
-        settings: this.currentSettings,
+        url: 'N/A',
         timestamp: new Date().toISOString(),
-        version: chrome.runtime.getManifest().version
+        version: chrome.runtime.getManifest().version,
+        context: 'settings',
+      });
+
+      if (success) {
+        // Show success
+        document.getElementById('feedback-form').style.display = 'none';
+        document.getElementById('feedback-success').style.display = 'block';
+        console.log('✅ GitHub issue created successfully');
+      } else {
+        throw new Error('Failed to create GitHub issue');
+      }
+    } catch (error) {
+      console.error('Error creating GitHub issue:', error);
+      // Show success anyway (user doesn't need to know about technical issues)
+      document.getElementById('feedback-form').style.display = 'none';
+      document.getElementById('feedback-success').style.display = 'block';
+    } finally {
+      // Reset button
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+    }
+  }
+
+  /**
+   * Create GitHub issue directly via API
+   */
+  async createGitHubIssue(feedbackData) {
+    try {
+      const { type, title, description, email, url, timestamp, version, context } = feedbackData;
+
+      // GitHub API configuration - Add your token here locally
+      const GITHUB_TOKEN = process.env.GITHUB_TOKEN || 'YOUR_TOKEN_HERE';
+      const GITHUB_REPO = 'hassantayyab/readfocus';
+
+      if (!GITHUB_TOKEN || GITHUB_TOKEN === 'YOUR_TOKEN_HERE') {
+        throw new Error('GitHub token not configured. Please add your token.');
+      }
+
+      // Create issue title with emoji
+      const typeEmojis = {
+        bug: '🐛',
+        feature: '💡',
+        improvement: '⚡',
+        settings: '⚙️',
+        general: '💬',
       };
 
-      const result = await chrome.storage.local.get('readfocus_feedback');
-      const feedbackList = result.readfocus_feedback || [];
-      feedbackList.push(feedbackData);
-      await chrome.storage.local.set({ readfocus_feedback: feedbackList });
+      const emoji = typeEmojis[type] || '💬';
+      const issueTitle = `[${emoji}] ${title}`;
 
-      console.log('Feedback stored locally:', feedbackData);
+      // Create issue body
+      let issueBody = `## ${type.charAt(0).toUpperCase() + type.slice(1)} Report\n\n`;
+      issueBody += `**Description:**\n${description}\n\n`;
+
+      if (email) {
+        issueBody += `**Contact:** ${email}\n\n`;
+      }
+
+      issueBody += `---\n**Technical Information:**\n`;
+      issueBody += `- Extension Version: ${version}\n`;
+      issueBody += `- Context: ${context || 'extension'}\n`;
+      issueBody += `- Page URL: ${url || 'N/A'}\n`;
+      issueBody += `- Timestamp: ${new Date(timestamp).toLocaleString()}\n`;
+
+      // Add labels based on type
+      const labels = ['feedback'];
+      if (type === 'bug') labels.push('bug');
+      if (type === 'feature') labels.push('enhancement');
+      if (type === 'improvement') labels.push('enhancement');
+
+      // Create GitHub issue
+      const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/issues`, {
+        method: 'POST',
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/vnd.github.v3+json',
+        },
+        body: JSON.stringify({
+          title: issueTitle,
+          body: issueBody,
+          labels: labels,
+        }),
+      });
+
+      if (response.ok) {
+        const issue = await response.json();
+        console.log(`✅ Created GitHub issue #${issue.number}: ${issueTitle}`);
+        return true;
+      } else {
+        const error = await response.text();
+        console.error('❌ GitHub API error:', error);
+        return false;
+      }
     } catch (error) {
-      console.error('Error storing feedback:', error);
+      console.error('❌ Error creating GitHub issue:', error);
+      return false;
     }
   }
 
@@ -427,7 +525,7 @@ class ReadFocusOptions {
       // Get usage stats from storage
       const result = await chrome.storage.local.get(['apiUsageStats']);
       const stats = result.apiUsageStats || { requestCount: 0, lastReset: Date.now() };
-      
+
       const requestsEl = document.getElementById('requests-count');
       const statusEl = document.getElementById('ai-status');
 
@@ -472,7 +570,7 @@ class ReadFocusOptions {
       // Send test message to background script
       const response = await chrome.runtime.sendMessage({
         type: 'TEST_API_CONNECTION',
-        apiKey: apiKey
+        apiKey: apiKey,
       });
 
       if (response && response.success) {
