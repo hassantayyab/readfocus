@@ -440,12 +440,14 @@ class ReadFocusPopup {
     try {
       const { type, title, description, email, url, timestamp, version, context } = feedbackData;
 
-      // GitHub API configuration - Add your token here locally
-      const GITHUB_TOKEN = 'YOUR_TOKEN_HERE';
+      // GitHub API configuration - Get token from settings
+      const result = await chrome.storage.sync.get('readfocusSettings');
+      const settings = result.readfocusSettings || {};
+      const GITHUB_TOKEN = settings.githubToken;
       const GITHUB_REPO = 'hassantayyab/readfocus';
 
-      if (!GITHUB_TOKEN || GITHUB_TOKEN === 'YOUR_TOKEN_HERE') {
-        throw new Error('GitHub token not configured. Please add your token.');
+      if (!GITHUB_TOKEN || GITHUB_TOKEN.trim() === '') {
+        throw new Error('GitHub token not configured. Please set it in extension settings.');
       }
 
       // Create issue title with emoji

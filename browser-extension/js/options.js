@@ -8,6 +8,7 @@ class ReadFocusOptions {
     this.defaultSettings = {
       // AI Configuration
       aiApiKey: '',
+      githubToken: '',
       summaryLength: 'medium',
       autoSummarize: false,
 
@@ -106,6 +107,7 @@ class ReadFocusOptions {
   updateUI() {
     // AI Configuration
     this.setElementValue('ai-api-key', this.currentSettings.aiApiKey);
+    this.setElementValue('github-token', this.currentSettings.githubToken);
     this.setElementValue('summary-length', this.currentSettings.summaryLength);
     this.setElementValue('auto-summarize', this.currentSettings.autoSummarize);
 
@@ -163,9 +165,14 @@ class ReadFocusOptions {
     // AI Settings
     document.getElementById('test-api-key')?.addEventListener('click', () => this.testApiKey());
 
-    // API key input - save on blur
+    // API key inputs - save on blur
     document.getElementById('ai-api-key')?.addEventListener('blur', (e) => {
       this.currentSettings.aiApiKey = e.target.value.trim();
+      this.saveSettings();
+    });
+
+    document.getElementById('github-token')?.addEventListener('blur', (e) => {
+      this.currentSettings.githubToken = e.target.value.trim();
       this.saveSettings();
     });
   }
@@ -405,12 +412,12 @@ class ReadFocusOptions {
     try {
       const { type, title, description, email, url, timestamp, version, context } = feedbackData;
 
-      // GitHub API configuration - Add your token here locally
-      const GITHUB_TOKEN = 'YOUR_TOKEN_HERE';
+      // GitHub API configuration - Get token from settings
+      const GITHUB_TOKEN = this.currentSettings.githubToken;
       const GITHUB_REPO = 'hassantayyab/readfocus';
 
-      if (!GITHUB_TOKEN || GITHUB_TOKEN === 'YOUR_TOKEN_HERE') {
-        throw new Error('GitHub token not configured. Please add your token.');
+      if (!GITHUB_TOKEN || GITHUB_TOKEN.trim() === '') {
+        throw new Error('GitHub token not configured. Please set it in extension settings.');
       }
 
       // Create issue title with emoji
