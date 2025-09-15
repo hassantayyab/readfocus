@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ReadFocus Settings - AI Summarization</title>
     <link rel="stylesheet" href="styles/options.css" />
+    <link rel="stylesheet" href="styles/feedback-modal.css" />
   </head>
   <body>
     <div class="container">
@@ -116,12 +117,44 @@
           <button type="button" id="reset-defaults-btn" class="secondary-button">
             Reset to Defaults
           </button>
+          <button type="button" id="send-feedback-settings" class="secondary-button">
+            💬 Send Feedback
+          </button>
           <button type="button" id="save-settings-btn" class="primary-button">Save Settings</button>
         </div>
         <div class="footer-info">
           <p>ReadFocus - AI-powered content summarization</p>
         </div>
       </footer>
+
+      <!-- Feedback Section -->
+      <div class="feedback-section" id="feedback-section" style="display:none;">
+        <div class="section-header">
+          <h4>💬 Send Feedback</h4>
+          <button class="close-feedback" id="close-feedback">×</button>
+        </div>
+        <form class="feedback-form" id="feedback-form">
+          <select id="feedback-type" required>
+            <option value="">Select feedback type...</option>
+            <option value="bug">🐛 Bug Report</option>
+            <option value="feature">💡 Feature Request</option>
+            <option value="improvement">⚡ Improvement</option>
+            <option value="settings">⚙️ Settings Issue</option>
+            <option value="general">💬 General Feedback</option>
+          </select>
+          <input type="text" id="feedback-title" placeholder="Brief description" required>
+          <textarea id="feedback-description" rows="3" placeholder="Describe your feedback..." required></textarea>
+          <input type="email" id="feedback-email" placeholder="Email (optional)">
+          <div class="feedback-actions">
+            <button type="button" class="secondary-button" id="feedback-cancel">Cancel</button>
+            <button type="submit" class="primary-button" id="feedback-submit">Send</button>
+          </div>
+        </form>
+        <div class="feedback-success" id="feedback-success" style="display:none;">
+          <div class="success-message">✅ Feedback sent successfully!</div>
+          <button class="primary-button" id="feedback-done">Done</button>
+        </div>
+      </div>
     </div>
 
     <script src="js/ai-client.js"></script>

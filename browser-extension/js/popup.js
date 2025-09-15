@@ -11,6 +11,7 @@ class ReadFocusPopup {
     this.isInitializing = false;
     this.initTimeout = null;
     this.statusPolling = null; // Track status polling interval
+    this.currentView = 'main'; // Track current view (main or feedback)
     this.init();
   }
 
@@ -43,6 +44,9 @@ class ReadFocusPopup {
 
       // Bind events early to make buttons functional
       this.bindEvents();
+
+      // Initialize feedback modal
+      this.initializeFeedbackModal();
 
       // Check API status (may reference non-existent elements, handle gracefully)
       await this.checkApiStatus();
@@ -151,6 +155,11 @@ class ReadFocusPopup {
     // Clear cache button
     document.getElementById('clear-cache')?.addEventListener('click', () => {
       this.clearSummaryCache();
+    });
+
+    // Feedback button
+    document.getElementById('send-feedback')?.addEventListener('click', () => {
+      this.openFeedbackForm();
     });
 
     // Summary buttons - handle both generate and show functionality
@@ -274,6 +283,140 @@ class ReadFocusPopup {
   openSettings() {
     chrome.runtime.openOptionsPage();
     window.close();
+  }
+
+  /**
+   * Initialize feedback navigation
+   */
+  initializeFeedbackModal() {
+    // Back to main button
+    document.getElementById('back-to-main')?.addEventListener('click', () => {
+      this.showMainView();
+    });
+
+    // Cancel button
+    document.getElementById('feedback-cancel')?.addEventListener('click', () => {
+      this.showMainView();
+    });
+
+    // Done button (after success)
+    document.getElementById('feedback-done')?.addEventListener('click', () => {
+      this.showMainView();
+    });
+
+    // Form submission
+    document.getElementById('feedback-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleFeedbackSubmit();
+    });
+
+    console.log('Feedback navigation initialized');
+  }
+
+  /**
+   * Open feedback form (navigate to feedback page)
+   */
+  openFeedbackForm() {
+    this.showFeedbackView();
+  }
+
+  /**
+   * Show main view
+   */
+  showMainView() {
+    // Hide all main content except header
+    const mainElements = [
+      '.feature-header',
+      '.summary-section',
+      '.secondary-actions',
+      '.tips-section',
+      '.footer'
+    ];
+
+    mainElements.forEach(selector => {
+      const element = document.querySelector(selector);
+      if (element) element.style.display = 'block';
+    });
+
+    // Hide feedback content
+    document.getElementById('feedback-content').style.display = 'none';
+    this.currentView = 'main';
+  }
+
+  /**
+   * Show feedback view
+   */
+  showFeedbackView() {
+    // Hide main content except header
+    const mainElements = [
+      '.feature-header',
+      '.summary-section',
+      '.secondary-actions',
+      '.tips-section',
+      '.footer'
+    ];
+
+    mainElements.forEach(selector => {
+      const element = document.querySelector(selector);
+      if (element) element.style.display = 'none';
+    });
+
+    // Reset and show feedback form
+    const feedbackForm = document.getElementById('feedback-form');
+    const feedbackSuccess = document.getElementById('feedback-success');
+
+    feedbackForm.style.display = 'block';
+    feedbackSuccess.style.display = 'none';
+
+    document.getElementById('feedback-type').value = '';
+    document.getElementById('feedback-title').value = '';
+    document.getElementById('feedback-description').value = '';
+    document.getElementById('feedback-email').value = '';
+
+    // Show feedback content
+    document.getElementById('feedback-content').style.display = 'block';
+    this.currentView = 'feedback';
+  }
+
+  /**
+   * Handle feedback form submission
+   */
+  async handleFeedbackSubmit() {
+    const type = document.getElementById('feedback-type').value;
+    const title = document.getElementById('feedback-title').value.trim();
+    const description = document.getElementById('feedback-description').value.trim();
+    const email = document.getElementById('feedback-email').value.trim();
+
+    if (!type || !title || !description) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    // Show success
+    document.getElementById('feedback-form').style.display = 'none';
+    document.getElementById('feedback-success').style.display = 'block';
+
+    // Store feedback locally for processing
+    try {
+      const feedbackData = {
+        type,
+        title,
+        description,
+        email,
+        url: this.currentTab?.url || 'N/A',
+        timestamp: new Date().toISOString(),
+        version: chrome.runtime.getManifest().version
+      };
+
+      const result = await chrome.storage.local.get('readfocus_feedback');
+      const feedbackList = result.readfocus_feedback || [];
+      feedbackList.push(feedbackData);
+      await chrome.storage.local.set({ readfocus_feedback: feedbackList });
+
+      console.log('Feedback stored locally:', feedbackData);
+    } catch (error) {
+      console.error('Error storing feedback:', error);
+    }
   }
 
   /**

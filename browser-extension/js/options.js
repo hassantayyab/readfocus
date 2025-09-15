@@ -21,12 +21,14 @@ class ReadFocusOptions {
     };
 
     this.currentSettings = { ...this.defaultSettings };
+    this.feedbackModal = null; // Feedback modal instance
     this.init();
   }
 
   async init() {
     await this.loadSettings();
     this.bindEvents();
+    this.initializeFeedbackModal();
     this.updateUI();
     this.updateUsageStats();
   }
@@ -153,6 +155,9 @@ class ReadFocusOptions {
     document
       .getElementById('clear-data-btn')
       ?.addEventListener('click', () => this.clearCachedSummaries());
+    document
+      .getElementById('send-feedback-settings')
+      ?.addEventListener('click', () => this.openFeedbackForm());
 
     // AI Settings
     document.getElementById('test-api-key')?.addEventListener('click', () => this.testApiKey());
@@ -275,6 +280,101 @@ class ReadFocusOptions {
       }
     }
     return 0;
+  }
+
+  /**
+   * Initialize feedback section
+   */
+  initializeFeedbackModal() {
+    // Bind feedback section events
+    document.getElementById('close-feedback')?.addEventListener('click', () => {
+      this.hideFeedbackSection();
+    });
+
+    document.getElementById('feedback-cancel')?.addEventListener('click', () => {
+      this.hideFeedbackSection();
+    });
+
+    document.getElementById('feedback-done')?.addEventListener('click', () => {
+      this.hideFeedbackSection();
+    });
+
+    document.getElementById('feedback-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleFeedbackSubmit();
+    });
+
+    console.log('Simple feedback initialized for settings');
+  }
+
+  /**
+   * Open feedback form (show section)
+   */
+  openFeedbackForm() {
+    const feedbackSection = document.getElementById('feedback-section');
+    const feedbackForm = document.getElementById('feedback-form');
+    const feedbackSuccess = document.getElementById('feedback-success');
+
+    // Reset form
+    feedbackForm.style.display = 'block';
+    feedbackSuccess.style.display = 'none';
+    document.getElementById('feedback-type').value = '';
+    document.getElementById('feedback-title').value = '';
+    document.getElementById('feedback-description').value = '';
+    document.getElementById('feedback-email').value = '';
+
+    // Show section
+    feedbackSection.style.display = 'block';
+  }
+
+  /**
+   * Hide feedback section
+   */
+  hideFeedbackSection() {
+    const feedbackSection = document.getElementById('feedback-section');
+    feedbackSection.style.display = 'none';
+  }
+
+  /**
+   * Handle feedback form submission
+   */
+  async handleFeedbackSubmit() {
+    const type = document.getElementById('feedback-type').value;
+    const title = document.getElementById('feedback-title').value.trim();
+    const description = document.getElementById('feedback-description').value.trim();
+    const email = document.getElementById('feedback-email').value.trim();
+
+    if (!type || !title || !description) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    // Show success
+    document.getElementById('feedback-form').style.display = 'none';
+    document.getElementById('feedback-success').style.display = 'block';
+
+    // Store feedback locally for processing
+    try {
+      const feedbackData = {
+        type,
+        title,
+        description,
+        email,
+        context: 'settings',
+        settings: this.currentSettings,
+        timestamp: new Date().toISOString(),
+        version: chrome.runtime.getManifest().version
+      };
+
+      const result = await chrome.storage.local.get('readfocus_feedback');
+      const feedbackList = result.readfocus_feedback || [];
+      feedbackList.push(feedbackData);
+      await chrome.storage.local.set({ readfocus_feedback: feedbackList });
+
+      console.log('Feedback stored locally:', feedbackData);
+    } catch (error) {
+      console.error('Error storing feedback:', error);
+    }
   }
 
   /**

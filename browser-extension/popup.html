@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ReadFocus - Auto Focus Mode</title>
     <link rel="stylesheet" href="styles/popup.css" />
+    <link rel="stylesheet" href="styles/feedback-modal.css" />
   </head>
   <body>
     <div class="container">
@@ -60,6 +61,10 @@
             <span class="button-icon">🗑️</span>
             Clear Cache
           </button>
+          <button class="secondary-button" id="send-feedback">
+            <span class="button-icon">💬</span>
+            Send Feedback
+          </button>
         </div>
       </div>
 
@@ -82,6 +87,63 @@
       <!-- Status Messages -->
       <div class="status-message" id="status-message"></div>
       <div class="error-message" id="error-message"></div>
+
+      <!-- Feedback Content (replaces main content) -->
+      <div class="feedback-content" id="feedback-content" style="display: none">
+        <!-- Back Button -->
+        <div class="feedback-header">
+          <button class="back-button" id="back-to-main">
+            <span class="button-icon">←</span>
+            Back
+          </button>
+          <h3>Send Feedback</h3>
+        </div>
+
+        <!-- Feedback Form -->
+        <form class="feedback-form" id="feedback-form">
+          <div class="form-group">
+            <label for="feedback-type">Type</label>
+            <select id="feedback-type" required>
+              <option value="">Select type...</option>
+              <option value="bug">🐛 Bug Report</option>
+              <option value="feature">💡 Feature Request</option>
+              <option value="improvement">⚡ Improvement</option>
+              <option value="general">💬 General Feedback</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="feedback-title">Title</label>
+            <input type="text" id="feedback-title" placeholder="Brief description" required />
+          </div>
+
+          <div class="form-group">
+            <label for="feedback-description">Description</label>
+            <textarea
+              id="feedback-description"
+              rows="3"
+              placeholder="Describe your feedback..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="feedback-email">Email (optional)</label>
+            <input type="email" id="feedback-email" placeholder="your.email@example.com" />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="secondary-button" id="feedback-cancel">Cancel</button>
+            <button type="submit" class="primary-button" id="feedback-submit">Send</button>
+          </div>
+        </form>
+
+        <!-- Success View -->
+        <div class="feedback-success" id="feedback-success" style="display: none">
+          <div class="success-message">✅ Feedback sent successfully!</div>
+          <button class="primary-button" id="feedback-done">Done</button>
+        </div>
+      </div>
     </div>
 
     <script src="js/popup.js"></script>
