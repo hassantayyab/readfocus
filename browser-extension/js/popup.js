@@ -438,8 +438,7 @@ class ReadFocusPopup {
    */
   async createGitHubIssue(feedbackData) {
     try {
-      const proxyURL =
-        'https://readfocus-9lvsu6bxn-helloappaddles-projects.vercel.app/api/github-feedback'; // Update with your actual Vercel URL
+      const proxyURL = 'https://readfocus-api.vercel.app/api/github-feedback';
 
       const response = await fetch(proxyURL, {
         method: 'POST',
@@ -468,7 +467,7 @@ class ReadFocusPopup {
    * Generate unique ID
    */
   generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    return Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 
   /**

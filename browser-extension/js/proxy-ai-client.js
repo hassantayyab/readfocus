@@ -5,7 +5,7 @@
 
 class ProxyAIClient {
   constructor() {
-    this.baseURL = 'https://readfocus-9lvsu6bxn-helloappaddles-projects.vercel.app/api'; // Update with your actual Vercel URL
+    this.baseURL = 'https://readfocus-api.vercel.app/api';
     this.rateLimitDelay = 1000;
     this.lastRequestTime = 0;
   }

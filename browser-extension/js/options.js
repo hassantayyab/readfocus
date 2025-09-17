@@ -410,8 +410,7 @@ class ReadFocusOptions {
    */
   async createGitHubIssue(feedbackData) {
     try {
-      const proxyURL =
-        'https://readfocus-9lvsu6bxn-helloappaddles-projects.vercel.app/api/github-feedback'; // Update with your actual Vercel URL
+      const proxyURL = 'https://readfocus-api.vercel.app/api/github-feedback';
 
       const response = await fetch(proxyURL, {
         method: 'POST',
