@@ -137,7 +137,6 @@ class ReadFocusContentScript {
         includeQuickSummary: true,
         includeDetailedSummary: true,
         includeActionItems: true,
-        maxLength: 'medium',
       });
 
       if (summaryResult.success) {
@@ -174,7 +173,7 @@ class ReadFocusContentScript {
       showQuizHints: true,
       trackComprehension: true,
       autoDetectArticles: true,
-      autoSummarize: false, // Added to match options.js default
+      autoSummarize: true, // Added to match options.js default
     };
   }
 
@@ -1898,36 +1897,8 @@ class ReadFocusContentScript {
 
       this.summaryService = new ContentSummaryService();
 
-      // Get API key from settings
-      let apiKey = null;
-      try {
-        // Try multiple storage locations for API key
-        let result = await chrome.storage.sync.get(['readfocusSettings']);
-        if (result.readfocusSettings?.aiApiKey) {
-          apiKey = result.readfocusSettings.aiApiKey;
-        }
-
-        if (!apiKey) {
-          result = await chrome.storage.local.get(['claude_api_key']);
-          apiKey = result.claude_api_key;
-        }
-
-        if (!apiKey) {
-          result = await chrome.storage.sync.get(['claude_api_key']);
-          apiKey = result.claude_api_key;
-        }
-      } catch (error) {
-        console.warn('⚠️ [ContentScript] Could not get API key from storage:', error);
-      }
-
-      if (!apiKey) {
-        throw new Error(
-          'API key not configured. Please set up your Claude API key in extension settings.'
-        );
-      }
-
-      // Initialize the service
-      await this.summaryService.initialize(apiKey);
+      // Initialize the service (no API key needed with proxy)
+      await this.summaryService.initialize();
       console.log('✅ [ContentScript] Summary service initialized successfully');
 
       return true;

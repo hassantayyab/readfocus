@@ -6,11 +6,8 @@
 class ReadFocusOptions {
   constructor() {
     this.defaultSettings = {
-      // AI Configuration
-      aiApiKey: '',
-      githubToken: '',
-      summaryLength: 'medium',
-      autoSummarize: false,
+      // Summary Configuration
+      autoSummarize: true,
 
       // Summary Preferences
       includeKeyPoints: true,
@@ -31,7 +28,6 @@ class ReadFocusOptions {
     this.bindEvents();
     this.initializeFeedbackModal();
     this.updateUI();
-    this.updateUsageStats();
   }
 
   /**
@@ -94,7 +90,6 @@ class ReadFocusOptions {
       'includeKeyPoints',
       'includeActionItems',
       'includeConcepts',
-      'summaryLength',
       'autoSummarize',
     ];
 
@@ -105,10 +100,7 @@ class ReadFocusOptions {
    * Update UI elements with current settings
    */
   updateUI() {
-    // AI Configuration
-    this.setElementValue('ai-api-key', this.currentSettings.aiApiKey);
-    this.setElementValue('github-token', this.currentSettings.githubToken);
-    this.setElementValue('summary-length', this.currentSettings.summaryLength);
+    // Summary Configuration
     this.setElementValue('auto-summarize', this.currentSettings.autoSummarize);
 
     // Summary Preferences
@@ -150,9 +142,6 @@ class ReadFocusOptions {
 
     // Buttons
     document
-      .getElementById('save-settings-btn')
-      ?.addEventListener('click', () => this.saveSettings());
-    document
       .getElementById('reset-defaults-btn')
       ?.addEventListener('click', () => this.resetToDefaults());
     document
@@ -162,19 +151,6 @@ class ReadFocusOptions {
       .getElementById('send-feedback-settings')
       ?.addEventListener('click', () => this.openFeedbackForm());
 
-    // AI Settings
-    document.getElementById('test-api-key')?.addEventListener('click', () => this.testApiKey());
-
-    // API key inputs - save on blur
-    document.getElementById('ai-api-key')?.addEventListener('blur', (e) => {
-      this.currentSettings.aiApiKey = e.target.value.trim();
-      this.saveSettings();
-    });
-
-    document.getElementById('github-token')?.addEventListener('blur', (e) => {
-      this.currentSettings.githubToken = e.target.value.trim();
-      this.saveSettings();
-    });
   }
 
   /**
@@ -203,7 +179,6 @@ class ReadFocusOptions {
       'includeKeyPoints',
       'includeActionItems',
       'includeConcepts',
-      'summaryLength',
       'autoSummarize',
     ];
     if (summaryKeys.includes(settingName) && oldValue !== settingValue) {
@@ -477,90 +452,6 @@ class ReadFocusOptions {
     }, 3000);
   }
 
-  /**
-   * Update AI usage statistics
-   */
-  async updateUsageStats() {
-    try {
-      // Get usage stats from storage
-      const result = await chrome.storage.local.get(['apiUsageStats']);
-      const stats = result.apiUsageStats || { requestCount: 0, lastReset: Date.now() };
-
-      const requestsEl = document.getElementById('requests-count');
-      const statusEl = document.getElementById('ai-status');
-
-      if (requestsEl) {
-        requestsEl.textContent = `${stats.requestCount} requests this hour`;
-      }
-
-      if (statusEl) {
-        if (this.currentSettings.aiApiKey) {
-          statusEl.textContent = 'API key configured';
-          statusEl.className = 'connected';
-        } else {
-          statusEl.textContent = 'No API key';
-          statusEl.className = 'disconnected';
-        }
-      }
-    } catch (error) {
-      console.error('Error updating usage stats:', error);
-    }
-  }
-
-  /**
-   * Test API key connection
-   */
-  async testApiKey() {
-    const apiKeyInput = document.getElementById('ai-api-key');
-    const testButton = document.getElementById('test-api-key');
-
-    const apiKey = apiKeyInput.value.trim();
-
-    if (!apiKey) {
-      this.showApiStatus('error', 'Please enter an API key');
-      return;
-    }
-
-    // Show testing state
-    testButton.disabled = true;
-    testButton.textContent = 'Testing...';
-    this.showApiStatus('testing', 'Testing API connection...');
-
-    try {
-      // Send test message to background script
-      const response = await chrome.runtime.sendMessage({
-        type: 'TEST_API_CONNECTION',
-        apiKey: apiKey,
-      });
-
-      if (response && response.success) {
-        // Test successful - save the key
-        this.currentSettings.aiApiKey = apiKey;
-        await this.saveSettings();
-        this.showApiStatus('success', 'API key verified and saved successfully!');
-        this.updateUsageStats();
-      } else {
-        throw new Error(response?.error || 'API test failed');
-      }
-    } catch (error) {
-      console.error('API key test failed:', error);
-      this.showApiStatus('error', `Test failed: ${error.message}`);
-    } finally {
-      testButton.disabled = false;
-      testButton.textContent = 'Test';
-    }
-  }
-
-  /**
-   * Show API key status message
-   */
-  showApiStatus(type, message) {
-    const statusEl = document.getElementById('api-key-status');
-    if (statusEl) {
-      statusEl.textContent = message;
-      statusEl.className = `api-status ${type}`;
-    }
-  }
 }
 
 // Initialize when DOM is loaded

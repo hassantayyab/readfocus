@@ -16,25 +16,30 @@ class ContentSummaryService {
 
   /**
    * Initialize the summary service
-   * @param {string} apiKey - Claude API key
    */
-  async initialize(apiKey) {
+  async initialize() {
     try {
       console.log('📄 [SummaryService] Initializing content summary service...');
 
-      // Initialize AI client
-      this.aiClient = new AIClient();
-      await this.aiClient.initialize(apiKey);
+      // Check if ProxyAIClient is available
+      if (typeof ProxyAIClient === 'undefined') {
+        throw new Error('ProxyAIClient not available. Make sure proxy-ai-client.js is loaded.');
+      }
+
+      // Initialize Proxy AI client (no API key needed)
+      this.aiClient = new ProxyAIClient();
+      await this.aiClient.initialize();
 
       // Initialize content analyzer
       this.contentAnalyzer = new ContentAnalyzer();
 
       this.initialized = true;
-      console.log('✅ [SummaryService] Content summary service initialized');
+      console.log('✅ [SummaryService] Content summary service initialized successfully');
 
       return { success: true };
     } catch (error) {
       console.error('❌ [SummaryService] Failed to initialize:', error);
+      this.initialized = false;
       throw new Error(`Summary service initialization failed: ${error.message}`);
     }
   }
@@ -47,7 +52,7 @@ class ContentSummaryService {
   async generateSummary(options = {}) {
     try {
       if (!this.initialized) {
-        throw new Error('Summary service not initialized. Please configure API key in settings.');
+        throw new Error('Summary service not initialized. Please refresh the page and try again.');
       }
 
       console.log('📄 [SummaryService] Starting content summarization...');
@@ -171,7 +176,6 @@ class ContentSummaryService {
           includeKeyPoints: true,
           includeActionItems: true,
           includeConcepts: true,
-          summaryLength: 'medium',
         }
       );
     } catch (error) {
@@ -181,7 +185,6 @@ class ContentSummaryService {
         includeKeyPoints: true,
         includeActionItems: true,
         includeConcepts: true,
-        summaryLength: 'medium',
       };
     }
   }
@@ -200,7 +203,6 @@ class ContentSummaryService {
       includeDetailedSummary = true,
       includeActionItems = true,
       includeConcepts = true,
-      maxLength = 'medium',
     } = options;
 
     console.log('📄 [SummaryService] Generating multi-format summary with options:', {
@@ -216,7 +218,6 @@ class ContentSummaryService {
       includeDetailedSummary,
       includeActionItems,
       includeConcepts,
-      maxLength,
     });
 
     try {
@@ -263,7 +264,6 @@ class ContentSummaryService {
       includeDetailedSummary,
       includeActionItems,
       includeConcepts,
-      maxLength,
     } = options;
 
     return `You are an expert content analyst and summarization specialist. Analyze this ${metadata.contentType} content and provide comprehensive summaries in multiple formats for students and professionals.
@@ -379,8 +379,6 @@ This is a paragraph before a list.
 - Third bullet point
 
 This is a paragraph after the list.
-
-LENGTH TARGET: ${maxLength === 'short' ? 'Concise summaries' : maxLength === 'medium' ? 'Balanced detail' : 'Comprehensive coverage'}
 
 Return only the JSON object, no additional text.`;
   }
@@ -551,8 +549,7 @@ Return only the JSON object, no additional text.`;
       includeQuickSummary: options.includeQuickSummary,
       includeDetailedSummary: options.includeDetailedSummary,
       includeActionItems: options.includeActionItems,
-      includeConcepts: options.includeConcepts,
-      maxLength: options.maxLength
+      includeConcepts: options.includeConcepts
     };
 
     const optionsHash = this.simpleHash(JSON.stringify(optionsSignature));
@@ -723,7 +720,6 @@ Return only the JSON object, no additional text.`;
       includeQuickSummary: true,
       includeDetailedSummary: true,
       includeActionItems: true,
-      maxLength: 'medium',
     });
   }
 

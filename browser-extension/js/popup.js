@@ -124,7 +124,7 @@ class ReadFocusPopup {
       await chrome.scripting.executeScript({
         target: { tabId: this.currentTab.id },
         files: [
-          'js/ai-client.js',
+          'js/proxy-ai-client.js',
           'js/content-analyzer.js',
           'js/content-summary-service.js',
           'js/summary-overlay.js',
@@ -192,35 +192,25 @@ class ReadFocusPopup {
    */
   async checkApiStatus() {
     try {
-      // Check if API key is configured
-      const result = await chrome.storage.sync.get(['readfocusSettings']);
-      const settings = result.readfocusSettings || {};
-      const hasApiKey = !!(settings.aiApiKey || settings.claude_api_key);
-
-      // These elements may not exist in the current popup.html, handle gracefully
+      // Since we're using Vercel proxy, API is always available
       const statusDot = document.getElementById('api-status-dot');
       const statusText = document.getElementById('api-status-text');
 
       if (statusDot && statusText) {
-        if (hasApiKey) {
-          statusDot.className = 'status-dot connected';
-          statusText.textContent = 'API key configured';
-        } else {
-          statusDot.className = 'status-dot disconnected';
-          statusText.textContent = 'API key required - click Settings';
-        }
+        statusDot.className = 'status-dot connected';
+        statusText.textContent = 'API ready via proxy';
       }
 
-      // Update summary section availability
+      // Summary section is always available
       const summarySection = document.getElementById('summary-section');
       if (summarySection) {
-        summarySection.style.opacity = hasApiKey ? '1' : '0.6';
+        summarySection.style.opacity = '1';
       }
 
-      return hasApiKey;
+      return true; // Always return true since proxy handles API access
     } catch (error) {
       console.error('Error checking API status:', error);
-      return false;
+      return true; // Still return true since we don't depend on user API keys
     }
   }
 

@@ -22,70 +22,22 @@
 
       <!-- Settings Sections -->
       <main class="settings-main">
-        <!-- AI Configuration -->
+        <!-- Settings -->
         <section class="settings-section">
-          <h2>🤖 AI Configuration</h2>
-
-          <div class="setting-group">
-            <label for="ai-api-key">Claude API Key</label>
-            <div class="api-key-container">
-              <input
-                type="password"
-                id="ai-api-key"
-                placeholder="sk-ant-api03-..."
-                class="api-key-input"
-              />
-              <button type="button" id="test-api-key" class="test-button">Test</button>
-            </div>
-            <div class="setting-description">
-              Get your API key from
-              <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a>.
-              Required for AI-powered content summarization.
-            </div>
-            <div id="api-key-status" class="api-status"></div>
-          </div>
-
-          <div class="setting-group">
-            <label for="github-token">GitHub Token (for Feedback)</label>
-            <div class="api-key-container">
-              <input
-                type="password"
-                id="github-token"
-                placeholder="ghp_..."
-                class="api-key-input"
-              />
-            </div>
-            <div class="setting-description">
-              Get your Personal Access Token from
-              <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a>.
-              Required for feedback system to create GitHub issues.
-            </div>
-          </div>
+          <h2>⚙️ ReadFocus Settings</h2>
 
 
-          <div class="setting-group">
-            <label for="summary-length">Default Summary Length</label>
-            <select id="summary-length">
-              <option value="brief">Brief (2-3 sentences)</option>
-              <option value="medium" selected>Medium (1 paragraph)</option>
-              <option value="detailed">Detailed (multiple paragraphs)</option>
-            </select>
-          </div>
 
           <div class="setting-group">
             <label class="checkbox-label">
-              <input type="checkbox" id="auto-summarize" />
+              <input type="checkbox" id="auto-summarize" checked />
               Auto-summarize articles when loaded
             </label>
             <div class="setting-description">
               Automatically generate summaries when you visit article pages.
             </div>
           </div>
-        </section>
 
-        <!-- Summary Preferences -->
-        <section class="settings-section">
-          <h2>📝 Summary Preferences</h2>
           <div class="setting-group">
             <label class="checkbox-label">
               <input type="checkbox" id="include-key-points" checked />
@@ -138,7 +90,6 @@
           <button type="button" id="send-feedback-settings" class="secondary-button">
             💬 Send Feedback
           </button>
-          <button type="button" id="save-settings-btn" class="primary-button">Save Settings</button>
         </div>
         <div class="footer-info">
           <p>ReadFocus - AI-powered content summarization</p>
@@ -175,7 +126,6 @@
       </div>
     </div>
 
-    <script src="js/ai-client.js"></script>
     <script src="js/options.js"></script>
   </body>
 </html>

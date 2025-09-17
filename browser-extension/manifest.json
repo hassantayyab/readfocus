@@ -6,7 +6,7 @@
 
   "permissions": ["activeTab", "storage", "contextMenus", "scripting"],
 
-  "host_permissions": ["https://api.anthropic.com/*"],
+  "host_permissions": ["https://readfocus-api.vercel.app/*"],
 
   "action": {
     "default_popup": "popup.html",
@@ -49,7 +49,7 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "js/ai-client.js",
+        "js/proxy-ai-client.js",
         "js/content-analyzer.js",
         "js/content-summary-service.js",
         "js/summary-overlay.js",

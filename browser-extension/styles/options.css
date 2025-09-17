@@ -290,14 +290,16 @@ textarea:focus {
 
 /* Success/Error States */
 .save-success {
-  background-color: #000000;
-  color: white;
+  background-color: var(--rf-surface);
+  color: var(--rf-text);
   padding: 0.75rem 1.5rem;
+  border: 1px solid var(--rf-border);
   border-radius: var(--rf-radius);
   margin-bottom: 1rem;
   text-align: center;
   opacity: 0;
   transition: opacity 0.3s;
+  box-shadow: var(--rf-shadow);
 }
 
 .save-success.show {
