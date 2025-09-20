@@ -805,12 +805,77 @@ class SummaryOverlay {
     let html = '';
     let inList = false;
     let listItems = [];
+    let inCodeBlock = false;
+    let codeBlockLanguage = '';
+    let codeBlockContent = [];
+    let inTable = false;
+    let tableRows = [];
+    let isTableHeader = true;
 
     for (let i = 0; i < lines.length; i++) {
-      let line = lines[i].trim();
+      let line = lines[i];
+      let trimmedLine = line.trim();
 
-      // Skip empty lines but close lists
-      if (!line) {
+      // Handle code blocks
+      if (trimmedLine.startsWith('```')) {
+        if (inCodeBlock) {
+          // End code block
+          html += this.renderCodeBlock(codeBlockContent.join('\n'), codeBlockLanguage);
+          inCodeBlock = false;
+          codeBlockLanguage = '';
+          codeBlockContent = [];
+        } else {
+          // Start code block
+          if (inList) {
+            html += `<ul>${listItems.join('')}</ul>`;
+            listItems = [];
+            inList = false;
+          }
+          if (inTable) {
+            html += this.renderTable(tableRows);
+            tableRows = [];
+            inTable = false;
+            isTableHeader = true;
+          }
+          inCodeBlock = true;
+          codeBlockLanguage = trimmedLine.substring(3).trim();
+        }
+        continue;
+      }
+
+      // If we're in a code block, just collect the content
+      if (inCodeBlock) {
+        codeBlockContent.push(line);
+        continue;
+      }
+
+      // Handle tables
+      if (trimmedLine.includes('|') && !trimmedLine.startsWith('|---')) {
+        if (!inList && !inCodeBlock) {
+          if (inList) {
+            html += `<ul>${listItems.join('')}</ul>`;
+            listItems = [];
+            inList = false;
+          }
+          inTable = true;
+          tableRows.push({ content: trimmedLine, isHeader: isTableHeader });
+          if (isTableHeader) isTableHeader = false;
+          continue;
+        }
+      } else if (inTable && trimmedLine.startsWith('|---')) {
+        // Table separator line - skip it
+        continue;
+      } else if (inTable) {
+        // End of table
+        html += this.renderTable(tableRows);
+        tableRows = [];
+        inTable = false;
+        isTableHeader = true;
+        // Continue processing this line as normal
+      }
+
+      // Skip empty lines but close lists and tables
+      if (!trimmedLine) {
         if (inList) {
           html += `<ul>${listItems.join('')}</ul>`;
           listItems = [];
@@ -820,76 +885,125 @@ class SummaryOverlay {
       }
 
       // Headers
-      if (line.startsWith('# ')) {
+      if (trimmedLine.startsWith('# ')) {
         if (inList) {
           html += `<ul>${listItems.join('')}</ul>`;
           listItems = [];
           inList = false;
         }
-        html += `<h1>${this.processInlineMarkdown(line.substring(2))}</h1>`;
-      } else if (line.startsWith('## ')) {
+        html += `<h1>${this.processInlineMarkdown(trimmedLine.substring(2))}</h1>`;
+      } else if (trimmedLine.startsWith('## ')) {
         if (inList) {
           html += `<ul>${listItems.join('')}</ul>`;
           listItems = [];
           inList = false;
         }
-        html += `<h2>${this.processInlineMarkdown(line.substring(3))}</h2>`;
-      } else if (line.startsWith('### ')) {
+        html += `<h2>${this.processInlineMarkdown(trimmedLine.substring(3))}</h2>`;
+      } else if (trimmedLine.startsWith('### ')) {
         if (inList) {
           html += `<ul>${listItems.join('')}</ul>`;
           listItems = [];
           inList = false;
         }
-        html += `<h3>${this.processInlineMarkdown(line.substring(4))}</h3>`;
-      } else if (line.startsWith('#### ')) {
+        html += `<h3>${this.processInlineMarkdown(trimmedLine.substring(4))}</h3>`;
+      } else if (trimmedLine.startsWith('#### ')) {
         if (inList) {
           html += `<ul>${listItems.join('')}</ul>`;
           listItems = [];
           inList = false;
         }
-        html += `<h4>${this.processInlineMarkdown(line.substring(5))}</h4>`;
+        html += `<h4>${this.processInlineMarkdown(trimmedLine.substring(5))}</h4>`;
       }
-      // List items - handle various bullet formats
-      else if (line.match(/^[-•*] /)) {
-        const content = line.substring(2).trim();
-        listItems.push(`<li>${this.processInlineMarkdown(content)}</li>`);
-        inList = true;
+      // Numbered lists
+      else if (trimmedLine.match(/^\d+\.\s/)) {
+        const content = trimmedLine.replace(/^\d+\.\s/, '');
+        if (!inList || listItems.length === 0) {
+          if (inList) {
+            html += `<ul>${listItems.join('')}</ul>`;
+            listItems = [];
+          }
+          html += `<ol><li>${this.processInlineMarkdown(content)}</li>`;
+          inList = 'ol';
+        } else if (inList === 'ol') {
+          html += `<li>${this.processInlineMarkdown(content)}</li>`;
+        } else {
+          html += `</ul><ol><li>${this.processInlineMarkdown(content)}</li>`;
+          inList = 'ol';
+        }
+      }
+      // Bullet list items - handle various bullet formats
+      else if (trimmedLine.match(/^[-•*] /)) {
+        const content = trimmedLine.substring(2).trim();
+        if (!inList || listItems.length === 0) {
+          if (inList === 'ol') {
+            html += `</ol>`;
+          }
+          listItems.push(`<li>${this.processInlineMarkdown(content)}</li>`);
+          inList = 'ul';
+        } else if (inList === 'ul') {
+          listItems.push(`<li>${this.processInlineMarkdown(content)}</li>`);
+        } else {
+          html += `</ol>`;
+          listItems = [`<li>${this.processInlineMarkdown(content)}</li>`];
+          inList = 'ul';
+        }
       }
       // Nested list items (with indentation)
-      else if (line.match(/^\s{2,}[-•*] /)) {
-        const content = line.replace(/^\s+[-•*] /, '');
+      else if (trimmedLine.match(/^\s{2,}[-•*] /)) {
+        const content = trimmedLine.replace(/^\s+[-•*] /, '');
         listItems.push(
           `<li style="margin-left: 20px;">${this.processInlineMarkdown(content)}</li>`
         );
-        inList = true;
+        if (!inList) inList = 'ul';
       }
       // Blockquotes
-      else if (line.startsWith('> ')) {
+      else if (trimmedLine.startsWith('> ')) {
         if (inList) {
-          html += `<ul>${listItems.join('')}</ul>`;
+          if (inList === 'ul') {
+            html += `<ul>${listItems.join('')}</ul>`;
+          } else {
+            html += `</ol>`;
+          }
           listItems = [];
           inList = false;
         }
-        html += `<blockquote>${this.processInlineMarkdown(line.substring(2))}</blockquote>`;
+        html += `<blockquote>${this.processInlineMarkdown(trimmedLine.substring(2))}</blockquote>`;
       }
       // Regular paragraphs
       else {
         if (inList) {
-          html += `<ul>${listItems.join('')}</ul>`;
+          if (inList === 'ul') {
+            html += `<ul>${listItems.join('')}</ul>`;
+          } else {
+            html += `</ol>`;
+          }
           listItems = [];
           inList = false;
         }
         // Only add paragraph if it's not empty
-        const processedContent = this.processInlineMarkdown(line);
+        const processedContent = this.processInlineMarkdown(trimmedLine);
         if (processedContent.trim()) {
           html += `<p>${processedContent}</p>`;
         }
       }
     }
 
-    // Close any remaining list
+    // Close any remaining structures
     if (inList && listItems.length > 0) {
-      html += `<ul>${listItems.join('')}</ul>`;
+      if (inList === 'ul') {
+        html += `<ul>${listItems.join('')}</ul>`;
+      } else {
+        html += `</ol>`;
+      }
+    }
+    if (inList === 'ol' && listItems.length === 0) {
+      html += `</ol>`;
+    }
+    if (inCodeBlock) {
+      html += this.renderCodeBlock(codeBlockContent.join('\n'), codeBlockLanguage);
+    }
+    if (inTable) {
+      html += this.renderTable(tableRows);
     }
 
     return html;
@@ -912,6 +1026,138 @@ class SummaryOverlay {
         // Inline code
         .replace(/`([^`]+)`/g, '<code>$1</code>')
     );
+  }
+
+  /**
+   * Render code block with syntax highlighting
+   * @param {string} code - Code content
+   * @param {string} language - Programming language
+   * @returns {string} - HTML code block
+   */
+  renderCodeBlock(code, language = '') {
+    if (!code.trim()) return '';
+
+    const escapedCode = code
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+    const languageClass = language ? ` class="language-${language}"` : '';
+    const languageLabel = language ? `<div class="rf-code-language">${language}</div>` : '';
+
+    return `
+      <div class="rf-code-block">
+        ${languageLabel}
+        <pre><code${languageClass}>${escapedCode}</code></pre>
+      </div>`;
+  }
+
+  /**
+   * Render markdown table
+   * @param {Array} rows - Array of table row objects
+   * @returns {string} - HTML table
+   */
+  renderTable(rows) {
+    if (!rows || rows.length === 0) return '';
+
+    let html = '<div class="rf-table-container"><table class="rf-markdown-table">';
+    let headerProcessed = false;
+
+    for (const row of rows) {
+      const cells = row.content.split('|').map(cell => cell.trim()).filter(cell => cell !== '');
+
+      if (cells.length === 0) continue;
+
+      if (row.isHeader && !headerProcessed) {
+        html += '<thead><tr>';
+        for (const cell of cells) {
+          html += `<th>${this.processInlineMarkdown(cell)}</th>`;
+        }
+        html += '</tr></thead><tbody>';
+        headerProcessed = true;
+      } else {
+        if (!headerProcessed) {
+          html += '<tbody>';
+          headerProcessed = true;
+        }
+        html += '<tr>';
+        for (const cell of cells) {
+          html += `<td>${this.processInlineMarkdown(cell)}</td>`;
+        }
+        html += '</tr>';
+      }
+    }
+
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  /**
+   * Test enhanced markdown rendering functionality
+   * @returns {string} - Test results
+   */
+  testEnhancedMarkdown() {
+    const testMarkdown = `# Enhanced Markdown Test
+
+## Code Block Example
+
+Here's a JavaScript function:
+
+\`\`\`javascript
+function calculateSum(a, b) {
+  return a + b;
+}
+
+const result = calculateSum(5, 3);
+console.log("Result:", result);
+\`\`\`
+
+## Table Example
+
+| Feature | Status | Priority |
+|---------|--------|----------|
+| Code Blocks | ✅ Complete | High |
+| Tables | ✅ Complete | High |
+| Syntax Highlighting | ✅ Basic | Medium |
+
+## Mixed Content
+
+Here's some **bold text** and *italic text* with \`inline code\`.
+
+- Bullet point one
+- Bullet point two with \`inline code\`
+- Bullet point three
+
+1. Numbered item one
+2. Numbered item two
+3. Numbered item three
+
+> This is a blockquote with some important information.
+
+## Python Example
+
+\`\`\`python
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+# Generate first 10 fibonacci numbers
+for i in range(10):
+    print(f"F({i}) = {fibonacci(i)}")
+\`\`\``;
+
+    try {
+      const rendered = this.renderMarkdown(testMarkdown);
+      console.log('✅ Enhanced markdown rendering test passed');
+      console.log('Rendered HTML length:', rendered.length);
+      return rendered;
+    } catch (error) {
+      console.error('❌ Enhanced markdown rendering test failed:', error);
+      return `<p>Test failed: ${error.message}</p>`;
+    }
   }
 
   /**
@@ -1230,6 +1476,110 @@ class SummaryOverlay {
       
       .rf-summary-markdown ol li {
         list-style-type: decimal;
+      }
+
+      /* Code block styles */
+      .rf-code-block {
+        margin: 16px 0;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        overflow: hidden;
+        text-align: left;
+      }
+
+      .rf-code-language {
+        background: #e9ecef;
+        color: #495057;
+        padding: 8px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .rf-code-block pre {
+        margin: 0;
+        padding: 16px;
+        background: #f8f9fa;
+        overflow-x: auto;
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .rf-code-block code {
+        background: none;
+        color: #212529;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        font-family: inherit;
+        font-size: inherit;
+        white-space: pre;
+      }
+
+      /* Table styles */
+      .rf-table-container {
+        margin: 16px 0;
+        overflow-x: auto;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+      }
+
+      .rf-markdown-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        text-align: left;
+        background: #ffffff;
+      }
+
+      .rf-markdown-table th {
+        background: #f8f9fa;
+        color: #495057;
+        font-weight: 600;
+        padding: 12px 16px;
+        border-bottom: 2px solid #dee2e6;
+        text-align: left;
+      }
+
+      .rf-markdown-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e9ecef;
+        color: #212529;
+        vertical-align: top;
+      }
+
+      .rf-markdown-table tbody tr:hover {
+        background: #f8f9fa;
+      }
+
+      .rf-markdown-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Enhanced code highlighting for different languages */
+      .rf-code-block .language-javascript,
+      .rf-code-block .language-js {
+        color: #d63384;
+      }
+
+      .rf-code-block .language-python {
+        color: #0d6efd;
+      }
+
+      .rf-code-block .language-html {
+        color: #fd7e14;
+      }
+
+      .rf-code-block .language-css {
+        color: #6f42c1;
+      }
+
+      .rf-code-block .language-json {
+        color: #198754;
       }
       
       .rf-reading-time {

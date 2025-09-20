@@ -7,6 +7,7 @@ class ContentSummaryService {
   constructor() {
     this.aiClient = null;
     this.contentAnalyzer = null;
+    this.promptBuilder = null;
     this.initialized = false;
     this.storageKey = 'readfocus_summaries';
     this.maxStorageItems = 100;
@@ -24,12 +25,20 @@ class ContentSummaryService {
         throw new Error('ProxyAIClient not available. Make sure proxy-ai-client.js is loaded.');
       }
 
+      // Check if AIPromptBuilder is available
+      if (typeof AIPromptBuilder === 'undefined') {
+        throw new Error('AIPromptBuilder not available. Make sure ai-prompt-builder.js is loaded.');
+      }
+
       // Initialize Proxy AI client (no API key needed)
       this.aiClient = new ProxyAIClient();
       await this.aiClient.initialize();
 
       // Initialize content analyzer
       this.contentAnalyzer = new ContentAnalyzer();
+
+      // Initialize prompt builder
+      this.promptBuilder = new AIPromptBuilder();
 
       this.initialized = true;
 
@@ -190,8 +199,8 @@ class ContentSummaryService {
       includeConcepts = true,
     } = options;
 
-    // Build comprehensive prompt
-    const prompt = this.buildSummaryPrompt(content, metadata, {
+    // Build comprehensive prompt using the prompt builder
+    const prompt = this.promptBuilder.buildSummaryPrompt(content, metadata, {
       includeKeyPoints,
       includeQuickSummary,
       includeDetailedSummary,
@@ -229,138 +238,6 @@ class ContentSummaryService {
     }
   }
 
-  /**
-   * Build comprehensive summary prompt
-   * @param {string} content - Content to summarize
-   * @param {Object} metadata - Content metadata
-   * @param {Object} options - Summary options
-   * @returns {string} - AI prompt
-   */
-  buildSummaryPrompt(content, metadata, options) {
-    const {
-      includeKeyPoints,
-      includeQuickSummary,
-      includeDetailedSummary,
-      includeActionItems,
-      includeConcepts,
-    } = options;
-
-    return `You are an expert content analyst and summarization specialist. Analyze this ${metadata.contentType} content and provide comprehensive summaries in multiple formats for students and professionals.
-
-CONTENT TO ANALYZE:
-${content}
-
-CONTENT METADATA:
-- Type: ${metadata.contentType}
-- Word Count: ${metadata.wordCount}
-- Readability Score: ${metadata.readabilityScore}/100
-- Has Headings: ${metadata.hasHeadings}
-
-TASK: Create multiple summary formats as requested below. Each format serves different reading needs and time constraints.
-
-RESPONSE FORMAT - Return a JSON object with the following structure:
-{
-  "quick_summary": {
-    "text": "2-3 sentence overview capturing the main message",
-    "reading_time": "30 seconds"
-  },
-  "detailed_summary": {
-    "markdown": "Comprehensive markdown-formatted summary with detailed analysis, context, examples, and practical insights. Use structured sections with ## headings, proper bullet points (- item), numbered lists (1. item), and clear explanations that help readers understand the subject matter deeply. ENSURE proper markdown formatting with line breaks before and after lists.",
-    "reading_time": "3-5 minutes"
-  },
-  "eliSummary": "Ultra-simplified explanation that a 15-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
-  "conceptDictionary": [
-    {
-      "term": "technical term 1",
-      "definition": "simple definition in everyday language",
-      "analogy": "comparison to something familiar",
-      "example": "real-world example"
-    }
-  ],
-  "key_points": [
-    "• First major point or finding",
-    "• Second important concept or argument", 
-    "• Third critical insight or conclusion",
-    "• Fourth significant detail or implication"
-  ],
-  "action_items": [
-    "Specific actionable takeaway or next step",
-    "Another practical application or recommendation"
-  ],
-  "main_topics": [
-    "Core theme 1",
-    "Core theme 2", 
-    "Core theme 3"
-  ],
-  "difficulty_level": "Beginner|Intermediate|Advanced",
-  "estimated_read_time": "X minutes",
-  "content_quality": "High|Medium|Low based on depth and credibility"
-}
-
-SUMMARY GUIDELINES:
-${includeQuickSummary ? '✅ Include QUICK_SUMMARY: Ultra-concise overview in 2-3 sentences' : '❌ Skip quick summary'}
-${
-  includeDetailedSummary
-    ? `✅ Include DETAILED_SUMMARY: Comprehensive markdown-formatted analysis with:
-   - # Main title reflecting the content theme
-   - ## Overview, Key Concepts, Main Arguments sections  
-   - ## Practical Applications and Critical Analysis
-   - ## Future Implications and conclusions
-   - Use structured headings, proper bullet points with dashes (- item)
-   - Use numbered lists with proper format (1. item, 2. item)
-   - **Bold** for emphasis, *italic* for subtle emphasis
-   - CRITICAL: Add blank lines before and after all lists and headings
-   - Include examples, data, and clear explanations
-   - Target comprehensive understanding with detailed insights`
-    : '❌ Skip detailed summary'
-}  
-${includeKeyPoints ? '✅ Include KEY_POINTS: 3-6 bullet points of most important information' : '❌ Skip key points'}
-${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways' : '❌ Skip action items'}
-
-✅ ALWAYS Include ELI_SUMMARY: Ultra-simplified explanation that a 15-year-old could understand:
-   - Use analogies and everyday examples
-   - Avoid all jargon and technical terms
-   - Compare complex concepts to familiar things (like comparing databases to filing cabinets)
-   - Focus on the "why it matters" in simple terms
-
-${includeConcepts !== false ? '✅ Include CONCEPT_DICTIONARY: Identify and explain technical terms with:' : '❌ Skip CONCEPT_DICTIONARY'}${
-      includeConcepts !== false
-        ? `
-   - Simple definitions in everyday language
-   - Analogies to familiar concepts when possible
-   - Real-world examples
-   - Focus on terms that might confuse readers`
-        : ''
-    }
-
-- Focus on educational value and practical insights
-- Make everything accessible and easy to understand
-- Use analogies and examples for complex concepts
-- Maintain accuracy while simplifying language
-- Preserve important nuances and qualifications
-- Organize information logically
-
-MARKDOWN FORMATTING REQUIREMENTS:
-- Always add blank lines before and after headings (## Heading)
-- Always add blank lines before and after bullet point lists
-- Use dashes for bullet points: - Item one
-- Use numbers for ordered lists: 1. First item
-- Use **bold** for important terms and *italic* for emphasis
-- Ensure proper line spacing between sections
-- Example of proper list formatting:
-
-## Section Title
-
-This is a paragraph before a list.
-
-- First bullet point
-- Second bullet point
-- Third bullet point
-
-This is a paragraph after the list.
-
-Return only the JSON object, no additional text.`;
-  }
 
   /**
    * Parse and validate AI summary response
@@ -513,11 +390,11 @@ Return only the JSON object, no additional text.`;
 
   /**
    * Generate cache key for summary
-   * @param {string} content - Content text (unused but kept for compatibility)
+   * @param {string} _content - Content text (unused but kept for compatibility)
    * @param {Object} options - Summary options for deduplication
    * @returns {string} - Cache key based on URL and options
    */
-  generateStorageKey(content, options = {}) {
+  generateStorageKey(_content, options = {}) {
     // Use clean URL as base
     const url = window.location.href.split('#')[0].split('?')[0]; // Remove hash and query params
 

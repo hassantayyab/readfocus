@@ -51,6 +51,7 @@
       "js": [
         "js/proxy-ai-client.js",
         "js/content-analyzer.js",
+        "js/ai-prompt-builder.js",
         "js/content-summary-service.js",
         "js/summary-overlay.js",
         "js/content.js"
