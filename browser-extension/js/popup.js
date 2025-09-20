@@ -1,9 +1,9 @@
 /**
- * ReadFocus Popup Controller (Enhanced for Auto Focus Mode)
+ * Explert Popup Controller (Enhanced for Auto Focus Mode)
  * Handles popup UI, settings display, and Focus Mode activation
  */
 
-class ReadFocusPopup {
+class ExplertPopup {
   constructor() {
     this.currentTab = null;
     this.pageStatus = null;
@@ -22,7 +22,6 @@ class ReadFocusPopup {
     try {
       // Set initialization timeout
       this.initTimeout = setTimeout(() => {
-        console.warn('Popup initialization timeout - showing basic interface');
         this.showBasicInterface();
       }, 3000);
 
@@ -57,8 +56,7 @@ class ReadFocusPopup {
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Summary status check timeout')), 2000)
         ),
-      ]).catch((error) => {
-        console.warn('Summary status check failed:', error.message);
+      ]).catch(() => {
         this.updateSummaryStatus('ready', 'Ready');
       });
 
@@ -66,8 +64,6 @@ class ReadFocusPopup {
         clearTimeout(this.initTimeout);
         this.initTimeout = null;
       }
-
-      console.log('ReadFocus popup initialized successfully');
     } catch (error) {
       console.error('Error initializing popup:', error);
       this.showErrorState(error.message);
@@ -119,8 +115,6 @@ class ReadFocusPopup {
    */
   async injectContentScript() {
     try {
-      console.log('💉 [Popup] Injecting content scripts...');
-
       // Inject scripts in the correct order
       await chrome.scripting.executeScript({
         target: { tabId: this.currentTab.id },
@@ -138,10 +132,8 @@ class ReadFocusPopup {
         target: { tabId: this.currentTab.id },
         files: ['styles/content.css'],
       });
-
-      console.log('✅ [Popup] Content scripts injected successfully');
     } catch (error) {
-      console.error('❌ [Popup] Error injecting content script:', error);
+      console.error('Error injecting content script:', error);
       throw error;
     }
   }
@@ -210,8 +202,6 @@ class ReadFocusPopup {
    */
   async clearSummaryCache() {
     try {
-      console.log('🗑️ [Popup] Clearing summary cache...');
-
       // Update button state
       const clearBtn = document.getElementById('clear-cache');
       if (clearBtn) {
@@ -243,12 +233,11 @@ class ReadFocusPopup {
         // Reset summary status to initial state
         this.updateSummaryStatus('ready', 'Ready');
         this.showSuccessMessage('Cache cleared successfully!');
-        console.log('✅ [Popup] Cache cleared successfully');
       } else {
         throw new Error(response?.error || 'Failed to clear cache');
       }
     } catch (error) {
-      console.error('❌ [Popup] Error clearing cache:', error);
+      console.error('Error clearing cache:', error);
       this.showErrorMessage(error.message);
     } finally {
       // Restore button state
@@ -292,8 +281,6 @@ class ReadFocusPopup {
       e.preventDefault();
       this.handleFeedbackSubmit();
     });
-
-    console.log('Feedback navigation initialized');
   }
 
   /**
@@ -398,7 +385,6 @@ class ReadFocusPopup {
         // Show success
         document.getElementById('feedback-form').style.display = 'none';
         document.getElementById('feedback-success').style.display = 'block';
-        console.log('✅ GitHub issue created successfully');
       } else {
         throw new Error('Failed to create GitHub issue');
       }
@@ -430,16 +416,12 @@ class ReadFocusPopup {
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log(`✅ Created GitHub issue via proxy: ${result.message}`);
         return true;
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('❌ Proxy API error:', errorData);
         return false;
       }
     } catch (error) {
-      console.error('❌ Error submitting feedback via proxy:', error);
+      console.error('Error submitting feedback via proxy:', error);
       return false;
     }
   }
@@ -473,11 +455,9 @@ class ReadFocusPopup {
       // First check if already injected
       const isInjected = await this.checkContentScriptsInjected();
       if (isInjected) {
-        console.log('Content scripts already available');
         return true;
       }
 
-      console.log('Injecting content scripts...');
       await this.injectContentScript();
 
       // Wait a moment for scripts to initialize
@@ -489,7 +469,6 @@ class ReadFocusPopup {
         throw new Error('Content scripts failed to initialize');
       }
 
-      console.log('Content scripts injected and verified');
       return true;
     } catch (error) {
       console.error('Failed to ensure content scripts:', error);
@@ -501,7 +480,6 @@ class ReadFocusPopup {
    * Show basic interface when full initialization fails
    */
   showBasicInterface() {
-    console.log('Showing basic popup interface');
     // Ensure basic functionality is available even if some features fail
     this.updateSummaryStatus('ready', 'Ready');
   }
@@ -586,8 +564,6 @@ class ReadFocusPopup {
    * Show invalid page state
    */
   showInvalidPageState() {
-    console.log('Invalid page detected, showing limited interface');
-
     // Disable summary functionality
     const summarySection = document.getElementById('summary-section');
     if (summarySection) {
@@ -601,7 +577,7 @@ class ReadFocusPopup {
     }
 
     this.showErrorMessage(
-      'ReadFocus only works on regular web pages (http/https). Please navigate to a website to use summary features.'
+      'Explert only works on regular web pages (http/https). Please navigate to a website to use summary features.'
     );
   }
 
@@ -611,7 +587,6 @@ class ReadFocusPopup {
   async handleSummarizeAction() {
     try {
       this.updateSummaryStatus('processing', 'Working...');
-      console.log('📄 [Popup] Handling summarize action...');
 
       // Ensure content scripts are loaded
       await this.ensureContentScriptsInjected();
@@ -633,14 +608,13 @@ class ReadFocusPopup {
       ]);
 
       if (response && response.success) {
-        console.log('✅ [Popup] Summary ready, closing popup');
         // Close popup - summary overlay will show automatically
         window.close();
       } else {
         throw new Error(response?.error || 'Failed to get summary');
       }
     } catch (error) {
-      console.error('❌ [Popup] Summarize action failed:', error);
+      console.error('Summarize action failed:', error);
       this.updateSummaryStatus('error', 'Failed');
       this.showErrorMessage(error.message);
     }
@@ -651,8 +625,6 @@ class ReadFocusPopup {
    */
   async showSummary() {
     try {
-      console.log('📄 [Popup] Showing summary overlay...');
-
       // First ensure content scripts are injected
       await this.ensureContentScriptsInjected();
 
@@ -672,14 +644,14 @@ class ReadFocusPopup {
           try {
             window.close();
           } catch (e) {
-            console.log('Popup already closed or closing');
+            // Popup already closed or closing
           }
         }, 300);
       } else {
         throw new Error(response?.error || 'Failed to show summary');
       }
     } catch (error) {
-      console.error('❌ [Popup] Error showing summary:', error);
+      console.error('Error showing summary:', error);
       this.showErrorMessage(error.message);
     }
   }
@@ -760,7 +732,6 @@ class ReadFocusPopup {
         this.updateSummaryStatus('ready', 'Ready');
       }
     } catch (error) {
-      console.log('❌ [Popup] Status check failed, defaulting to ready');
       this.updateSummaryStatus('ready', 'Ready');
     }
   }
@@ -768,10 +739,10 @@ class ReadFocusPopup {
 
 // Initialize popup when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  new ReadFocusPopup();
+  new ExplertPopup();
 });
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ReadFocusPopup;
+  module.exports = ExplertPopup;
 }

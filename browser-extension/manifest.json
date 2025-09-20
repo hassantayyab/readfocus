@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ReadFocus - Auto Focus Mode",
+  "name": "Explert - Auto Focus Mode",
   "version": "2.7.3",
   "description": "Transform any webpage into a distraction-free Focus Reading Mode with guided pacing and comprehension checks",
 
@@ -10,7 +10,7 @@
 
   "action": {
     "default_popup": "popup.html",
-    "default_title": "ReadFocus - Auto Focus Mode",
+    "default_title": "Explert - Auto Focus Mode",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ReadFocus Settings - AI Summarization</title>
+    <title>Explert Settings - AI Summarization</title>
     <link rel="stylesheet" href="styles/options.css" />
     <link rel="stylesheet" href="styles/feedback-modal.css" />
   </head>
@@ -12,116 +12,130 @@
       <!-- Header -->
       <header class="header">
         <div class="header-content">
-          <img src="icons/icon48.png" alt="ReadFocus" class="logo" />
-          <div>
-            <h1>ReadFocus Settings</h1>
-            <p>Configure your AI-powered content summarization preferences</p>
+          <img src="icons/icon48.png" alt="Explert" class="logo" />
+          <div class="header-text">
+            <h1>Explert Settings</h1>
+            <p>Configure your AI-powered content summarization</p>
           </div>
         </div>
       </header>
 
-      <!-- Settings Sections -->
+      <!-- Main Content -->
       <main class="settings-main">
-        <!-- Settings -->
-        <section class="settings-section">
-          <h2>⚙️ ReadFocus Settings</h2>
+        <div class="settings-container">
+          <!-- Main Setting Card -->
+          <section class="main-setting-card">
+            <div class="setting-header">
+              <div class="setting-icon">⚡</div>
+              <div class="setting-title">
+                <h2>Auto-Summarization</h2>
+                <p>Control when Explert generates summaries</p>
+              </div>
+            </div>
 
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="auto-summarize" checked />
+                <span class="slider"></span>
+              </label>
+              <div class="setting-info">
+                <h3>Auto-summarize articles when loaded</h3>
+                <p>
+                  Automatically generate AI summaries when you visit article pages. Summaries are
+                  cached for instant access.
+                </p>
+              </div>
+            </div>
+          </section>
 
+          <!-- Info Cards -->
+          <div class="info-cards">
+            <div class="info-card">
+              <div class="info-icon">📊</div>
+              <h3>How it works</h3>
+              <p>
+                Explert analyzes page content and generates comprehensive summaries with key
+                points, concepts, and action items.
+              </p>
+            </div>
 
-          <div class="setting-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="auto-summarize" checked />
-              Auto-summarize articles when loaded
-            </label>
-            <div class="setting-description">
-              Automatically generate summaries when you visit article pages.
+            <div class="info-card">
+              <div class="info-icon">🔒</div>
+              <h3>Privacy First</h3>
+              <p>
+                All processing happens securely. Your browsing data stays private and summaries are
+                stored locally.
+              </p>
+            </div>
+
+            <div class="info-card">
+              <div class="info-icon">⚡</div>
+              <h3>Smart Caching</h3>
+              <p>
+                Summaries are cached locally for instant access. Clear cache anytime from the
+                extension popup.
+              </p>
             </div>
           </div>
 
-          <div class="setting-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="include-key-points" checked />
-              Include Key Points section
-            </label>
-          </div>
-
-          <div class="setting-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="include-action-items" checked />
-              Include Action Items section
-            </label>
-          </div>
-
-          <div class="setting-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="include-concepts" checked />
-              Include Concept Dictionary (ELI15 explanations)
-            </label>
-          </div>
-        </section>
-
-        <!-- Storage & Data -->
-        <!-- <section class="settings-section">
-          <h2>💾 Storage & Data</h2>
-          <div class="setting-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="cache-summaries" checked />
-              Cache summaries for faster access
-            </label>
-            <div class="setting-description">
-              Store generated summaries locally to avoid re-generating for the same content.
-            </div>
-          </div>
-
-          <div class="setting-group">
-            <button type="button" id="clear-data-btn" class="secondary-button">
-              Clear All Cached Summaries
+          <!-- Quick Actions -->
+          <section class="quick-actions">
+            <button type="button" id="reset-defaults-btn" class="action-button secondary">
+              <span class="button-icon">🔄</span>
+              Reset to Defaults
             </button>
-          </div>
-        </section> -->
+            <button type="button" id="send-feedback-settings" class="action-button primary">
+              <span class="button-icon">💬</span>
+              Send Feedback
+            </button>
+          </section>
+        </div>
       </main>
 
-      <!-- Footer Actions -->
+      <!-- Footer -->
       <footer class="footer">
-        <div class="footer-actions">
-          <button type="button" id="reset-defaults-btn" class="secondary-button">
-            Reset to Defaults
-          </button>
-          <button type="button" id="send-feedback-settings" class="secondary-button">
-            💬 Send Feedback
-          </button>
-        </div>
-        <div class="footer-info">
-          <p>ReadFocus - AI-powered content summarization</p>
+        <div class="footer-content">
+          <p>Explert v1.0 - AI-powered content summarization</p>
+          <p class="footer-links">
+            <a href="#" id="clear-cache-link">Clear Cache</a> •
+            <a href="#" id="view-stats-link">View Stats</a> •
+            <a href="https://github.com/anthropics/claude-code" target="_blank">GitHub</a>
+          </p>
         </div>
       </footer>
 
       <!-- Feedback Section -->
-      <div class="feedback-section" id="feedback-section" style="display:none;">
-        <div class="section-header">
-          <h4>💬 Send Feedback</h4>
-          <button class="close-feedback" id="close-feedback">×</button>
-        </div>
-        <form class="feedback-form" id="feedback-form">
-          <select id="feedback-type" required>
-            <option value="">Select feedback type...</option>
-            <option value="bug">🐛 Bug Report</option>
-            <option value="feature">💡 Feature Request</option>
-            <option value="improvement">⚡ Improvement</option>
-            <option value="settings">⚙️ Settings Issue</option>
-            <option value="general">💬 General Feedback</option>
-          </select>
-          <input type="text" id="feedback-title" placeholder="Brief description" required>
-          <textarea id="feedback-description" rows="3" placeholder="Describe your feedback..." required></textarea>
-          <input type="email" id="feedback-email" placeholder="Email (optional)">
-          <div class="feedback-actions">
-            <button type="button" class="secondary-button" id="feedback-cancel">Cancel</button>
-            <button type="submit" class="primary-button" id="feedback-submit">Send</button>
+      <div class="feedback-section" id="feedback-section" style="display: none">
+        <div class="feedback-modal">
+          <div class="section-header">
+            <h4>💬 Send Feedback</h4>
           </div>
-        </form>
-        <div class="feedback-success" id="feedback-success" style="display:none;">
-          <div class="success-message">✅ Feedback sent successfully!</div>
-          <button class="primary-button" id="feedback-done">Done</button>
+          <form class="feedback-form" id="feedback-form">
+            <select id="feedback-type" required>
+              <option value="">Select feedback type...</option>
+              <option value="bug">🐛 Bug Report</option>
+              <option value="feature">💡 Feature Request</option>
+              <option value="improvement">⚡ Improvement</option>
+              <option value="settings">⚙️ Settings Issue</option>
+              <option value="general">💬 General Feedback</option>
+            </select>
+            <input type="text" id="feedback-title" placeholder="Brief description" required />
+            <textarea
+              id="feedback-description"
+              rows="4"
+              placeholder="Describe your feedback..."
+              required
+            ></textarea>
+            <input type="email" id="feedback-email" placeholder="Email (optional)" />
+            <div class="feedback-actions">
+              <button type="button" class="secondary-button" id="feedback-cancel">Cancel</button>
+              <button type="submit" class="primary-button" id="feedback-submit">Send</button>
+            </div>
+          </form>
+          <div class="feedback-success" id="feedback-success" style="display: none">
+            <div class="success-message">✅ Feedback sent successfully!</div>
+            <button class="primary-button" id="feedback-done">Done</button>
+          </div>
         </div>
       </div>
     </div>

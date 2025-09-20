@@ -1,21 +1,13 @@
 /**
- * ReadFocus Options Page Controller
+ * Explert Options Page Controller
  * Handles AI summarization settings, storage, and user preferences
  */
 
-class ReadFocusOptions {
+class ExplertOptions {
   constructor() {
     this.defaultSettings = {
       // Summary Configuration
-      autoSummarize: true,
-
-      // Summary Preferences
-      includeKeyPoints: true,
-      includeActionItems: true,
-      includeConcepts: true,
-
-      // Storage & Data
-      cacheSummaries: true,
+      autoSummarize: false,
     };
 
     this.currentSettings = { ...this.defaultSettings };
@@ -151,6 +143,19 @@ class ReadFocusOptions {
       .getElementById('send-feedback-settings')
       ?.addEventListener('click', () => this.openFeedbackForm());
 
+    // Footer links
+    document
+      .getElementById('clear-cache-link')
+      ?.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.clearCachedSummaries();
+      });
+    document
+      .getElementById('view-stats-link')
+      ?.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.showUsageStats();
+      });
   }
 
   /**
@@ -296,11 +301,18 @@ class ReadFocusOptions {
       this.handleFeedbackSubmit();
     });
 
+    // Close modal when clicking on background
+    document.getElementById('feedback-section')?.addEventListener('click', (e) => {
+      if (e.target.id === 'feedback-section') {
+        this.hideFeedbackSection();
+      }
+    });
+
     console.log('Simple feedback initialized for settings');
   }
 
   /**
-   * Open feedback form (show section)
+   * Open feedback form (show modal)
    */
   openFeedbackForm() {
     const feedbackSection = document.getElementById('feedback-section');
@@ -315,12 +327,17 @@ class ReadFocusOptions {
     document.getElementById('feedback-description').value = '';
     document.getElementById('feedback-email').value = '';
 
-    // Show section
-    feedbackSection.style.display = 'block';
+    // Show modal with fade-in effect
+    feedbackSection.style.display = 'flex';
+
+    // Focus first input
+    setTimeout(() => {
+      document.getElementById('feedback-type')?.focus();
+    }, 100);
   }
 
   /**
-   * Hide feedback section
+   * Hide feedback modal
    */
   hideFeedbackSection() {
     const feedbackSection = document.getElementById('feedback-section');
@@ -432,6 +449,38 @@ class ReadFocusOptions {
   }
 
   /**
+   * Show usage statistics
+   */
+  async showUsageStats() {
+    try {
+      const result = await chrome.storage.local.get(null);
+      const summaryKeys = Object.keys(result).filter(
+        (key) => key.startsWith('summary_') || key.startsWith('readfocus_summary')
+      );
+
+      const totalSummaries = summaryKeys.length;
+      const totalStorageSize = JSON.stringify(result).length;
+
+      // Calculate storage usage percentage (Chrome allows 10MB for local storage)
+      const maxStorageBytes = 10 * 1024 * 1024; // 10MB
+      const usagePercentage = ((totalStorageSize / maxStorageBytes) * 100).toFixed(1);
+
+      const statsMessage = `
+Usage Statistics:
+• Cached Summaries: ${totalSummaries}
+• Storage Used: ${(totalStorageSize / 1024).toFixed(1)} KB (${usagePercentage}% of limit)
+• Auto-summarize: ${this.currentSettings.autoSummarize ? 'Enabled' : 'Disabled'}
+• Extension Version: ${chrome.runtime.getManifest().version}
+      `;
+
+      alert(statsMessage);
+    } catch (error) {
+      console.error('Error getting usage stats:', error);
+      this.showNotification('Error getting usage statistics', 'error');
+    }
+  }
+
+  /**
    * Show notification
    */
   showNotification(message, type = 'info') {
@@ -451,15 +500,14 @@ class ReadFocusOptions {
       setTimeout(() => notification.remove(), 300);
     }, 3000);
   }
-
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  new ReadFocusOptions();
+  new ExplertOptions();
 });
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ReadFocusOptions;
+  module.exports = ExplertOptions;
 }

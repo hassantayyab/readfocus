@@ -19,8 +19,6 @@ class ContentSummaryService {
    */
   async initialize() {
     try {
-      console.log('📄 [SummaryService] Initializing content summary service...');
-
       // Check if ProxyAIClient is available
       if (typeof ProxyAIClient === 'undefined') {
         throw new Error('ProxyAIClient not available. Make sure proxy-ai-client.js is loaded.');
@@ -34,11 +32,10 @@ class ContentSummaryService {
       this.contentAnalyzer = new ContentAnalyzer();
 
       this.initialized = true;
-      console.log('✅ [SummaryService] Content summary service initialized successfully');
 
       return { success: true };
     } catch (error) {
-      console.error('❌ [SummaryService] Failed to initialize:', error);
+      console.error('Failed to initialize summary service:', error);
       this.initialized = false;
       throw new Error(`Summary service initialization failed: ${error.message}`);
     }
@@ -55,11 +52,8 @@ class ContentSummaryService {
         throw new Error('Summary service not initialized. Please refresh the page and try again.');
       }
 
-      console.log('📄 [SummaryService] Starting content summarization...');
-
       // Load user settings to determine what to generate
       const settings = await this.loadUserSettings();
-      console.log('📄 [SummaryService] Loaded user settings:', settings);
 
       // Extract and analyze content
       const contentElement = this.findMainContent();
@@ -75,21 +69,14 @@ class ContentSummaryService {
 
       // Check local storage first - ALWAYS
       const storageKey = this.generateStorageKey(analysisResult.processedContent, options);
-      console.log('📄 [SummaryService] 🔍 Storage key generated:', storageKey);
-      console.log('📄 [SummaryService] 🔍 Current URL:', window.location.href);
 
       const storedSummary = await this.getStoredSummary(storageKey);
       if (storedSummary) {
-        console.log('📄 [SummaryService] ✅ FOUND stored summary - returning cached data');
-        console.log('📄 [SummaryService] ✅ Summary timestamp:', storedSummary.timestamp);
         return storedSummary;
       }
 
-      console.log('📄 [SummaryService] ❌ NO stored summary found - calling Claude API');
-
       // Check if there's already an active request for this key
       if (this.activeRequests.has(storageKey)) {
-        console.log('📄 [SummaryService] ⏳ Request already in progress, waiting for it...');
         return await this.activeRequests.get(storageKey);
       }
 
@@ -105,7 +92,7 @@ class ContentSummaryService {
         this.activeRequests.delete(storageKey);
       }
     } catch (error) {
-      console.error('❌ [SummaryService] Summary generation failed:', error);
+      console.error('Summary generation failed:', error);
       return {
         success: false,
         error: error.message,
@@ -142,7 +129,6 @@ class ContentSummaryService {
       );
 
       // Store the result permanently in local storage
-      console.log('📄 [SummaryService] 💾 Storing new summary with key:', storageKey);
       await this.storeSummary(storageKey, summaryResult);
 
       // Store current content for future reference
@@ -152,10 +138,9 @@ class ContentSummaryService {
         timestamp: Date.now(),
       };
 
-      console.log('✅ [SummaryService] Summary generation completed');
       return summaryResult;
     } catch (error) {
-      console.error('❌ [SummaryService] Summary generation failed:', error);
+      console.error('Summary generation failed:', error);
       return {
         success: false,
         error: error.message,
@@ -179,7 +164,7 @@ class ContentSummaryService {
         }
       );
     } catch (error) {
-      console.error('❌ [SummaryService] Failed to load settings:', error);
+      console.error('Failed to load settings:', error);
       // Return defaults if loading fails
       return {
         includeKeyPoints: true,
@@ -205,11 +190,6 @@ class ContentSummaryService {
       includeConcepts = true,
     } = options;
 
-    console.log('📄 [SummaryService] Generating multi-format summary with options:', {
-      includeKeyPoints,
-      includeActionItems,
-      includeConcepts,
-    });
 
     // Build comprehensive prompt
     const prompt = this.buildSummaryPrompt(content, metadata, {
@@ -245,7 +225,7 @@ class ContentSummaryService {
 
       return result;
     } catch (error) {
-      console.error('❌ [SummaryService] AI summary generation failed:', error);
+      console.error('AI summary generation failed:', error);
       throw error;
     }
   }
@@ -435,8 +415,7 @@ Return only the JSON object, no additional text.`;
 
       return result;
     } catch (error) {
-      console.error('❌ [SummaryService] Failed to parse summary response:', error);
-      console.error('Raw response:', response);
+      console.error('Failed to parse summary response:', error);
 
       // Return fallback structure
       return {
@@ -597,10 +576,8 @@ Return only the JSON object, no additional text.`;
 
       // Store back to Chrome storage
       await chrome.storage.local.set({ [this.storageKey]: existingSummaries });
-
-      console.log(`📄 [SummaryService] Summary stored permanently with key: ${key}`);
     } catch (error) {
-      console.error('❌ [SummaryService] Error storing summary:', error);
+      console.error('Error storing summary:', error);
     }
   }
 
@@ -618,9 +595,8 @@ Return only the JSON object, no additional text.`;
   async clearCache() {
     try {
       await chrome.storage.local.remove(this.storageKey);
-      console.log('📄 [SummaryService] All stored summaries cleared');
     } catch (error) {
-      console.error('❌ [SummaryService] Error clearing storage:', error);
+      console.error('Error clearing storage:', error);
     }
   }
 
@@ -633,7 +609,7 @@ Return only the JSON object, no additional text.`;
       const summaries = await this.getAllStoredSummaries();
       return Object.keys(summaries).length > 0;
     } catch (error) {
-      console.error('❌ [SummaryService] Error checking cache:', error);
+      console.error('Error checking cache:', error);
       return false;
     }
   }
@@ -646,22 +622,15 @@ Return only the JSON object, no additional text.`;
   async getStoredSummary(key) {
     try {
       const summaries = await this.getAllStoredSummaries();
-      const storedKeys = Object.keys(summaries);
-      console.log('📄 [SummaryService] 🗄️ Total cached summaries:', storedKeys.length);
-      console.log('📄 [SummaryService] 🗄️ All stored keys:', storedKeys);
-      console.log('📄 [SummaryService] 🔍 Looking for exact key:', key);
-
       const summary = summaries[key];
 
       if (summary) {
-        console.log(`📄 [SummaryService] ✅ EXACT MATCH found for key: ${key}`);
         return summary;
       }
 
-      console.log(`📄 [SummaryService] ❌ NO EXACT MATCH found for key: ${key}`);
       return null;
     } catch (error) {
-      console.error('❌ [SummaryService] Error retrieving stored summary:', error);
+      console.error('Error retrieving stored summary:', error);
       return null;
     }
   }
@@ -675,7 +644,7 @@ Return only the JSON object, no additional text.`;
       const result = await chrome.storage.local.get(this.storageKey);
       return result[this.storageKey] || {};
     } catch (error) {
-      console.error('❌ [SummaryService] Error getting stored summaries:', error);
+      console.error('Error getting stored summaries:', error);
       return {};
     }
   }
@@ -697,7 +666,6 @@ Return only the JSON object, no additional text.`;
 
       toRemove.forEach((entry) => {
         delete summaries[entry.key];
-        console.log(`📄 [SummaryService] Removed old summary: ${entry.key}`);
       });
     }
   }
@@ -759,4 +727,3 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = ContentSummaryService;
 }
 
-console.log('✅ [ContentSummaryService] Content Summary Service loaded');

@@ -1,6 +1,6 @@
-// ReadFocus Extension Background Service Worker
+// Explert Extension Background Service Worker
 
-class ReadFocusBackground {
+class ExplertBackground {
   constructor() {
     this.readfocusUrl = 'http://localhost:3000';
     this.init();
@@ -30,11 +30,11 @@ class ReadFocusBackground {
       this.handleIconClick(tab);
     });
 
-    console.log('ReadFocus background script initialized');
+    console.log('Explert background script initialized');
   }
 
   handleInstallation(details) {
-    console.log('ReadFocus extension installed:', details.reason);
+    console.log('Explert extension installed:', details.reason);
 
     if (details.reason === 'install') {
       // First time installation
@@ -42,21 +42,21 @@ class ReadFocusBackground {
       this.setDefaultSettings();
     } else if (details.reason === 'update') {
       // Extension updated
-      console.log('ReadFocus extension updated');
+      console.log('Explert extension updated');
     }
   }
 
   createContextMenu() {
     chrome.contextMenus.create({
       id: 'readfocus-send-text',
-      title: 'Send to ReadFocus',
+      title: 'Send to Explert',
       contexts: ['selection'],
       documentUrlPatterns: ['http://*/*', 'https://*/*'],
     });
 
     chrome.contextMenus.create({
       id: 'readfocus-capture-article',
-      title: 'Capture Article in ReadFocus',
+      title: 'Capture Article in Explert',
       contexts: ['page'],
       documentUrlPatterns: ['http://*/*', 'https://*/*'],
     });
@@ -67,7 +67,7 @@ class ReadFocusBackground {
       switch (info.menuItemId) {
         case 'readfocus-send-text':
           if (info.selectionText) {
-            await this.sendTextToReadFocus(info.selectionText, 'Selected Text', tab.url);
+            await this.sendTextToExplert(info.selectionText, 'Selected Text', tab.url);
           }
           break;
 
@@ -78,7 +78,7 @@ class ReadFocusBackground {
           });
 
           if (response && response.text) {
-            await this.sendTextToReadFocus(response.text, response.title, tab.url);
+            await this.sendTextToExplert(response.text, response.title, tab.url);
           }
           break;
       }
@@ -90,8 +90,8 @@ class ReadFocusBackground {
 
   handleMessage(request, sender, sendResponse) {
     switch (request.action) {
-      case 'openReadFocus':
-        this.openReadFocus(request.text, request.title);
+      case 'openExplert':
+        this.openExplert(request.text, request.title);
         sendResponse({ success: true });
         break;
 
@@ -122,13 +122,13 @@ class ReadFocusBackground {
     console.log('Extension icon clicked');
   }
 
-  async sendTextToReadFocus(text, title = 'Captured Text', sourceUrl = '') {
+  async sendTextToExplert(text, title = 'Captured Text', sourceUrl = '') {
     try {
       if (!text || text.trim().length < 10) {
         throw new Error('Text too short');
       }
 
-      // Store text data for ReadFocus to pick up
+      // Store text data for Explert to pick up
       const textData = {
         text: text.trim(),
         title: title || 'Captured Text',
@@ -142,21 +142,21 @@ class ReadFocusBackground {
         readfocus_captured_text: textData,
       });
 
-      // Create ReadFocus URL with text data as URL parameters (as backup)
+      // Create Explert URL with text data as URL parameters (as backup)
       const encodedText = encodeURIComponent(textData.text.substring(0, 2000)); // Limit URL length
       const encodedTitle = encodeURIComponent(textData.title);
       const readfocusUrl = `${this.readfocusUrl}?source=extension&id=${textData.id}&text=${encodedText}&title=${encodedTitle}`;
 
       await chrome.tabs.create({ url: readfocusUrl });
 
-      this.showSuccessNotification('Text sent to ReadFocus!');
+      this.showSuccessNotification('Text sent to Explert!');
     } catch (error) {
-      console.error('Error sending text to ReadFocus:', error);
-      this.showErrorNotification('Failed to send text to ReadFocus');
+      console.error('Error sending text to Explert:', error);
+      this.showErrorNotification('Failed to send text to Explert');
     }
   }
 
-  async openReadFocus(text = '', title = '') {
+  async openExplert(text = '', title = '') {
     try {
       let url = this.readfocusUrl;
 
@@ -180,7 +180,7 @@ class ReadFocusBackground {
 
       await chrome.tabs.create({ url: url });
     } catch (error) {
-      console.error('Error opening ReadFocus:', error);
+      console.error('Error opening Explert:', error);
     }
   }
 
@@ -194,16 +194,16 @@ class ReadFocusBackground {
 
   showWelcomeNotification() {
     console.log(
-      'ReadFocus extension installed successfully! Right-click on any text to send it to ReadFocus for guided reading.'
+      'Explert extension installed successfully! Right-click on any text to send it to Explert for guided reading.'
     );
   }
 
   showSuccessNotification(message) {
-    console.log('ReadFocus:', message);
+    console.log('Explert:', message);
   }
 
   showErrorNotification(message) {
-    console.error('ReadFocus Error:', message);
+    console.error('Explert Error:', message);
   }
 
   async getSettings() {
@@ -253,4 +253,4 @@ class ReadFocusBackground {
 }
 
 // Initialize background script
-new ReadFocusBackground();
+new ExplertBackground();

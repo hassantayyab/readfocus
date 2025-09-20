@@ -1,22 +1,10 @@
 /**
- * ReadFocus Content Script (Enhanced for Auto Focus Mode)
+ * Explert Content Script (Enhanced for Auto Focus Mode)
  * Handles article detection, content extraction, and Focus Mode overlay
  */
 
-console.log('🚀 [ContentScript] ReadFocus content script loading...');
-console.log('🌐 [ContentScript] Page URL:', window.location.href);
-console.log('📊 [ContentScript] Document ready state:', document.readyState);
-console.log(
-  '🔧 [ContentScript] FocusModeOverlay available?',
-  typeof FocusModeOverlay !== 'undefined'
-);
-console.log(
-  '🔧 [ContentScript] ReadingHelperOverlay available?',
-  typeof ReadingHelperOverlay !== 'undefined'
-);
-console.log('🔧 [ContentScript] Window.ReadingHelperOverlay:', window.ReadingHelperOverlay);
 
-class ReadFocusContentScript {
+class ExplertContentScript {
   constructor() {
     this.settings = {};
     this.isExtensionUrl = false;
@@ -33,38 +21,28 @@ class ReadFocusContentScript {
 
   // Make content script accessible to standalone highlighting
   static getInstance() {
-    return window.readFocusContentScriptInstance;
+    return window.explertContentScriptInstance;
   }
 
   async init() {
-    console.log('🔧 [ContentScript] Initializing content script...');
-
     // Check if we're on the extension's own pages
     this.isExtensionUrl = window.location.href.includes('chrome-extension://');
     if (this.isExtensionUrl) {
-      console.log('📃 [ContentScript] Extension page detected, skipping initialization');
       return;
     }
 
     try {
-      console.log('⚙️ [ContentScript] Loading settings...');
       // Load settings
       await this.loadSettings();
-      console.log('✅ [ContentScript] Settings loaded:', this.settings);
 
-      console.log('📡 [ContentScript] Setting up message listener...');
       // Listen for messages from popup and background
       chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        console.log('📨 [ContentScript] Message received:', request.type);
         this.handleMessage(request, sender, sendResponse);
         return true; // Keep message channel open for async responses
       });
 
-      console.log('🎉 [ContentScript] ReadFocus content script initialized successfully!');
-
       // Start background summary generation only if auto-summarize is enabled
       if (this.settings.autoSummarize === true) {
-        console.log('✅ [ContentScript] Auto-summarize enabled, starting background generation');
         if (document.readyState === 'complete') {
           this.startBackgroundSummaryGeneration();
         } else {
@@ -72,11 +50,9 @@ class ReadFocusContentScript {
             this.startBackgroundSummaryGeneration();
           });
         }
-      } else {
-        console.log('⏭️ [ContentScript] Auto-summarize disabled, skipping background generation');
       }
     } catch (error) {
-      console.error('Error initializing ReadFocus content script:', error);
+      console.error('Error initializing Explert content script:', error);
     }
   }
 
@@ -98,18 +74,14 @@ class ReadFocusContentScript {
    */
   async startBackgroundSummaryGeneration() {
     if (this.isGeneratingSummary) {
-      console.log('⏭️ [ContentScript] Background generation already in progress');
       return;
     }
 
     try {
-      console.log('🔄 [ContentScript] Starting background summary generation...');
-
       // Initialize summary service if needed
       if (!this.summaryService) {
         const initialized = await this.initializeSummaryService();
         if (!initialized) {
-          console.error('❌ [ContentScript] Failed to initialize summary service');
           return;
         }
       }
@@ -117,27 +89,20 @@ class ReadFocusContentScript {
       // Check cache first - don't regenerate if already exists
       const hasCached = await this.summaryService.hasSummaryForCurrentPage();
       if (hasCached) {
-        console.log('✅ [ContentScript] Summary already cached, skipping background generation');
         return;
       }
 
       this.isGeneratingSummary = true;
 
       // Generate summary in background
-      const summaryResult = await this.summaryService.generateSummary({
+      await this.summaryService.generateSummary({
         includeKeyPoints: true,
         includeQuickSummary: true,
         includeDetailedSummary: true,
         includeActionItems: true,
       });
-
-      if (summaryResult.success) {
-        console.log('✅ [ContentScript] Background summary generation completed');
-      } else {
-        console.error('❌ [ContentScript] Background generation failed:', summaryResult.error);
-      }
     } catch (error) {
-      console.error('❌ [ContentScript] Background generation error:', error);
+      console.error('Background generation error:', error);
     } finally {
       this.isGeneratingSummary = false;
     }
@@ -221,10 +186,8 @@ class ReadFocusContentScript {
 
           // Handle auto-summarize setting changes
           if (this.settings.autoSummarize === true && oldAutoSummarize !== true) {
-            console.log('✅ [ContentScript] Auto-summarize enabled, starting background generation');
             this.startBackgroundSummaryGeneration();
           } else if (this.settings.autoSummarize !== true && oldAutoSummarize === true) {
-            console.log('⏹️ [ContentScript] Auto-summarize disabled, stopping background generation');
             this.isGeneratingSummary = false;
           }
 
@@ -232,8 +195,6 @@ class ReadFocusContentScript {
           break;
 
         case 'GENERATE_SUMMARY':
-          console.log('📄 [ContentScript] Handling GENERATE_SUMMARY request...');
-
           // Initialize summary service if needed
           if (!this.summaryService) {
             const initialized = await this.initializeSummaryService();
@@ -283,7 +244,6 @@ class ReadFocusContentScript {
           break;
 
         case 'CLEAR_SUMMARY_CACHE':
-          console.log('🗑️ [ContentScript] Clearing summary cache...');
           if (this.summaryService) {
             this.summaryService.clearCache();
           }
@@ -331,9 +291,6 @@ class ReadFocusContentScript {
    * Analyze page for article content
    */
   async analyzePageForArticle() {
-    console.log('🔍 [ContentScript] Analyzing page for article content...');
-    console.log('🌐 [ContentScript] Current URL:', window.location.href);
-
     try {
       const analysis = {
         isArticle: false,
@@ -345,57 +302,35 @@ class ReadFocusContentScript {
         publishDate: '',
       };
 
-      console.log('📄 [ContentScript] Detecting main content...');
-
       // Extract potential article content
       const rawContent = this.detectMainContent();
       if (!rawContent) {
-        console.warn('⚠️ [ContentScript] No main content detected');
         return analysis;
       }
 
       // Validate the content is a proper DOM element
       const content = this.validateContentElement(rawContent, 'detectMainContent');
       if (!content) {
-        console.error('❌ [ContentScript] Content validation failed');
         return analysis;
       }
 
-      console.log('✅ [ContentScript] Main content detected:', content.tagName);
-      console.log(
-        '📏 [ContentScript] Content element HTML length:',
-        content.innerHTML?.length || 0
-      );
-
       // Check if content has textContent
       if (!content.textContent) {
-        console.error('❌ [ContentScript] Content element has no textContent');
         return analysis;
       }
 
       // Get text content and word count
       const textContent = content.textContent.trim();
-      console.log('📝 [ContentScript] Text content length:', textContent.length);
-      console.log('📋 [ContentScript] First 200 chars:', textContent.substring(0, 200));
-
       const wordCount = this.countWords(textContent);
-      console.log('🔢 [ContentScript] Word count:', wordCount);
 
       // Get title
       const title = this.extractTitle();
-      console.log('📑 [ContentScript] Extracted title:', title);
 
       // Calculate confidence score
       const confidence = this.calculateArticleConfidence(content, wordCount);
-      console.log('📊 [ContentScript] Confidence score:', confidence);
 
       // Determine if this looks like an article
       const isArticle = wordCount >= 100 && confidence > 0.6;
-      console.log(
-        '🎯 [ContentScript] Is article?',
-        isArticle,
-        `(wordCount: ${wordCount >= 100}, confidence: ${confidence > 0.6})`
-      );
 
       analysis.isArticle = isArticle;
       analysis.title = title;
@@ -403,37 +338,20 @@ class ReadFocusContentScript {
       analysis.confidence = confidence;
 
       // Validate content before setting it
-      console.log('🔍 [ContentScript] Validating content before setting in analysis...');
       const validatedContent = this.validateContentElement(content, 'analyzePageForArticle');
       if (validatedContent) {
         analysis.mainContent = validatedContent;
-        console.log('✅ [ContentScript] Valid content set in analysis');
       } else {
-        console.error('❌ [ContentScript] Invalid content detected in analysis, setting to null');
         analysis.mainContent = null;
       }
 
       analysis.author = this.extractAuthor();
       analysis.publishDate = this.extractPublishDate();
 
-      console.log('✅ [ContentScript] Analysis complete:', {
-        isArticle: analysis.isArticle,
-        title: analysis.title,
-        wordCount: analysis.wordCount,
-        confidence: analysis.confidence,
-        hasContent: !!analysis.mainContent,
-        author: analysis.author,
-      });
-
       this.pageAnalysis = analysis;
       return analysis;
     } catch (error) {
-      console.error('❌ [ContentScript] Error analyzing page:', error);
-      console.error('📊 [ContentScript] Analysis error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      });
+      console.error('Error analyzing page:', error);
       return { isArticle: false, title: '', wordCount: 0, confidence: 0 };
     }
   }
@@ -442,39 +360,10 @@ class ReadFocusContentScript {
    * Detect main content using various strategies
    */
   detectMainContent() {
-    console.log('🔍 [ContentScript] ========== detectMainContent() called ==========');
-    console.log('🔍 [ContentScript] Starting content detection strategies...');
-    console.log('🌐 [ContentScript] Current domain:', window.location.hostname);
-    console.log(
-      '🔍 [ContentScript] Page HTML sample:',
-      document.body.innerHTML.substring(0, 500) + '...'
-    );
-
     // Check if this is actually Medium
     const isMedium = window.location.hostname.includes('medium.com');
-    console.log('📰 [ContentScript] Is Medium site?', isMedium);
-
-    // Add debugging function for content elements
-    const debugElement = (element, name) => {
-      if (!element) {
-        console.log(`🔍 [ContentScript] ${name}: null/undefined`);
-        return;
-      }
-      console.log(`🔍 [ContentScript] ${name}:`, {
-        type: typeof element,
-        constructor: element.constructor?.name,
-        isElement: element instanceof Element,
-        isNode: element instanceof Node,
-        hasQuerySelectorAll: typeof element.querySelectorAll === 'function',
-        hasTextContent: 'textContent' in element,
-        tagName: element.tagName,
-        textLength: element.textContent?.length || 0,
-      });
-    };
 
     // Strategy 1: Medium-specific selectors (highest priority)
-    console.log('📰 [ContentScript] Strategy 1: Medium-specific selectors...');
-
     const mediumSelectors = [
       // Updated Medium selectors based on current structure
       'article div[data-selectable-paragraph]', // Medium paragraph container
@@ -493,23 +382,6 @@ class ReadFocusContentScript {
 
     for (const selector of mediumSelectors) {
       const elements = document.querySelectorAll(selector);
-      console.log(
-        `🎯 [ContentScript] Checking Medium selector "${selector}": found ${elements.length} elements`
-      );
-
-      // Log details about first few elements
-      if (elements.length > 0) {
-        for (let i = 0; i < Math.min(3, elements.length); i++) {
-          const el = elements[i];
-          console.log(`📝 [ContentScript] Element ${i + 1} details:`, {
-            tagName: el.tagName,
-            className: el.className,
-            textLength: el.textContent?.length || 0,
-            hasDataAttr: el.hasAttribute('data-selectable-paragraph'),
-            innerHTML: el.innerHTML?.substring(0, 200) + '...',
-          });
-        }
-      }
 
       if (elements.length > 0) {
         // For Medium, we need to collect all paragraph elements
@@ -517,61 +389,35 @@ class ReadFocusContentScript {
         let hasText = false;
         let totalTextLength = 0;
 
-        elements.forEach((element, index) => {
+        elements.forEach((element) => {
           const text = element.textContent?.trim();
           if (text && text.length > 10) {
             // More lenient for Medium
             contentContainer.appendChild(element.cloneNode(true));
             hasText = true;
             totalTextLength += text.length;
-            console.log(
-              `✅ [ContentScript] Added Medium element ${index + 1} (${text.length} chars): ${text.substring(0, 100)}...`
-            );
-          } else {
-            console.log(
-              `⚠️ [ContentScript] Skipped Medium element ${index + 1}: ${text?.length || 0} chars`
-            );
           }
         });
 
-        console.log(
-          `📊 [ContentScript] Medium container stats: ${hasText}, ${totalTextLength} total chars`
-        );
-
         if (hasText && totalTextLength > 100) {
           // More lenient check
-          console.log('🎉 [ContentScript] Medium content detected successfully!');
-          debugElement(contentContainer, 'Medium content container');
-          console.log(
-            '🔍 [ContentScript] ========== detectMainContent() returning Medium container =========='
-          );
           return contentContainer;
         }
       }
     }
 
     // Strategy 2: Semantic HTML5 elements
-    console.log('📝 [ContentScript] Strategy 2: Semantic HTML5 elements...');
     let content = document.querySelector('article');
     if (content && this.hasSignificantText(content)) {
-      console.log('✅ [ContentScript] Found content via <article> tag');
-      console.log(
-        '🔍 [ContentScript] ========== detectMainContent() returning article element =========='
-      );
       return content;
     }
 
     content = document.querySelector('main');
     if (content && this.hasSignificantText(content)) {
-      console.log('✅ [ContentScript] Found content via <main> tag');
-      console.log(
-        '🔍 [ContentScript] ========== detectMainContent() returning main element =========='
-      );
       return content;
     }
 
     // Strategy 3: Enhanced common class/id patterns
-    console.log('🎯 [ContentScript] Strategy 3: Common class/id patterns...');
     const contentSelectors = [
       // Modern CMS patterns
       '.article-content',
@@ -633,56 +479,32 @@ class ReadFocusContentScript {
 
     for (const selector of contentSelectors) {
       content = document.querySelector(selector);
-      console.log(
-        `🔍 [ContentScript] Checking selector "${selector}": ${content ? 'found' : 'not found'}`
-      );
 
       if (content && this.hasSignificantText(content)) {
-        console.log(`✅ [ContentScript] Found content via selector: ${selector}`);
-        console.log(
-          `🔍 [ContentScript] ========== detectMainContent() returning selector content (${selector}) ==========`
-        );
         return content;
       }
     }
 
     // Strategy 4: Heuristic analysis
-    console.log('🧠 [ContentScript] Strategy 4: Heuristic analysis...');
     const heuristicContent = this.findContentByHeuristics();
     if (heuristicContent) {
-      console.log('✅ [ContentScript] Found content via heuristics');
-      console.log(
-        '🔍 [ContentScript] ========== detectMainContent() returning heuristic content =========='
-      );
       return heuristicContent;
     }
 
     // Strategy 5: Medium-specific aggressive extraction
     if (isMedium) {
-      console.log('📰 [ContentScript] Strategy 5: Medium aggressive extraction...');
       const mediumContent = this.extractMediumContentAggressively();
       if (mediumContent) {
-        console.log('✅ [ContentScript] Medium aggressive extraction succeeded');
-        console.log(
-          '🔍 [ContentScript] ========== detectMainContent() returning Medium aggressive content =========='
-        );
         return mediumContent;
       }
     }
 
     // Strategy 6: Emergency fallback - collect all readable text
-    console.log('🆘 [ContentScript] Strategy 6: Emergency fallback...');
     const emergencyContent = this.createEmergencyContent();
     if (emergencyContent) {
-      console.log('✅ [ContentScript] Created emergency content container');
-      console.log(
-        '🔍 [ContentScript] ========== detectMainContent() returning emergency content =========='
-      );
       return emergencyContent;
     }
 
-    console.warn('⚠️ [ContentScript] No content found with any strategy');
-    console.log('🔍 [ContentScript] detectMainContent returning null');
     return null;
   }
 
@@ -690,36 +512,21 @@ class ReadFocusContentScript {
    * Validate and ensure content is a proper DOM element
    */
   validateContentElement(element, source = 'unknown') {
-    console.log(`🔍 [ContentScript] Validating content from ${source}...`);
-
     if (!element) {
-      console.error(`❌ [ContentScript] ${source}: Content is null/undefined`);
       return null;
     }
 
     if (!(element instanceof Element)) {
-      console.error(
-        `❌ [ContentScript] ${source}: Content is not a DOM Element:`,
-        element.constructor?.name || typeof element
-      );
-      console.error(`❌ [ContentScript] ${source}: Content value:`, element);
       return null;
     }
 
     if (typeof element.querySelectorAll !== 'function') {
-      console.error(`❌ [ContentScript] ${source}: Element missing querySelectorAll method`);
       return null;
     }
 
     if (typeof element.textContent !== 'string' && element.textContent !== null) {
-      console.error(`❌ [ContentScript] ${source}: Element has invalid textContent property`);
       return null;
     }
-
-    console.log(`✅ [ContentScript] ${source}: Content validation passed`);
-    console.log(`📊 [ContentScript] ${source}: Element type: ${element.constructor.name}`);
-    console.log(`📊 [ContentScript] ${source}: Tag name: ${element.tagName}`);
-    console.log(`📊 [ContentScript] ${source}: Text length: ${element.textContent?.length || 0}`);
 
     return element;
   }
@@ -728,13 +535,10 @@ class ReadFocusContentScript {
    * Find content using heuristic analysis
    */
   findContentByHeuristics() {
-    console.log('🧠 [ContentScript] Starting heuristic analysis...');
-
     // Get all potential content containers
     const candidates = Array.from(
       document.querySelectorAll('div, section, article, main, [role="main"]')
     );
-    console.log(`🎯 [ContentScript] Found ${candidates.length} content candidates`);
 
     let bestCandidate = null;
     let bestScore = 0;
@@ -743,27 +547,10 @@ class ReadFocusContentScript {
       const candidate = candidates[i];
       const score = this.scoreContentCandidate(candidate);
 
-      console.log(
-        `📊 [ContentScript] Candidate ${i + 1}: score=${score.toFixed(2)}, tag=${candidate.tagName}, class="${candidate.className}"${candidate.id ? `, id="${candidate.id}"` : ''}`
-      );
-
       if (score > bestScore && score > 20) {
         bestScore = score;
         bestCandidate = candidate;
-        console.log(`🏆 [ContentScript] New best candidate with score: ${score.toFixed(2)}`);
       }
-    }
-
-    if (bestCandidate) {
-      console.log(
-        `✅ [ContentScript] Selected best candidate: ${bestCandidate.tagName} with score ${bestScore.toFixed(2)}`
-      );
-      console.log(
-        `📝 [ContentScript] Content preview: ${bestCandidate.textContent.trim().substring(0, 200)}...`
-      );
-      debugElement(bestCandidate, 'Heuristic best candidate');
-    } else {
-      console.warn('⚠️ [ContentScript] No suitable candidate found via heuristics');
     }
 
     return bestCandidate;
@@ -868,10 +655,6 @@ class ReadFocusContentScript {
     const text = element.textContent.trim();
     const wordCount = this.countWords(text);
 
-    console.log(
-      `📏 [ContentScript] Text significance check: ${text.length} chars, ${wordCount} words`
-    );
-
     // More lenient requirements for modern content structures
     const hasMinimumText = text.length > 100 && wordCount > 20;
     const hasGoodStructure =
@@ -883,10 +666,6 @@ class ReadFocusContentScript {
     const isSignificant =
       hasMinimumText || (hasGoodStructure && wordCount > 10) || hasMediumContent;
 
-    console.log(
-      `🎯 [ContentScript] Significance result: ${isSignificant} (minText: ${hasMinimumText}, structure: ${hasGoodStructure}, medium: ${hasMediumContent})`
-    );
-
     return isSignificant;
   }
 
@@ -894,8 +673,6 @@ class ReadFocusContentScript {
    * Emergency content creation - collect all readable paragraphs
    */
   createEmergencyContent() {
-    console.log('🆘 [ContentScript] Creating emergency content container...');
-
     // Collect all text-containing elements
     const textElements = Array.from(
       document.querySelectorAll('p, div, span, section, article')
@@ -916,8 +693,6 @@ class ReadFocusContentScript {
 
       return true;
     });
-
-    console.log(`🔍 [ContentScript] Found ${textElements.length} potential text elements`);
 
     if (textElements.length === 0) {
       return null;
@@ -940,10 +715,7 @@ class ReadFocusContentScript {
       .forEach((item) => {
         container.appendChild(item.element.cloneNode(true));
         totalWords += item.wordCount;
-        console.log(`📝 [ContentScript] Added emergency element: ${item.wordCount} words`);
       });
-
-    console.log(`📊 [ContentScript] Emergency container created with ${totalWords} total words`);
 
     return totalWords > 50 ? container : null;
   }
@@ -952,19 +724,13 @@ class ReadFocusContentScript {
    * Try alternative content extraction when main content is empty
    */
   tryAlternativeContentExtraction() {
-    console.log('🔧 [ContentScript] Starting alternative content extraction...');
-
     // First check if we even have a pageAnalysis object
     if (!this.pageAnalysis) {
-      console.log('🔍 [ContentScript] No pageAnalysis found, will try direct content detection...');
       this.pageAnalysis = { mainContent: null };
     }
 
     // Strategy 1: Try to get text from the current element's children
     const currentElement = this.pageAnalysis?.mainContent;
-    console.log('🔍 [ContentScript] Current element for alternative extraction:', currentElement);
-    console.log('🔍 [ContentScript] Current element type:', typeof currentElement);
-    console.log('🔍 [ContentScript] Is Element?', currentElement instanceof Element);
 
     if (
       currentElement &&
@@ -972,8 +738,6 @@ class ReadFocusContentScript {
       currentElement.children &&
       currentElement.children.length > 0
     ) {
-      console.log('📝 [ContentScript] Strategy 1: Extracting text from children...');
-
       const textContainer = document.createElement('div');
       let totalTextLength = 0;
 
@@ -985,9 +749,6 @@ class ReadFocusContentScript {
             const childClone = child.cloneNode(true);
             textContainer.appendChild(childClone);
             totalTextLength += child.textContent.trim().length;
-            console.log(
-              `   ✅ Added child: ${child.tagName} (${child.textContent.trim().length} chars)`
-            );
           }
           // Recursively check nested children
           if (child.children && child.children.length > 0) {
@@ -999,26 +760,21 @@ class ReadFocusContentScript {
       extractTextFromChildren(currentElement);
 
       if (totalTextLength > 100) {
-        console.log(`✅ [ContentScript] Strategy 1 succeeded: ${totalTextLength} chars extracted`);
-        debugElement(textContainer, 'Alternative Strategy 1 container');
         return textContainer;
       }
     }
 
     // Strategy 2: Re-run content detection with more aggressive settings
-    console.log('🎯 [ContentScript] Strategy 2: Re-running content detection...');
     const newContent = this.detectMainContent();
     if (
       newContent &&
       newContent !== currentElement &&
       newContent.textContent?.trim().length > 100
     ) {
-      console.log('✅ [ContentScript] Strategy 2 succeeded: Found different content element');
       return newContent;
     }
 
     // Strategy 3: Collect all readable paragraphs from the page
-    console.log('📋 [ContentScript] Strategy 3: Collecting all readable paragraphs...');
     const allParagraphs = document.querySelectorAll(
       'p, div[data-selectable-paragraph], .graf, [class*="paragraph"], [class*="content"] p'
     );
@@ -1027,36 +783,27 @@ class ReadFocusContentScript {
       const paragraphContainer = document.createElement('div');
       let paragraphTextLength = 0;
 
-      allParagraphs.forEach((p, index) => {
+      allParagraphs.forEach((p) => {
         const text = p.textContent?.trim();
         if (text && text.length > 30) {
           paragraphContainer.appendChild(p.cloneNode(true));
           paragraphTextLength += text.length;
-          console.log(
-            `   📝 Paragraph ${index + 1}: ${text.substring(0, 50)}... (${text.length} chars)`
-          );
         }
       });
 
       if (paragraphTextLength > 200) {
-        console.log(
-          `✅ [ContentScript] Strategy 3 succeeded: ${paragraphTextLength} chars from ${allParagraphs.length} paragraphs`
-        );
         return paragraphContainer;
       }
     }
 
     // Strategy 4: Last resort - get the body text
-    console.log('🆘 [ContentScript] Strategy 4: Last resort body text extraction...');
     const bodyText = document.body.textContent?.trim();
     if (bodyText && bodyText.length > 500) {
       const bodyContainer = document.createElement('div');
       bodyContainer.textContent = bodyText;
-      console.log(`✅ [ContentScript] Strategy 4 succeeded: ${bodyText.length} chars from body`);
       return bodyContainer;
     }
 
-    console.error('❌ [ContentScript] All alternative extraction strategies failed');
     return null;
   }
 
@@ -1064,8 +811,6 @@ class ReadFocusContentScript {
    * Aggressive Medium content extraction - try everything
    */
   extractMediumContentAggressively() {
-    console.log('🔧 [ContentScript] Starting aggressive Medium extraction...');
-
     // Try various approaches for Medium
     const strategies = [
       // Strategy 1: Look for any text content in article tags
@@ -1074,7 +819,6 @@ class ReadFocusContentScript {
         for (const article of articles) {
           const text = article.textContent?.trim();
           if (text && text.length > 500) {
-            console.log('✅ [ContentScript] Found content in article tag');
             return article;
           }
         }
@@ -1099,7 +843,6 @@ class ReadFocusContentScript {
           });
 
           if (totalText > 300) {
-            console.log('✅ [ContentScript] Built content from paragraph elements');
             return container;
           }
         }
@@ -1124,7 +867,6 @@ class ReadFocusContentScript {
           for (const element of elements) {
             const text = element.textContent?.trim();
             if (text && text.length > 500) {
-              console.log(`✅ [ContentScript] Found content via selector: ${selector}`);
               return element;
             }
           }
@@ -1151,7 +893,6 @@ class ReadFocusContentScript {
         }
 
         if (bestElement) {
-          console.log(`✅ [ContentScript] Found content via text length: ${maxTextLength} chars`);
           return bestElement;
         }
         return null;
@@ -1160,16 +901,12 @@ class ReadFocusContentScript {
 
     // Try each strategy
     for (let i = 0; i < strategies.length; i++) {
-      console.log(`🎯 [ContentScript] Trying aggressive strategy ${i + 1}...`);
       const result = strategies[i]();
       if (result) {
-        console.log(`🎉 [ContentScript] Aggressive strategy ${i + 1} succeeded!`);
-        debugElement(result, `Aggressive strategy ${i + 1} result`);
         return result;
       }
     }
 
-    console.warn('⚠️ [ContentScript] All aggressive strategies failed');
     return null;
   }
 
@@ -1839,10 +1576,7 @@ class ReadFocusContentScript {
    */
   async initializeSummaryService() {
     try {
-      console.log('📄 [ContentScript] Initializing summary service...');
-
       if (!window.ContentSummaryService) {
-        console.error('❌ [ContentScript] ContentSummaryService not available');
         return false;
       }
 
@@ -1850,11 +1584,10 @@ class ReadFocusContentScript {
 
       // Initialize the service (no API key needed with proxy)
       await this.summaryService.initialize();
-      console.log('✅ [ContentScript] Summary service initialized successfully');
 
       return true;
     } catch (error) {
-      console.error('❌ [ContentScript] Failed to initialize summary service:', error);
+      console.error('Failed to initialize summary service:', error);
       return false;
     }
   }
@@ -1867,12 +1600,9 @@ class ReadFocusContentScript {
    */
   async showSummaryOverlay(summaryData = null) {
     try {
-      console.log('📄 [ContentScript] Showing summary overlay...');
-
       // Initialize summary overlay if needed
       if (!this.summaryOverlay) {
         if (!window.SummaryOverlay) {
-          console.error('❌ [ContentScript] SummaryOverlay not available');
           throw new Error('Summary overlay component not loaded');
         }
         this.summaryOverlay = new SummaryOverlay();
@@ -1889,11 +1619,10 @@ class ReadFocusContentScript {
 
       // Show the overlay
       await this.summaryOverlay.show(summaryData);
-      console.log('✅ [ContentScript] Summary overlay displayed');
 
       return { success: true };
     } catch (error) {
-      console.error('❌ [ContentScript] Failed to show summary overlay:', error);
+      console.error('Failed to show summary overlay:', error);
       return {
         success: false,
         error: error.message,
@@ -1907,7 +1636,6 @@ class ReadFocusContentScript {
   hideSummaryOverlay() {
     if (this.summaryOverlay) {
       this.summaryOverlay.hide();
-      console.log('📄 [ContentScript] Summary overlay hidden');
     }
   }
 
@@ -1929,13 +1657,13 @@ class ReadFocusContentScript {
 // Initialize content script
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    window.readFocusContentScriptInstance = new ReadFocusContentScript();
+    window.explertContentScriptInstance = new ExplertContentScript();
   });
 } else {
-  window.readFocusContentScriptInstance = new ReadFocusContentScript();
+  window.explertContentScriptInstance = new ExplertContentScript();
 }
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ReadFocusContentScript;
+  module.exports = ExplertContentScript;
 }
