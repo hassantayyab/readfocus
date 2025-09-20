@@ -25,8 +25,7 @@ class ReadFocusContentScript {
     this.summaryService = null;
     this.summaryOverlay = null;
 
-    // Pre-loaded summary cache
-    this.preloadedSummary = null;
+    // Background generation state
     this.isGeneratingSummary = false;
 
     this.init();
@@ -63,8 +62,8 @@ class ReadFocusContentScript {
 
       console.log('🎉 [ContentScript] ReadFocus content script initialized successfully!');
 
-      // Start background summary generation after page is ready (only if auto-summarize is enabled)
-      if (this.settings.autoSummarize) {
+      // Start background summary generation only if auto-summarize is enabled
+      if (this.settings.autoSummarize === true) {
         console.log('✅ [ContentScript] Auto-summarize enabled, starting background generation');
         if (document.readyState === 'complete') {
           this.startBackgroundSummaryGeneration();
@@ -95,43 +94,36 @@ class ReadFocusContentScript {
   }
 
   /**
-   * Start generating summary in the background without showing overlay
+   * Start generating summary in the background (only if auto-summarize enabled)
    */
   async startBackgroundSummaryGeneration() {
-    try {
-      // Skip if already generating or if we already have a summary
-      if (this.isGeneratingSummary || this.preloadedSummary) {
-        console.log(
-          '⏭️ [ContentScript] Skipping background generation - already in progress or completed'
-        );
-        return;
-      }
+    if (this.isGeneratingSummary) {
+      console.log('⏭️ [ContentScript] Background generation already in progress');
+      return;
+    }
 
-      console.log('🔄 [ContentScript] Checking for cached summary before background generation...');
+    try {
+      console.log('🔄 [ContentScript] Starting background summary generation...');
 
       // Initialize summary service if needed
       if (!this.summaryService) {
         const initialized = await this.initializeSummaryService();
         if (!initialized) {
-          console.error(
-            '❌ [ContentScript] Failed to initialize summary service for background generation'
-          );
+          console.error('❌ [ContentScript] Failed to initialize summary service');
           return;
         }
       }
 
-      // CHECK CACHE FIRST - DO NOT CALL API IF DATA EXISTS
-      const hasCachedSummary = await this.summaryService.hasSummaryForCurrentPage();
-      if (hasCachedSummary) {
-        console.log('✅ [ContentScript] CACHED SUMMARY FOUND - SKIPPING API CALL');
-        console.log('✅ [ContentScript] No background generation needed - using cached data');
+      // Check cache first - don't regenerate if already exists
+      const hasCached = await this.summaryService.hasSummaryForCurrentPage();
+      if (hasCached) {
+        console.log('✅ [ContentScript] Summary already cached, skipping background generation');
         return;
       }
 
-      console.log('❌ [ContentScript] No cached summary found - proceeding with background generation');
       this.isGeneratingSummary = true;
 
-      // Generate summary silently in the background
+      // Generate summary in background
       const summaryResult = await this.summaryService.generateSummary({
         includeKeyPoints: true,
         includeQuickSummary: true,
@@ -140,18 +132,13 @@ class ReadFocusContentScript {
       });
 
       if (summaryResult.success) {
-        console.log('✅ [ContentScript] Background summary generated successfully');
-        this.preloadedSummary = summaryResult;
+        console.log('✅ [ContentScript] Background summary generation completed');
       } else {
-        console.error(
-          '❌ [ContentScript] Background summary generation failed:',
-          summaryResult.error
-        );
+        console.error('❌ [ContentScript] Background generation failed:', summaryResult.error);
       }
-
-      this.isGeneratingSummary = false;
     } catch (error) {
-      console.error('❌ [ContentScript] Error in background summary generation:', error);
+      console.error('❌ [ContentScript] Background generation error:', error);
+    } finally {
       this.isGeneratingSummary = false;
     }
   }
@@ -225,99 +212,68 @@ class ReadFocusContentScript {
   /**
    * Handle messages from popup and background scripts
    */
-  async handleMessage(request, sender, sendResponse) {
+  async handleMessage(request, _sender, sendResponse) {
     try {
       switch (request.type) {
         case 'SETTINGS_UPDATED':
           const oldAutoSummarize = this.settings.autoSummarize;
           this.settings = request.settings;
 
-          // If auto-summarize was just enabled and we don't have a pre-loaded summary, start background generation
-          if (this.settings.autoSummarize && !oldAutoSummarize && !this.preloadedSummary && !this.isGeneratingSummary) {
-            console.log('✅ [ContentScript] Auto-summarize just enabled, starting background generation');
+          // Handle auto-summarize setting changes
+          if (this.settings.autoSummarize === true && oldAutoSummarize !== true) {
+            console.log('✅ [ContentScript] Auto-summarize enabled, starting background generation');
             this.startBackgroundSummaryGeneration();
-          }
-          // If auto-summarize was disabled, stop any ongoing generation and clear pre-loaded summary
-          else if (!this.settings.autoSummarize && oldAutoSummarize) {
+          } else if (this.settings.autoSummarize !== true && oldAutoSummarize === true) {
             console.log('⏹️ [ContentScript] Auto-summarize disabled, stopping background generation');
             this.isGeneratingSummary = false;
-            this.preloadedSummary = null;
-            if (this.summaryService) {
-              this.summaryService.clearCache();
-            }
           }
 
           sendResponse({ success: true });
           break;
 
         case 'GENERATE_SUMMARY':
-          // First check if we have a pre-loaded summary
-          if (this.preloadedSummary && !this.isGeneratingSummary) {
-            console.log('🚀 [ContentScript] Using pre-loaded summary for instant display');
-            await this.showSummaryOverlay(this.preloadedSummary);
-            sendResponse({ ...this.preloadedSummary, instantLoad: true });
-          } else if (this.isGeneratingSummary) {
-            // Wait for background generation to complete
-            console.log('⏳ [ContentScript] Waiting for background generation to complete...');
-            let waitCount = 0;
-            const maxWait = 30; // 15 seconds max wait
-            const checkInterval = setInterval(async () => {
-              waitCount++;
-              if (this.preloadedSummary || waitCount >= maxWait) {
-                clearInterval(checkInterval);
-                if (this.preloadedSummary) {
-                  await this.showSummaryOverlay(this.preloadedSummary);
-                  sendResponse({ ...this.preloadedSummary, instantLoad: true });
-                } else {
-                  // Fallback to regular generation
-                  const summaryResult = await this.generateContentSummary(request.options);
-                  sendResponse(summaryResult);
-                }
-              }
-            }, 500);
+          console.log('📄 [ContentScript] Handling GENERATE_SUMMARY request...');
+
+          // Initialize summary service if needed
+          if (!this.summaryService) {
+            const initialized = await this.initializeSummaryService();
+            if (!initialized) {
+              sendResponse({ success: false, error: 'Failed to initialize summary service' });
+              break;
+            }
+          }
+
+          // Generate or get cached summary
+          const summaryResult = await this.summaryService.generateSummary(request.options);
+
+          if (summaryResult.success) {
+            // Show the summary overlay
+            await this.showSummaryOverlay(summaryResult);
+            sendResponse(summaryResult);
           } else {
-            // CHECK CACHE FIRST BEFORE GENERATING
-            console.log('🔍 [ContentScript] Checking cache before generating summary...');
-
-            // Initialize summary service if needed
-            if (!this.summaryService) {
-              const initialized = await this.initializeSummaryService();
-              if (!initialized) {
-                sendResponse({ success: false, error: 'Failed to initialize summary service' });
-                break;
-              }
-            }
-
-            // Check if we have cached data
-            const hasCached = await this.summaryService.hasSummaryForCurrentPage();
-            if (hasCached) {
-              console.log('✅ [ContentScript] CACHED SUMMARY EXISTS - USING CACHED DATA');
-              // Get the cached summary by calling generateSummary which will return cached data
-              const cachedResult = await this.summaryService.generateSummary(request.options);
-              if (cachedResult.success) {
-                await this.showSummaryOverlay(cachedResult);
-                sendResponse({ ...cachedResult, fromCache: true });
-              } else {
-                sendResponse(cachedResult);
-              }
-            } else {
-              console.log('❌ [ContentScript] No cached summary - generating new one');
-              const summaryResult = await this.generateContentSummary(request.options);
-              sendResponse(summaryResult);
-            }
+            sendResponse(summaryResult);
           }
           break;
 
         case 'SHOW_SUMMARY':
-          // Use pre-loaded summary if available and no data provided
-          const summaryData =
-            request.summaryData || (this.preloadedSummary ? this.preloadedSummary.summary : null);
-          const showResult = await this.showSummaryOverlay(summaryData);
+          // Show existing summary overlay
+          const showResult = await this.showSummaryOverlay(request.summaryData);
           sendResponse(showResult);
           break;
 
         case 'REGENERATE_SUMMARY':
-          const regenResult = await this.regenerateContentSummary();
+          // Clear cache and regenerate
+          if (this.summaryService) {
+            this.summaryService.clearCache();
+          }
+          // Trigger new generation
+          const regenResult = await this.summaryService.generateSummary({
+            ...request.options,
+            forceRegenerate: true,
+          });
+          if (regenResult.success) {
+            await this.showSummaryOverlay(regenResult);
+          }
           sendResponse(regenResult);
           break;
 
@@ -327,38 +283,33 @@ class ReadFocusContentScript {
           break;
 
         case 'CLEAR_SUMMARY_CACHE':
+          console.log('🗑️ [ContentScript] Clearing summary cache...');
           if (this.summaryService) {
             this.summaryService.clearCache();
           }
+          // Clear background generation state
+          this.isGeneratingSummary = false;
           sendResponse({ success: true });
           break;
 
         case 'CHECK_SUMMARY_EXISTS':
-          // Check if we have a pre-loaded summary or cached summary
-          const hasPreloaded = !!this.preloadedSummary;
-          let hasCached = false;
-          let isGenerating = this.isGeneratingSummary;
+          let exists = false;
+          let isGenerating = false;
 
-          // Check cached summary and active generation state from summary service
+          // Check if summary service has cached summary
           if (this.summaryService) {
-            hasCached = await this.summaryService.hasSummaryForCurrentPage();
-            // Also check if summary service has active requests
-            const serviceGenerating = this.summaryService.isActivelyGenerating();
-            isGenerating = isGenerating || serviceGenerating;
+            exists = await this.summaryService.hasSummaryForCurrentPage();
+            isGenerating = this.summaryService.isActivelyGenerating();
           }
 
-          console.log('📄 [ContentScript] Summary status check:', {
-            hasPreloaded,
-            hasCached,
-            isGenerating,
-            isGeneratingSummary: this.isGeneratingSummary,
-            serviceGenerating: this.summaryService?.isActivelyGenerating() || false,
-          });
+          // Also check background generation state
+          if (this.isGeneratingSummary) {
+            isGenerating = true;
+          }
 
           sendResponse({
-            exists: hasPreloaded || hasCached,
+            exists: exists,
             isGenerating: isGenerating,
-            preloaded: hasPreloaded,
           });
           break;
 
@@ -1908,43 +1859,6 @@ class ReadFocusContentScript {
     }
   }
 
-  /**
-   * Generate content summary
-   * @param {Object} options - Summary generation options
-   * @returns {Object} - Summary result
-   */
-  async generateContentSummary(options = {}) {
-    try {
-      console.log('📄 [ContentScript] Generating content summary...');
-
-      // Initialize summary service if needed
-      if (!this.summaryService) {
-        const initialized = await this.initializeSummaryService();
-        if (!initialized) {
-          throw new Error('Failed to initialize summary service');
-        }
-      }
-
-      // Generate summary
-      const summaryResult = await this.summaryService.generateSummary(options);
-
-      if (summaryResult.success) {
-        console.log('✅ [ContentScript] Summary generated successfully');
-      } else {
-        throw new Error(summaryResult.error || 'Summary generation failed');
-      }
-
-      return summaryResult;
-    } catch (error) {
-      console.error('❌ [ContentScript] Failed to generate summary:', error);
-
-      return {
-        success: false,
-        error: error.message,
-        timestamp: Date.now(),
-      };
-    }
-  }
 
   /**
    * Show summary overlay with given data
@@ -1961,26 +1875,16 @@ class ReadFocusContentScript {
           console.error('❌ [ContentScript] SummaryOverlay not available');
           throw new Error('Summary overlay component not loaded');
         }
-
         this.summaryOverlay = new SummaryOverlay();
       }
 
-      // If no data provided, try to get current summary
-      if (!summaryData) {
-        if (this.summaryService) {
-          summaryData = this.summaryService.getCurrentSummary();
-        }
+      // If no data provided, try to get current summary from service
+      if (!summaryData && this.summaryService) {
+        summaryData = this.summaryService.getCurrentSummary();
+      }
 
-        if (!summaryData) {
-          // Generate new summary
-          console.log('📄 [ContentScript] No summary data available, generating new summary...');
-          const generateResult = await this.generateContentSummary();
-          if (generateResult.success) {
-            summaryData = generateResult;
-          } else {
-            throw new Error('Failed to generate summary for display');
-          }
-        }
+      if (!summaryData) {
+        throw new Error('No summary data available to display');
       }
 
       // Show the overlay
@@ -1990,7 +1894,6 @@ class ReadFocusContentScript {
       return { success: true };
     } catch (error) {
       console.error('❌ [ContentScript] Failed to show summary overlay:', error);
-
       return {
         success: false,
         error: error.message,
@@ -2008,52 +1911,6 @@ class ReadFocusContentScript {
     }
   }
 
-  /**
-   * Regenerate content summary with new options
-   * @param {Object} options - New summary options
-   * @returns {Object} - Regeneration result
-   */
-  async regenerateContentSummary(options = {}) {
-    try {
-      console.log('📄 [ContentScript] Regenerating content summary...');
-
-      // Clear pre-loaded summary cache
-      this.preloadedSummary = null;
-      this.isGeneratingSummary = false;
-
-      // Clear cache if summary service exists
-      if (this.summaryService) {
-        this.summaryService.clearCache();
-      }
-
-      // Generate new summary
-      const summaryResult = await this.generateContentSummary({
-        ...options,
-        forceRegenerate: true,
-      });
-
-      if (summaryResult.success) {
-        // Update overlay if it's currently showing
-        if (this.summaryOverlay && this.summaryOverlay.isShowing()) {
-          await this.summaryOverlay.show(summaryResult);
-        }
-
-        return {
-          success: true,
-          summary: summaryResult,
-        };
-      } else {
-        throw new Error(summaryResult.error);
-      }
-    } catch (error) {
-      console.error('❌ [ContentScript] Failed to regenerate summary:', error);
-
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  }
 
   /**
    * Get summary service status

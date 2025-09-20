@@ -198,13 +198,13 @@ class SummaryOverlay {
         <!-- Tab Navigation -->
         <div class="rf-summary-tabs">
           <button class="rf-summary-tab ${this.activeTab === 'quick' ? 'active' : ''}" data-tab="quick">
-            <span class="rf-tab-icon">⚡</span>Quick Summary
+            <span class="rf-tab-icon">⚡</span>Summary
           </button>
           <button class="rf-summary-tab ${this.activeTab === 'detailed' ? 'active' : ''}" data-tab="detailed">
             <span class="rf-tab-icon">📖</span>Detailed
           </button>
           <button class="rf-summary-tab ${this.activeTab === 'eli15' ? 'active' : ''}" data-tab="eli15">
-            <span class="rf-tab-icon">👶</span>ELI15
+            <span class="rf-tab-icon">👶</span>ELI5
           </button>
           ${
             this.settings?.includeConcepts !== false

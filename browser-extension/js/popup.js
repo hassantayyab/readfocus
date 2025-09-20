@@ -110,6 +110,7 @@ class ReadFocusPopup {
       showQuizHints: true,
       trackComprehension: true,
       autoDetectArticles: true,
+      autoSummarize: true,
     };
   }
 
@@ -164,22 +165,12 @@ class ReadFocusPopup {
       this.openFeedbackForm();
     });
 
-    // Summary buttons - handle both generate and show functionality
+    // Simplified summarize button - always triggers summarization flow
     document.getElementById('generate-summary')?.addEventListener('click', async () => {
       const button = document.getElementById('generate-summary');
       if (!button || button.disabled) return;
 
-      // Check current status to determine action
-      const statusElement = document.getElementById('summary-status');
-      const currentStatus = statusElement ? statusElement.classList.contains('completed') : false;
-
-      if (currentStatus) {
-        // If summary is completed, show it
-        await this.showSummary();
-      } else {
-        // Otherwise, generate new summary
-        await this.generateSummary();
-      }
+      await this.handleSummarizeAction();
     });
 
     document.getElementById('show-summary')?.addEventListener('click', async () => {
@@ -615,17 +606,17 @@ class ReadFocusPopup {
   }
 
   /**
-   * Generate content summary
+   * Handle summarize button action - simplified flow
    */
-  async generateSummary() {
+  async handleSummarizeAction() {
     try {
-      this.updateSummaryStatus('processing', 'Generating...');
-      console.log('📄 [Popup] Generating content summary...');
+      this.updateSummaryStatus('processing', 'Working...');
+      console.log('📄 [Popup] Handling summarize action...');
 
-      // First ensure content scripts are injected
+      // Ensure content scripts are loaded
       await this.ensureContentScriptsInjected();
 
-      // Execute content script and generate summary with timeout
+      // Send request to content script
       const response = await Promise.race([
         chrome.tabs.sendMessage(this.currentTab.id, {
           type: 'GENERATE_SUMMARY',
@@ -634,28 +625,22 @@ class ReadFocusPopup {
             includeQuickSummary: true,
             includeDetailedSummary: true,
             includeActionItems: true,
-            maxLength: 'medium',
           },
         }),
         new Promise((_, reject) => {
-          setTimeout(
-            () => reject(new Error('Summary generation timeout - please try again')),
-            30000
-          );
+          setTimeout(() => reject(new Error('Request timeout')), 20000);
         }),
       ]);
 
       if (response && response.success) {
-        this.updateSummaryStatus('completed', 'Ready');
-        // Close popup after successful generation and show summary
-        setTimeout(() => {
-          this.showSummary();
-        }, 500);
+        console.log('✅ [Popup] Summary ready, closing popup');
+        // Close popup - summary overlay will show automatically
+        window.close();
       } else {
-        throw new Error(response?.error || 'Failed to generate summary');
+        throw new Error(response?.error || 'Failed to get summary');
       }
     } catch (error) {
-      console.error('❌ [Popup] Error generating summary:', error);
+      console.error('❌ [Popup] Summarize action failed:', error);
       this.updateSummaryStatus('error', 'Failed');
       this.showErrorMessage(error.message);
     }
@@ -700,66 +685,17 @@ class ReadFocusPopup {
   }
 
   /**
-   * Start polling to check status during background generation
+   * Cleanup method - remove status polling if exists
    */
-  startStatusPolling() {
-    // Clear any existing polling
+  cleanup() {
     if (this.statusPolling) {
       clearInterval(this.statusPolling);
+      this.statusPolling = null;
     }
-
-    console.log('📄 [Popup] Starting status polling for background generation...');
-
-    this.statusPolling = setInterval(async () => {
-      try {
-        const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-          type: 'CHECK_SUMMARY_EXISTS',
-        });
-
-        if (response && response.exists && !response.isGenerating) {
-          // Background generation completed!
-          console.log('📄 [Popup] Background generation completed - updating UI');
-
-          if (response.preloaded) {
-            this.updateSummaryStatus('completed', 'Ready');
-          } else {
-            this.updateSummaryStatus('completed', 'Available');
-          }
-
-          // Stop polling
-          clearInterval(this.statusPolling);
-          this.statusPolling = null;
-        } else if (!response || (!response.exists && !response.isGenerating)) {
-          // Generation failed or stopped
-          console.log('📄 [Popup] Background generation stopped - resetting UI');
-          this.updateSummaryStatus('ready', 'Ready');
-
-          // Stop polling
-          clearInterval(this.statusPolling);
-          this.statusPolling = null;
-        }
-        // If still generating, keep polling
-      } catch (error) {
-        console.log('📄 [Popup] Status polling error:', error.message);
-        // Stop polling on error
-        clearInterval(this.statusPolling);
-        this.statusPolling = null;
-      }
-    }, 2000); // Poll every 2 seconds
-
-    // Auto-stop polling after 2 minutes to avoid infinite polling
-    setTimeout(() => {
-      if (this.statusPolling) {
-        console.log('📄 [Popup] Auto-stopping status polling after timeout');
-        clearInterval(this.statusPolling);
-        this.statusPolling = null;
-        this.updateSummaryStatus('ready', 'Ready');
-      }
-    }, 120000); // 2 minutes
   }
 
   /**
-   * Update summary status indicator
+   * Update summary status indicator - simplified
    * @param {string} status - Status type (processing, completed, error, ready)
    * @param {string} text - Status text to display
    */
@@ -770,19 +706,16 @@ class ReadFocusPopup {
       statusElement.textContent = text;
     }
 
-    // Update button states based on status
+    // Update main button state
     const generateBtn = document.getElementById('generate-summary');
-    const showBtn = document.getElementById('show-summary');
-
     if (generateBtn) {
       const isProcessing = status === 'processing';
-      const hasCompleted = status === 'completed';
 
       generateBtn.disabled = isProcessing;
 
       if (isProcessing) {
-        generateBtn.innerHTML = '<span class="button-icon">⏳</span>Summarizing...';
-      } else if (hasCompleted) {
+        generateBtn.innerHTML = '<span class="button-icon">⏳</span>Working...';
+      } else if (status === 'completed') {
         generateBtn.innerHTML = '<span class="button-icon">👁️</span>View Summary';
       } else if (status === 'error') {
         generateBtn.innerHTML = '<span class="button-icon">🔄</span>Try Again';
@@ -791,53 +724,43 @@ class ReadFocusPopup {
       }
     }
 
-    // Update show button if it exists
+    // Hide secondary show button - main button handles everything
+    const showBtn = document.getElementById('show-summary');
     if (showBtn) {
-      showBtn.disabled = status !== 'completed';
-      showBtn.style.display = status === 'completed' ? 'flex' : 'none';
+      showBtn.style.display = 'none';
     }
   }
 
   /**
-   * Check if summary is available for current page
+   * Check summary status - simplified version
    */
   async checkSummaryStatus() {
     try {
-      // First check if content scripts are available
+      // Check if content scripts are available
       const scriptsInjected = await this.checkContentScriptsInjected();
       if (!scriptsInjected) {
-        console.log('Content scripts not loaded, will inject on demand');
+        // Start with ready state if no scripts are loaded yet
         this.updateSummaryStatus('ready', 'Ready');
         return;
       }
 
-      // Check if a summary already exists for this page with timeout
+      // Quick check for existing summary
       const response = await Promise.race([
-        chrome.tabs.sendMessage(this.currentTab.id, {
-          type: 'CHECK_SUMMARY_EXISTS',
-        }),
+        chrome.tabs.sendMessage(this.currentTab.id, { type: 'CHECK_SUMMARY_EXISTS' }),
         new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Summary status check timeout')), 2000);
+          setTimeout(() => reject(new Error('Status check timeout')), 3000);
         }),
       ]);
 
-      if (response && response.exists) {
-        if (response.preloaded) {
-          this.updateSummaryStatus('completed', 'Pre-loaded');
-        } else {
-          this.updateSummaryStatus('completed', 'Available');
-        }
-      } else if (response && response.isGenerating) {
+      if (response?.exists && !response.isGenerating) {
+        this.updateSummaryStatus('completed', 'Available');
+      } else if (response?.isGenerating) {
         this.updateSummaryStatus('processing', 'Generating...');
-        console.log('📄 [Popup] Background summary generation detected - disabling button');
-        // Start polling to check when background generation completes
-        this.startStatusPolling();
       } else {
         this.updateSummaryStatus('ready', 'Ready');
       }
     } catch (error) {
-      console.log('❌ [Popup] Error checking summary status:', error.message);
-      // Default to initial state
+      console.log('❌ [Popup] Status check failed, defaulting to ready');
       this.updateSummaryStatus('ready', 'Ready');
     }
   }
