@@ -1,10 +1,10 @@
 /**
- * Explert Content Script (Enhanced for Auto Focus Mode)
+ * Kuiqlee Content Script (Enhanced for Auto Focus Mode)
  * Handles article detection, content extraction, and Focus Mode overlay
  */
 
 
-class ExplertContentScript {
+class KuiqleeContentScript {
   constructor() {
     this.settings = {};
     this.isExtensionUrl = false;
@@ -21,7 +21,7 @@ class ExplertContentScript {
 
   // Make content script accessible to standalone highlighting
   static getInstance() {
-    return window.explertContentScriptInstance;
+    return window.kuiqleeContentScriptInstance;
   }
 
   async init() {
@@ -66,7 +66,7 @@ class ExplertContentScript {
         }
       }
     } catch (error) {
-      console.error('Error initializing Explert content script:', error);
+      console.error('Error initializing Kuiqlee content script:', error);
     }
   }
 
@@ -1750,13 +1750,13 @@ class ExplertContentScript {
 // Initialize content script
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    window.explertContentScriptInstance = new ExplertContentScript();
+    window.kuiqleeContentScriptInstance = new KuiqleeContentScript();
   });
 } else {
-  window.explertContentScriptInstance = new ExplertContentScript();
+  window.kuiqleeContentScriptInstance = new KuiqleeContentScript();
 }
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ExplertContentScript;
+  module.exports = KuiqleeContentScript;
 }

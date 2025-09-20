@@ -1,6 +1,6 @@
-// Explert Extension Background Service Worker
+// Kuiqlee Extension Background Service Worker
 
-class ExplertBackground {
+class KuiqleeBackground {
   constructor() {
     this.readfocusUrl = 'http://localhost:3000';
     this.init();
@@ -30,11 +30,11 @@ class ExplertBackground {
       this.handleIconClick(tab);
     });
 
-    console.log('Explert background script initialized');
+    console.log('Kuiqlee background script initialized');
   }
 
   handleInstallation(details) {
-    console.log('Explert extension installed:', details.reason);
+    console.log('Kuiqlee extension installed:', details.reason);
 
     if (details.reason === 'install') {
       // First time installation
@@ -42,21 +42,21 @@ class ExplertBackground {
       this.setDefaultSettings();
     } else if (details.reason === 'update') {
       // Extension updated
-      console.log('Explert extension updated');
+      console.log('Kuiqlee extension updated');
     }
   }
 
   createContextMenu() {
     chrome.contextMenus.create({
       id: 'readfocus-send-text',
-      title: 'Send to Explert',
+      title: 'Send to Kuiqlee',
       contexts: ['selection'],
       documentUrlPatterns: ['http://*/*', 'https://*/*'],
     });
 
     chrome.contextMenus.create({
       id: 'readfocus-capture-article',
-      title: 'Capture Article in Explert',
+      title: 'Capture Article in Kuiqlee',
       contexts: ['page'],
       documentUrlPatterns: ['http://*/*', 'https://*/*'],
     });
@@ -67,7 +67,7 @@ class ExplertBackground {
       switch (info.menuItemId) {
         case 'readfocus-send-text':
           if (info.selectionText) {
-            await this.sendTextToExplert(info.selectionText, 'Selected Text', tab.url);
+            await this.sendTextToKuiqlee(info.selectionText, 'Selected Text', tab.url);
           }
           break;
 
@@ -78,7 +78,7 @@ class ExplertBackground {
           });
 
           if (response && response.text) {
-            await this.sendTextToExplert(response.text, response.title, tab.url);
+            await this.sendTextToKuiqlee(response.text, response.title, tab.url);
           }
           break;
       }
@@ -90,8 +90,8 @@ class ExplertBackground {
 
   handleMessage(request, sender, sendResponse) {
     switch (request.action) {
-      case 'openExplert':
-        this.openExplert(request.text, request.title);
+      case 'openKuiqlee':
+        this.openKuiqlee(request.text, request.title);
         sendResponse({ success: true });
         break;
 
@@ -122,13 +122,13 @@ class ExplertBackground {
     console.log('Extension icon clicked');
   }
 
-  async sendTextToExplert(text, title = 'Captured Text', sourceUrl = '') {
+  async sendTextToKuiqlee(text, title = 'Captured Text', sourceUrl = '') {
     try {
       if (!text || text.trim().length < 10) {
         throw new Error('Text too short');
       }
 
-      // Store text data for Explert to pick up
+      // Store text data for Kuiqlee to pick up
       const textData = {
         text: text.trim(),
         title: title || 'Captured Text',
@@ -142,21 +142,21 @@ class ExplertBackground {
         readfocus_captured_text: textData,
       });
 
-      // Create Explert URL with text data as URL parameters (as backup)
+      // Create Kuiqlee URL with text data as URL parameters (as backup)
       const encodedText = encodeURIComponent(textData.text.substring(0, 2000)); // Limit URL length
       const encodedTitle = encodeURIComponent(textData.title);
       const readfocusUrl = `${this.readfocusUrl}?source=extension&id=${textData.id}&text=${encodedText}&title=${encodedTitle}`;
 
       await chrome.tabs.create({ url: readfocusUrl });
 
-      this.showSuccessNotification('Text sent to Explert!');
+      this.showSuccessNotification('Text sent to Kuiqlee!');
     } catch (error) {
-      console.error('Error sending text to Explert:', error);
-      this.showErrorNotification('Failed to send text to Explert');
+      console.error('Error sending text to Kuiqlee:', error);
+      this.showErrorNotification('Failed to send text to Kuiqlee');
     }
   }
 
-  async openExplert(text = '', title = '') {
+  async openKuiqlee(text = '', title = '') {
     try {
       let url = this.readfocusUrl;
 
@@ -180,7 +180,7 @@ class ExplertBackground {
 
       await chrome.tabs.create({ url: url });
     } catch (error) {
-      console.error('Error opening Explert:', error);
+      console.error('Error opening Kuiqlee:', error);
     }
   }
 
@@ -194,16 +194,16 @@ class ExplertBackground {
 
   showWelcomeNotification() {
     console.log(
-      'Explert extension installed successfully! Right-click on any text to send it to Explert for guided reading.'
+      'Kuiqlee extension installed successfully! Right-click on any text to send it to Kuiqlee for guided reading.'
     );
   }
 
   showSuccessNotification(message) {
-    console.log('Explert:', message);
+    console.log('Kuiqlee:', message);
   }
 
   showErrorNotification(message) {
-    console.error('Explert Error:', message);
+    console.error('Kuiqlee Error:', message);
   }
 
   async getSettings() {
@@ -253,4 +253,4 @@ class ExplertBackground {
 }
 
 // Initialize background script
-new ExplertBackground();
+new KuiqleeBackground();

@@ -1,9 +1,9 @@
 /**
- * Explert Options Page Controller
+ * Kuiqlee Options Page Controller
  * Handles AI summarization settings, storage, and user preferences
  */
 
-class ExplertOptions {
+class KuiqleeOptions {
   constructor() {
     this.defaultSettings = {
       // Summary Configuration
@@ -504,10 +504,10 @@ Usage Statistics:
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  new ExplertOptions();
+  new KuiqleeOptions();
 });
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ExplertOptions;
+  module.exports = KuiqleeOptions;
 }

@@ -1,9 +1,9 @@
 /**
- * Explert Popup Controller (Enhanced for Auto Focus Mode)
+ * Kuiqlee Popup Controller (Enhanced for Auto Focus Mode)
  * Handles popup UI, settings display, and Focus Mode activation
  */
 
-class ExplertPopup {
+class KuiqleePopup {
   constructor() {
     this.currentTab = null;
     this.pageStatus = null;
@@ -524,7 +524,7 @@ class ExplertPopup {
     }
 
     this.showErrorMessage(
-      'Explert only works on regular web pages (http/https). Please navigate to a website to use summary features.'
+      'Kuiqlee only works on regular web pages (http/https). Please navigate to a website to use summary features.'
     );
   }
 
@@ -627,12 +627,8 @@ class ExplertPopup {
 
       if (isProcessing) {
         generateBtn.innerHTML = '<span class="button-icon">⏳</span>Working...';
-      } else if (status === 'completed') {
-        generateBtn.innerHTML = '<span class="button-icon">👁️</span>View Summary';
-      } else if (status === 'error') {
-        generateBtn.innerHTML = '<span class="button-icon">🔄</span>Try Again';
       } else {
-        generateBtn.innerHTML = '<span class="button-icon">⚡</span>Summarize';
+        generateBtn.innerHTML = '<span class="button-icon">⚡</span>Understand';
       }
     }
 
@@ -726,10 +722,10 @@ class ExplertPopup {
 
 // Initialize popup when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  new ExplertPopup();
+  new KuiqleePopup();
 });
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ExplertPopup;
+  module.exports = KuiqleePopup;
 }

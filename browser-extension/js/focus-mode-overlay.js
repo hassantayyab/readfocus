@@ -417,8 +417,8 @@ class FocusModeOverlay {
       <div class="rf-overlay-container">
         <header class="rf-header">
           <div class="rf-header-left">
-            <img src="${chrome.runtime.getURL('icons/icon32.png')}" alt="Explert" class="rf-logo">
-            <span class="rf-title">Explert</span>
+            <img src="${chrome.runtime.getURL('icons/icon32.png')}" alt="Kuiqlee" class="rf-logo">
+            <span class="rf-title">Kuiqlee</span>
           </div>
           <div class="rf-header-right">
             <button class="rf-btn rf-btn-icon" id="rf-settings-btn" title="Settings">
