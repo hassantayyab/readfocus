@@ -58,7 +58,7 @@ class ExplertPopup {
         ),
       ]).catch(() => {
         // Default to ready, but try again after a short delay
-        this.updateSummaryStatus('ready', 'Ready');
+        this.updateSummaryStatus('ready');
         setTimeout(() => this.checkSummaryStatus(), 500);
       });
 
@@ -428,7 +428,7 @@ class ExplertPopup {
    */
   showBasicInterface() {
     // Ensure basic functionality is available even if some features fail
-    this.updateSummaryStatus('ready', 'Ready');
+    this.updateSummaryStatus('ready');
   }
 
   /**
@@ -533,7 +533,7 @@ class ExplertPopup {
    */
   async handleSummarizeAction() {
     try {
-      this.updateSummaryStatus('processing', 'Working...');
+      this.updateSummaryStatus('processing');
 
       // Ensure content scripts are loaded
       await this.ensureContentScriptsInjected();
@@ -562,7 +562,7 @@ class ExplertPopup {
       }
     } catch (error) {
       console.error('Summarize action failed:', error);
-      this.updateSummaryStatus('error', 'Failed');
+      this.updateSummaryStatus('error');
       this.showErrorMessage(error.message);
     }
   }
@@ -614,17 +614,10 @@ class ExplertPopup {
   }
 
   /**
-   * Update summary status indicator - simplified
+   * Update summary button state
    * @param {string} status - Status type (processing, completed, error, ready)
-   * @param {string} text - Status text to display
    */
-  updateSummaryStatus(status, text) {
-    const statusElement = document.getElementById('summary-status');
-    if (statusElement) {
-      statusElement.className = `summary-status ${status}`;
-      statusElement.textContent = text;
-    }
-
+  updateSummaryStatus(status) {
     // Update main button state
     const generateBtn = document.getElementById('generate-summary');
     if (generateBtn) {
@@ -668,10 +661,10 @@ class ExplertPopup {
           ]);
 
           if (response?.exists && !response.isGenerating) {
-            this.updateSummaryStatus('completed', 'Available');
+            this.updateSummaryStatus('completed');
             return;
           } else if (response?.isGenerating) {
-            this.updateSummaryStatus('processing', 'Generating...');
+            this.updateSummaryStatus('processing');
             return;
           }
         } catch (contentScriptError) {
@@ -682,12 +675,12 @@ class ExplertPopup {
       // Fallback: Check local storage directly
       const summaryExists = await this.checkSummaryExistsInStorage();
       if (summaryExists) {
-        this.updateSummaryStatus('completed', 'Available');
+        this.updateSummaryStatus('completed');
       } else {
-        this.updateSummaryStatus('ready', 'Ready');
+        this.updateSummaryStatus('ready');
       }
     } catch (error) {
-      this.updateSummaryStatus('ready', 'Ready');
+      this.updateSummaryStatus('ready');
     }
   }
 

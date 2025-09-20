@@ -320,34 +320,6 @@ body {
   flex: 1;
 }
 
-.summary-status {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 12px;
-  text-transform: uppercase;
-}
-
-.summary-status.ready {
-  background-color: rgba(0, 0, 0, 0.1);
-  color: #000000;
-}
-
-.summary-status.processing {
-  background-color: rgba(102, 102, 102, 0.1);
-  color: #666666;
-  animation: pulse 2s infinite;
-}
-
-.summary-status.completed {
-  background-color: rgba(0, 0, 0, 0.1);
-  color: #000000;
-}
-
-.summary-status.error {
-  background-color: rgba(102, 102, 102, 0.1);
-  color: #666666;
-}
 
 .summary-description {
   font-size: 13px;
