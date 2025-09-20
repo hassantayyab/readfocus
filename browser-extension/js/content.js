@@ -211,7 +211,6 @@ class ExplertContentScript {
       if (summaryResult.success) {
         // Show the summary overlay
         await this.showSummaryOverlay(summaryResult);
-        this.showNotification('Summary generated successfully', 'info');
       } else {
         this.showNotification(summaryResult.error || 'Failed to generate summary', 'error');
       }

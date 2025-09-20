@@ -190,7 +190,6 @@ class ContentSummaryService {
       includeConcepts = true,
     } = options;
 
-
     // Build comprehensive prompt
     const prompt = this.buildSummaryPrompt(content, metadata, {
       includeKeyPoints,
@@ -399,7 +398,7 @@ Return only the JSON object, no additional text.`;
                 'Detailed summary not available',
             }
           : null,
-        eliSummary: summary.eliSummary || summary.eli_summary || 'ELI15 summary not available',
+        eliSummary: summary.eliSummary || summary.eli_summary || 'ELI5 summary not available',
         conceptDictionary: Array.isArray(summary.conceptDictionary)
           ? summary.conceptDictionary
           : Array.isArray(summary.concept_dictionary)
@@ -528,7 +527,7 @@ Return only the JSON object, no additional text.`;
       includeQuickSummary: options.includeQuickSummary,
       includeDetailedSummary: options.includeDetailedSummary,
       includeActionItems: options.includeActionItems,
-      includeConcepts: options.includeConcepts
+      includeConcepts: options.includeConcepts,
     };
 
     const optionsHash = this.simpleHash(JSON.stringify(optionsSignature));
@@ -549,7 +548,6 @@ Return only the JSON object, no additional text.`;
     }
     return Math.abs(hash).toString(36);
   }
-
 
   /**
    * Store summary result in Chrome storage
@@ -726,4 +724,3 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ContentSummaryService;
 }
-
