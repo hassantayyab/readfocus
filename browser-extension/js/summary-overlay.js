@@ -396,13 +396,16 @@ class SummaryOverlay {
 
     const actionsHTML = actionItems
       .map(
-        (action, index) => `
+        (action, index) => {
+          // Remove leading bullet points, dashes, or asterisks from the action text
+          const cleanedAction = action.replace(/^[•·\-*]\s*/, '');
+          return `
       <div class="rf-action-item">
-        <div class="rf-action-icon">🎯</div>
-        <div class="rf-action-text">${action}</div>
-        <button class="rf-action-done" title="Mark as done">✓</button>
+        <div class="rf-action-number">${index + 1}</div>
+        <div class="rf-action-text">${cleanedAction}</div>
       </div>
-    `
+    `;
+        }
       )
       .join('');
 
@@ -570,13 +573,6 @@ class SummaryOverlay {
     const settingsBtn = this.overlay.querySelector('#rf-open-settings');
     settingsBtn?.addEventListener('click', () => this.openSettings());
 
-    // Action item done buttons
-    const doneButtons = this.overlay.querySelectorAll('.rf-action-done');
-    doneButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
-        e.target.closest('.rf-action-item').classList.toggle('rf-action-completed');
-      });
-    });
 
     // Click outside to close - with protection against immediate closure
     this.overlay.addEventListener(
@@ -631,13 +627,6 @@ class SummaryOverlay {
       return;
     }
 
-    // Action item done buttons
-    const doneButtons = this.overlay.querySelectorAll('.rf-action-done');
-    doneButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
-        e.target.closest('.rf-action-item').classList.toggle('rf-action-completed');
-      });
-    });
   }
 
   /**
@@ -1381,62 +1370,94 @@ class SummaryOverlay {
       .rf-action-items-list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 16px;
         text-align: left;
       }
-      
+
+      .rf-action-items-list ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .rf-action-items-list li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .rf-action-items-list li::marker {
+        display: none;
+      }
+
       .rf-action-item {
         display: flex;
-        align-items: center;
-        gap: 12px;
+        gap: 16px;
         padding: 16px;
         background: #f8f8f8;
         border-radius: 12px;
-        border-left: 4px solid #666666;
+        border-left: 4px solid #000000;
         border: 1px solid #e8e8e8;
-        transition: all 0.2s;
       }
-      
-      .rf-action-item.rf-action-completed {
-        background: #f0f0f0;
-        border-left-color: #000000;
-        opacity: 0.7;
+
+      .rf-action-item ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
       }
-      
-      .rf-action-item.rf-action-completed .rf-action-text {
-        text-decoration: line-through;
+
+      .rf-action-item li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
       }
-      
-      .rf-action-icon {
-        font-size: 18px;
-        flex-shrink: 0;
+
+      .rf-action-item li::marker {
+        display: none;
       }
-      
-      .rf-action-text {
-        flex: 1;
-        color: #333333;
-        line-height: 1.5;
-      }
-      
-      .rf-action-done {
+
+      .rf-action-number {
         background: #000000;
         color: white;
-        border: none;
-        border-radius: 50%;
         width: 28px;
         height: 28px;
-        cursor: pointer;
-        font-size: 14px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s;
+        font-size: 14px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .rf-action-text {
+        color: #333333;
+        line-height: 1.6;
+        font-size: 15px;
+        text-align: left;
+      }
+
+      .rf-action-text ul {
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .rf-action-text li {
+        list-style: none !important;
+        list-style-type: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .rf-action-text li::marker {
+        display: none !important;
+      }
+
+      .rf-action-text li::before {
+        display: none !important;
       }
       
-      .rf-action-done:hover {
-        background: #333333;
-        transform: scale(1.1);
-      }
       
       .rf-summary-footer {
         background: #f8f8f8;

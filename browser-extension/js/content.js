@@ -41,6 +41,11 @@ class ExplertContentScript {
         return true; // Keep message channel open for async responses
       });
 
+      // Add keyboard shortcut listener
+      document.addEventListener('keydown', (event) => {
+        this.handleKeyboardShortcuts(event);
+      });
+
       // Start background summary generation only if auto-summarize is enabled
       if (this.settings.autoSummarize === true) {
         if (document.readyState === 'complete') {
@@ -133,6 +138,13 @@ class ExplertContentScript {
    * Handle keyboard shortcuts
    */
   handleKeyboardShortcuts(event) {
+    // Trigger Summarization: Cmd/Ctrl + Shift + S
+    if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'S') {
+      event.preventDefault();
+      this.triggerSummarization();
+      return;
+    }
+
     // Toggle Focus Mode: Cmd/Ctrl + Shift + F
     if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'F') {
       event.preventDefault();
@@ -171,6 +183,41 @@ class ExplertContentScript {
     if (event.key === 'q' || event.key === 'Q') {
       event.preventDefault();
       this.focusMode.showQuiz();
+    }
+  }
+
+  /**
+   * Trigger summarization via keyboard shortcut
+   */
+  async triggerSummarization() {
+    try {
+      // Initialize summary service if needed
+      if (!this.summaryService) {
+        const initialized = await this.initializeSummaryService();
+        if (!initialized) {
+          this.showNotification('Failed to initialize summary service', 'error');
+          return;
+        }
+      }
+
+      // Generate or get cached summary
+      const summaryResult = await this.summaryService.generateSummary({
+        includeKeyPoints: true,
+        includeQuickSummary: true,
+        includeDetailedSummary: true,
+        includeActionItems: true,
+      });
+
+      if (summaryResult.success) {
+        // Show the summary overlay
+        await this.showSummaryOverlay(summaryResult);
+        this.showNotification('Summary generated successfully', 'info');
+      } else {
+        this.showNotification(summaryResult.error || 'Failed to generate summary', 'error');
+      }
+    } catch (error) {
+      console.error('Error triggering summarization:', error);
+      this.showNotification('Error generating summary', 'error');
     }
   }
 
