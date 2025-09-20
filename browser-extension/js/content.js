@@ -46,6 +46,15 @@ class ExplertContentScript {
         this.handleKeyboardShortcuts(event);
       });
 
+      // Check for existing summary and show immediately
+      if (document.readyState === 'complete') {
+        this.checkAndShowExistingSummary();
+      } else {
+        window.addEventListener('load', () => {
+          this.checkAndShowExistingSummary();
+        });
+      }
+
       // Start background summary generation only if auto-summarize is enabled
       if (this.settings.autoSummarize === true) {
         if (document.readyState === 'complete') {
@@ -71,6 +80,44 @@ class ExplertContentScript {
     } catch (error) {
       console.error('Error loading settings:', error);
       this.settings = this.getDefaultSettings();
+    }
+  }
+
+  /**
+   * Check for existing summary and show it immediately if available
+   */
+  async checkAndShowExistingSummary() {
+    try {
+      // Only auto-show if auto-summarize is enabled
+      if (!this.settings.autoSummarize) {
+        return;
+      }
+
+      // Initialize summary service if needed
+      if (!this.summaryService) {
+        const initialized = await this.initializeSummaryService();
+        if (!initialized) {
+          return; // Fail silently, don't block page load
+        }
+      }
+
+      // Check if summary exists for current page
+      const hasExisting = await this.summaryService.hasSummaryForCurrentPage();
+      if (!hasExisting) {
+        return; // No existing summary, nothing to show
+      }
+
+      // Get the existing summary
+      const storageKey = this.summaryService.getCurrentStorageKey();
+      const existingSummary = await this.summaryService.getStoredSummary(storageKey);
+
+      if (existingSummary && existingSummary.success) {
+        // Show the existing summary immediately
+        await this.showSummaryOverlay(existingSummary);
+      }
+    } catch (error) {
+      // Fail silently to not interfere with normal page operation
+      console.log('Could not load existing summary on page load:', error);
     }
   }
 

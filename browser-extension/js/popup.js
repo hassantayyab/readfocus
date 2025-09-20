@@ -54,10 +54,12 @@ class ExplertPopup {
       await Promise.race([
         this.checkSummaryStatus(),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Summary status check timeout')), 2000)
+          setTimeout(() => reject(new Error('Summary status check timeout')), 3000)
         ),
       ]).catch(() => {
+        // Default to ready, but try again after a short delay
         this.updateSummaryStatus('ready', 'Ready');
+        setTimeout(() => this.checkSummaryStatus(), 500);
       });
 
       if (this.initTimeout) {
@@ -708,32 +710,79 @@ class ExplertPopup {
    */
   async checkSummaryStatus() {
     try {
-      // Check if content scripts are available
+      // First try to check content script
       const scriptsInjected = await this.checkContentScriptsInjected();
-      if (!scriptsInjected) {
-        // Start with ready state if no scripts are loaded yet
-        this.updateSummaryStatus('ready', 'Ready');
-        return;
+      if (scriptsInjected) {
+        try {
+          // Quick check for existing summary via content script
+          const response = await Promise.race([
+            chrome.tabs.sendMessage(this.currentTab.id, { type: 'CHECK_SUMMARY_EXISTS' }),
+            new Promise((_, reject) => {
+              setTimeout(() => reject(new Error('Status check timeout')), 2000);
+            }),
+          ]);
+
+          if (response?.exists && !response.isGenerating) {
+            this.updateSummaryStatus('completed', 'Available');
+            return;
+          } else if (response?.isGenerating) {
+            this.updateSummaryStatus('processing', 'Generating...');
+            return;
+          }
+        } catch (contentScriptError) {
+          // Content script failed, fall through to direct storage check
+        }
       }
 
-      // Quick check for existing summary
-      const response = await Promise.race([
-        chrome.tabs.sendMessage(this.currentTab.id, { type: 'CHECK_SUMMARY_EXISTS' }),
-        new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Status check timeout')), 3000);
-        }),
-      ]);
-
-      if (response?.exists && !response.isGenerating) {
+      // Fallback: Check local storage directly
+      const summaryExists = await this.checkSummaryExistsInStorage();
+      if (summaryExists) {
         this.updateSummaryStatus('completed', 'Available');
-      } else if (response?.isGenerating) {
-        this.updateSummaryStatus('processing', 'Generating...');
       } else {
         this.updateSummaryStatus('ready', 'Ready');
       }
     } catch (error) {
       this.updateSummaryStatus('ready', 'Ready');
     }
+  }
+
+  /**
+   * Check if summary exists in local storage directly
+   */
+  async checkSummaryExistsInStorage() {
+    try {
+      // Get all stored summaries
+      const result = await chrome.storage.local.get(['readfocus_summaries']);
+      const summaries = result.readfocus_summaries || {};
+
+      // Generate storage key using same logic as content script
+      const url = this.currentTab.url.split('#')[0].split('?')[0]; // Remove hash and query params
+      const optionsSignature = {
+        includeKeyPoints: true,
+        includeQuickSummary: true,
+        includeDetailedSummary: true,
+        includeActionItems: true,
+      };
+      const optionsHash = this.simpleHash(JSON.stringify(optionsSignature));
+      const storageKey = `${url}_${optionsHash}`;
+
+      return !!summaries[storageKey];
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Simple hash function (same as content script)
+   */
+  simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(36);
   }
 }
 
