@@ -149,10 +149,6 @@ class ExplertPopup {
       this.openSettings();
     });
 
-    // Clear cache button
-    document.getElementById('clear-cache')?.addEventListener('click', () => {
-      this.clearSummaryCache();
-    });
 
     // Feedback button
     document.getElementById('send-feedback')?.addEventListener('click', () => {
@@ -199,57 +195,6 @@ class ExplertPopup {
     }
   }
 
-  /**
-   * Clear summary cache
-   */
-  async clearSummaryCache() {
-    try {
-      // Update button state
-      const clearBtn = document.getElementById('clear-cache');
-      if (clearBtn) {
-        clearBtn.disabled = true;
-        clearBtn.innerHTML = '<span class="button-icon">⏳</span>Clearing...';
-      }
-
-      // First check if content scripts are available
-      const scriptsInjected = await this.checkContentScriptsInjected();
-      if (!scriptsInjected) {
-        // Just clear local storage if no content scripts
-        await chrome.storage.local.clear();
-        this.updateSummaryStatus('ready', 'Ready');
-        this.showSuccessMessage('Cache cleared!');
-        return;
-      }
-
-      // Send message to content script to clear cache with timeout
-      const response = await Promise.race([
-        chrome.tabs.sendMessage(this.currentTab.id, {
-          type: 'CLEAR_SUMMARY_CACHE',
-        }),
-        new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Clear cache timeout')), 3000);
-        }),
-      ]);
-
-      if (response && response.success) {
-        // Reset summary status to initial state
-        this.updateSummaryStatus('ready', 'Ready');
-        this.showSuccessMessage('Cache cleared successfully!');
-      } else {
-        throw new Error(response?.error || 'Failed to clear cache');
-      }
-    } catch (error) {
-      console.error('Error clearing cache:', error);
-      this.showErrorMessage(error.message);
-    } finally {
-      // Restore button state
-      const clearBtn = document.getElementById('clear-cache');
-      if (clearBtn) {
-        clearBtn.disabled = false;
-        clearBtn.innerHTML = '<span class="button-icon">🗑️</span>Clear Cache';
-      }
-    }
-  }
 
   /**
    * Open settings page
