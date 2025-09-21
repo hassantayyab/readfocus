@@ -6,7 +6,7 @@
 
   "permissions": ["activeTab", "storage", "contextMenus", "scripting"],
 
-  "host_permissions": ["https://readfocus-api.vercel.app/*"],
+  "host_permissions": ["https://*/*"],
 
   "action": {
     "default_popup": "popup.html",
