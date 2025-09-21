@@ -246,17 +246,70 @@ class ContentSummaryService {
    */
   parseSummaryResponse(response) {
     try {
+      console.log('🔍 [DEBUG] Raw response type:', typeof response);
+      console.log('🔍 [DEBUG] Raw response length:', response?.length);
+      console.log('🔍 [DEBUG] Raw response preview:', response?.substring(0, 200));
+
       // Clean response
       let cleanResponse = response.trim();
 
       // Extract JSON if wrapped in code blocks
       const jsonMatch = cleanResponse.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
       if (jsonMatch) {
+        console.log('🔍 [DEBUG] Found code block, extracting JSON');
         cleanResponse = jsonMatch[1];
       }
 
-      // Parse JSON
-      const summary = JSON.parse(cleanResponse);
+      console.log('🔍 [DEBUG] Clean response length:', cleanResponse.length);
+      console.log('🔍 [DEBUG] Clean response at position 1548:', cleanResponse.substring(1540, 1560));
+
+      // Find problematic characters
+      for (let i = 0; i < cleanResponse.length; i++) {
+        const char = cleanResponse[i];
+        const charCode = char.charCodeAt(0);
+        if (charCode < 32 && charCode !== 9 && charCode !== 10 && charCode !== 13) {
+          console.log(`🔍 [DEBUG] Found control character at position ${i}: charCode=${charCode}, char="${char}"`);
+        }
+      }
+
+      // Simple but effective JSON parsing with control character handling
+      let summary;
+
+      try {
+        // First attempt: direct parsing
+        summary = JSON.parse(cleanResponse);
+        console.log('✅ [DEBUG] Direct parsing successful');
+      } catch (firstError) {
+        console.log('❌ [DEBUG] Direct parsing failed:', firstError.message);
+
+        // Extract error position for debugging
+        const posMatch = firstError.message.match(/position (\d+)/);
+        const errorPos = posMatch ? parseInt(posMatch[1]) : 1548;
+        console.log('🔍 [DEBUG] Error position context:', cleanResponse.substring(Math.max(0, errorPos-50), errorPos+50));
+
+        try {
+          // Second attempt: clean control characters by simple removal
+          const cleanedResponse = cleanResponse.replace(/[\x00-\x1F\x7F]/g, '');
+          summary = JSON.parse(cleanedResponse);
+          console.log('✅ [DEBUG] Cleaned parsing successful');
+        } catch (secondError) {
+          console.log('❌ [DEBUG] Cleaned parsing failed:', secondError.message);
+
+          try {
+            // Third attempt: more aggressive cleaning
+            const sanitizedResponse = cleanResponse
+              .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove all control chars except \t and \n
+              .replace(/\n/g, '\\n')  // Escape remaining newlines
+              .replace(/\t/g, '\\t'); // Escape remaining tabs
+
+            summary = JSON.parse(sanitizedResponse);
+            console.log('✅ [DEBUG] Sanitized parsing successful');
+          } catch (thirdError) {
+            console.log('❌ [DEBUG] All parsing attempts failed');
+            throw new Error(`JSON parsing failed: ${firstError.message}`);
+          }
+        }
+      }
 
       // Validate and structure
       const result = {
