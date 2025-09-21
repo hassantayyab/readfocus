@@ -189,35 +189,45 @@ class SummaryOverlay {
         <!-- Header -->
         <div class="rf-summary-header">
           <div class="rf-summary-title">
-            <span class="rf-summary-icon">📄</span>
-            <h2>Content Summary</h2>
+            <span class="rf-summary-icon">🧠</span>
+            <h2>Learn Quickly</h2>
           </div>
           <button class="rf-summary-close" title="Close Summary">×</button>
         </div>
 
         <!-- Tab Navigation -->
         <div class="rf-summary-tabs">
-          <button class="rf-summary-tab ${this.activeTab === 'quick' ? 'active' : ''}" data-tab="quick">
+          <button class="rf-summary-tab ${
+            this.activeTab === 'quick' ? 'active' : ''
+          }" data-tab="quick">
             <span class="rf-tab-icon">⚡</span>Summary
           </button>
-          <button class="rf-summary-tab ${this.activeTab === 'detailed' ? 'active' : ''}" data-tab="detailed">
+          <button class="rf-summary-tab ${
+            this.activeTab === 'detailed' ? 'active' : ''
+          }" data-tab="detailed">
             <span class="rf-tab-icon">📖</span>Detailed
           </button>
-          <button class="rf-summary-tab ${this.activeTab === 'eli15' ? 'active' : ''}" data-tab="eli15">
+          <button class="rf-summary-tab ${
+            this.activeTab === 'eli15' ? 'active' : ''
+          }" data-tab="eli15">
             <span class="rf-tab-icon">👶</span>ELI5
           </button>
           ${
             this.settings?.includeConcepts !== false
               ? `
-          <button class="rf-summary-tab ${this.activeTab === 'concepts' ? 'active' : ''}" data-tab="concepts">
-            <span class="rf-tab-icon">📚</span>Concepts
+          <button class="rf-summary-tab ${
+            this.activeTab === 'concepts' ? 'active' : ''
+          }" data-tab="concepts">
+            <span class="rf-tab-icon">💡</span>Concepts
           </button>`
               : ''
           }
           ${
             this.settings?.includeKeyPoints !== false
               ? `
-          <button class="rf-summary-tab ${this.activeTab === 'points' ? 'active' : ''}" data-tab="points">
+          <button class="rf-summary-tab ${
+            this.activeTab === 'points' ? 'active' : ''
+          }" data-tab="points">
             <span class="rf-tab-icon">📌</span>Key Points
           </button>`
               : ''
@@ -225,7 +235,9 @@ class SummaryOverlay {
           ${
             this.settings?.includeActionItems !== false
               ? `
-          <button class="rf-summary-tab ${this.activeTab === 'actions' ? 'active' : ''}" data-tab="actions">
+          <button class="rf-summary-tab ${
+            this.activeTab === 'actions' ? 'active' : ''
+          }" data-tab="actions">
             <span class="rf-tab-icon">🎯</span>Actions
           </button>`
               : ''
@@ -395,18 +407,16 @@ class SummaryOverlay {
     }
 
     const actionsHTML = actionItems
-      .map(
-        (action, index) => {
-          // Remove leading bullet points, dashes, or asterisks from the action text
-          const cleanedAction = action.replace(/^[•·\-*]\s*/, '');
-          return `
+      .map((action, index) => {
+        // Remove leading bullet points, dashes, or asterisks from the action text
+        const cleanedAction = action.replace(/^[•·\-*]\s*/, '');
+        return `
       <div class="rf-action-item">
         <div class="rf-action-number">${index + 1}</div>
         <div class="rf-action-text">${cleanedAction}</div>
       </div>
     `;
-        }
-      )
+      })
       .join('');
 
     return `
@@ -460,14 +470,22 @@ class SummaryOverlay {
         (concept, index) => `
       <div class="rf-concept-item">
         <div class="rf-concept-term">
-          <span class="rf-concept-icon">📚</span>
+          <span class="rf-concept-icon">${index + 1}</span>
           ${concept.term}
         </div>
         <div class="rf-concept-definition">${concept.definition}</div>
-        ${concept.analogy ? `<div class="rf-concept-analogy">💡 <strong>Like:</strong> ${concept.analogy}</div>` : ''}
-        ${concept.example ? `<div class="rf-concept-example">📋 <strong>Example:</strong> ${concept.example}</div>` : ''}
+        ${
+          concept.analogy
+            ? `<div class="rf-concept-analogy">💡 <strong>Like:</strong> ${concept.analogy}</div>`
+            : ''
+        }
+        ${
+          concept.example
+            ? `<div class="rf-concept-example">📋 <strong>Example:</strong> ${concept.example}</div>`
+            : ''
+        }
       </div>
-    `
+    `,
       )
       .join('');
 
@@ -495,7 +513,7 @@ class SummaryOverlay {
       .map(
         (topic) => `
       <span class="rf-topic-tag">${topic}</span>
-    `
+    `,
       )
       .join('');
 
@@ -573,7 +591,6 @@ class SummaryOverlay {
     const settingsBtn = this.overlay.querySelector('#rf-open-settings');
     settingsBtn?.addEventListener('click', () => this.openSettings());
 
-
     // Click outside to close - with protection against immediate closure
     this.overlay.addEventListener(
       'click',
@@ -585,7 +602,7 @@ class SummaryOverlay {
           this.hide();
         }
       },
-      true
+      true,
     ); // Use capture phase to handle events before they bubble
 
     // Keyboard shortcuts
@@ -626,7 +643,6 @@ class SummaryOverlay {
     if (!this.overlay) {
       return;
     }
-
   }
 
   /**
@@ -952,7 +968,7 @@ class SummaryOverlay {
       else if (trimmedLine.match(/^\s{2,}[-•*] /)) {
         const content = trimmedLine.replace(/^\s+[-•*] /, '');
         listItems.push(
-          `<li style="margin-left: 20px;">${this.processInlineMarkdown(content)}</li>`
+          `<li style="margin-left: 20px;">${this.processInlineMarkdown(content)}</li>`,
         );
         if (!inList) inList = 'ul';
       }
@@ -1066,7 +1082,10 @@ class SummaryOverlay {
     let headerProcessed = false;
 
     for (const row of rows) {
-      const cells = row.content.split('|').map(cell => cell.trim()).filter(cell => cell !== '');
+      const cells = row.content
+        .split('|')
+        .map((cell) => cell.trim())
+        .filter((cell) => cell !== '');
 
       if (cells.length === 0) continue;
 

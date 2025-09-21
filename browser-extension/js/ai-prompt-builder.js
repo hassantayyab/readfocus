@@ -32,7 +32,9 @@ class AIPromptBuilder {
       includeConcepts,
     } = promptOptions;
 
-    return `You are an expert content analyst and summarization specialist. Analyze this ${metadata.contentType} content and provide comprehensive summaries in multiple formats for students and professionals.
+    return `You are an expert content analyst and summarization specialist. Analyze this ${
+      metadata.contentType
+    } content and provide comprehensive summaries in multiple formats for students and professionals.
 
 CONTENT TO ANALYZE:
 ${content}
@@ -55,7 +57,7 @@ RESPONSE FORMAT - Return a JSON object with the following structure:
     "markdown": "Comprehensive markdown-formatted summary with detailed analysis, context, examples, and practical insights. Use structured sections with ## headings, proper bullet points (- item), numbered lists (1. item), code snippets, tables, charts, and any other content formats that enhance understanding. Provide clear explanations that help readers understand the subject matter deeply. ENSURE proper markdown formatting with line breaks before and after lists, code blocks, and tables.",
     "reading_time": "comprehensive"
   },
-  "eliSummary": "Ultra-simplified explanation that a 15-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
+  "eliSummary": "Simplified explanation that a 15-year-old could understand, using analogies and everyday examples. Avoid jargon completely.",
   "conceptDictionary": [
     {
       "term": "technical term 1",
@@ -85,7 +87,11 @@ RESPONSE FORMAT - Return a JSON object with the following structure:
 }
 
 SUMMARY GUIDELINES:
-${includeQuickSummary ? '✅ Include QUICK_SUMMARY: Ultra-concise overview in 2-3 sentences' : '❌ Skip quick summary'}
+${
+  includeQuickSummary
+    ? '✅ Include QUICK_SUMMARY: Ultra-concise overview in 2-3 sentences'
+    : '❌ Skip quick summary'
+}
 ${
   includeDetailedSummary
     ? `✅ Include DETAILED_SUMMARY: Comprehensive, in-depth markdown-formatted analysis with:
@@ -105,7 +111,11 @@ ${
    - Include any supplementary content that enhances comprehension`
     : '❌ Skip detailed summary'
 }
-${includeKeyPoints ? '✅ Include KEY_POINTS: 3-6 bullet points of most important information' : '❌ Skip key points'}
+${
+  includeKeyPoints
+    ? '✅ Include KEY_POINTS: 3-6 bullet points of most important information'
+    : '❌ Skip key points'
+}
 ${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways' : '❌ Skip action items'}
 
 ✅ ALWAYS Include ELI_SUMMARY: Ultra-simplified explanation that a 15-year-old could understand:
@@ -114,7 +124,11 @@ ${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways' : '❌ Sk
    - Compare complex concepts to familiar things (like comparing databases to filing cabinets)
    - Focus on the "why it matters" in simple terms
 
-${includeConcepts !== false ? '✅ Include CONCEPT_DICTIONARY: Identify and explain technical terms with:' : '❌ Skip CONCEPT_DICTIONARY'}${
+${
+  includeConcepts !== false
+    ? '✅ Include CONCEPT_DICTIONARY: Identify and explain technical terms with:'
+    : '❌ Skip CONCEPT_DICTIONARY'
+}${
       includeConcepts !== false
         ? `
    - Simple definitions in everyday language
@@ -188,12 +202,17 @@ METADATA:
 
     switch (summaryType) {
       case 'quick':
-        return basePrompt + `
+        return (
+          basePrompt +
+          `
 TASK: Create a quick 2-3 sentence summary that captures the main message.
-Return as plain text, no formatting.`;
+Return as plain text, no formatting.`
+        );
 
       case 'detailed':
-        return basePrompt + `
+        return (
+          basePrompt +
+          `
 TASK: Create a comprehensive, in-depth markdown-formatted summary with:
 - # Main title
 - ## Overview section
@@ -211,19 +230,25 @@ Include any relevant content that enhances understanding:
 - Be as thorough as needed - no time constraints
 
 Use proper markdown formatting with structured headings, bullet points, code blocks, and tables.
-Return only the markdown text.`;
+Return only the markdown text.`
+        );
 
       case 'eli5':
-        return basePrompt + `
+        return (
+          basePrompt +
+          `
 TASK: Create an ultra-simplified explanation that a 15-year-old could understand.
 - Use analogies and everyday examples
 - Avoid all jargon and technical terms
 - Compare complex concepts to familiar things
 - Focus on "why it matters" in simple terms
-Return as plain text.`;
+Return as plain text.`
+        );
 
       case 'concepts':
-        return basePrompt + `
+        return (
+          basePrompt +
+          `
 TASK: Identify 3-5 key technical terms or concepts and explain them simply.
 Return a JSON array of objects with this structure:
 [
@@ -233,17 +258,24 @@ Return a JSON array of objects with this structure:
     "analogy": "comparison to something familiar",
     "example": "real-world example"
   }
-]`;
+]`
+        );
 
       case 'keyPoints':
-        return basePrompt + `
+        return (
+          basePrompt +
+          `
 TASK: Extract 3-6 key points or main findings.
-Return a JSON array of strings, each starting with "• ".`;
+Return a JSON array of strings, each starting with "• ".`
+        );
 
       case 'actions':
-        return basePrompt + `
+        return (
+          basePrompt +
+          `
 TASK: Identify practical takeaways and actionable recommendations.
-Return a JSON array of strings with specific actionable items.`;
+Return a JSON array of strings with specific actionable items.`
+        );
 
       default:
         throw new Error(`Unknown summary type: ${summaryType}`);
@@ -314,7 +346,7 @@ Return a JSON array of strings with specific actionable items.`;
    */
   validateOptions(options) {
     const validOptions = Object.keys(this.defaultOptions);
-    const invalidOptions = Object.keys(options).filter(key => !validOptions.includes(key));
+    const invalidOptions = Object.keys(options).filter((key) => !validOptions.includes(key));
 
     return {
       isValid: invalidOptions.length === 0,
