@@ -930,20 +930,29 @@ class SummaryOverlay {
         }
         html += `<h4>${this.processInlineMarkdown(trimmedLine.substring(5))}</h4>`;
       }
-      // Numbered lists
-      else if (trimmedLine.match(/^\d+\.\s/)) {
+      // Numbered lists - handle both regular and nested
+      else if (trimmedLine.match(/^\s*\d+\.\s/)) {
+        const indentLevel = line.length - line.trimLeft().length;
         const content = trimmedLine.replace(/^\d+\.\s/, '');
+
         if (!inList || listItems.length === 0) {
-          if (inList) {
+          if (inList === 'ul') {
             html += `<ul>${listItems.join('')}</ul>`;
             listItems = [];
           }
-          html += `<ol><li>${this.processInlineMarkdown(content)}</li>`;
+          listItems.push(`<li>${this.processInlineMarkdown(content)}</li>`);
           inList = 'ol';
         } else if (inList === 'ol') {
-          html += `<li>${this.processInlineMarkdown(content)}</li>`;
+          if (indentLevel > 0) {
+            // This is a nested list item - add with appropriate indentation
+            listItems.push(`<li style="margin-left: ${indentLevel}px;">${this.processInlineMarkdown(content)}</li>`);
+          } else {
+            // Regular list item
+            listItems.push(`<li>${this.processInlineMarkdown(content)}</li>`);
+          }
         } else {
-          html += `</ul><ol><li>${this.processInlineMarkdown(content)}</li>`;
+          html += `<ul>${listItems.join('')}</ul>`;
+          listItems = [`<li>${this.processInlineMarkdown(content)}</li>`];
           inList = 'ol';
         }
       }
@@ -952,14 +961,15 @@ class SummaryOverlay {
         const content = trimmedLine.substring(2).trim();
         if (!inList || listItems.length === 0) {
           if (inList === 'ol') {
-            html += `</ol>`;
+            html += `<ol>${listItems.join('')}</ol>`;
+            listItems = [];
           }
           listItems.push(`<li>${this.processInlineMarkdown(content)}</li>`);
           inList = 'ul';
         } else if (inList === 'ul') {
           listItems.push(`<li>${this.processInlineMarkdown(content)}</li>`);
         } else {
-          html += `</ol>`;
+          html += `<ol>${listItems.join('')}</ol>`;
           listItems = [`<li>${this.processInlineMarkdown(content)}</li>`];
           inList = 'ul';
         }
@@ -978,7 +988,7 @@ class SummaryOverlay {
           if (inList === 'ul') {
             html += `<ul>${listItems.join('')}</ul>`;
           } else {
-            html += `</ol>`;
+            html += `<ol>${listItems.join('')}</ol>`;
           }
           listItems = [];
           inList = false;
@@ -991,7 +1001,7 @@ class SummaryOverlay {
           if (inList === 'ul') {
             html += `<ul>${listItems.join('')}</ul>`;
           } else {
-            html += `</ol>`;
+            html += `<ol>${listItems.join('')}</ol>`;
           }
           listItems = [];
           inList = false;
@@ -1008,12 +1018,9 @@ class SummaryOverlay {
     if (inList && listItems.length > 0) {
       if (inList === 'ul') {
         html += `<ul>${listItems.join('')}</ul>`;
-      } else {
-        html += `</ol>`;
+      } else if (inList === 'ol') {
+        html += `<ol>${listItems.join('')}</ol>`;
       }
-    }
-    if (inList === 'ol' && listItems.length === 0) {
-      html += `</ol>`;
     }
     if (inCodeBlock) {
       html += this.renderCodeBlock(codeBlockContent.join('\n'), codeBlockLanguage);
