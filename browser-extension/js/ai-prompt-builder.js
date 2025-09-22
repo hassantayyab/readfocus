@@ -12,6 +12,37 @@ class AIPromptBuilder {
       includeActionItems: true,
       includeConcepts: true,
     };
+
+    // Shared formatting guidelines to avoid duplication
+    this.markdownGuidelines = `
+MARKDOWN FORMATTING REQUIREMENTS:
+- Always add blank lines before and after headings (## Heading)
+- Always add blank lines before and after bullet point lists
+- Use dashes for bullet points: - Item one
+- Use numbers for ordered lists: 1. First item
+- Use **bold** for important terms and *italic* for emphasis
+- Use code blocks with language specification: \`\`\`javascript or \`\`\`python
+- Use tables with proper markdown table syntax including headers and alignment
+- Ensure proper line spacing between sections, code blocks, and tables`;
+  }
+
+  /**
+   * Build base prompt with content and metadata
+   * @param {string} content - Content to summarize
+   * @param {Object} metadata - Content metadata
+   * @returns {string} - Base prompt with content and metadata
+   */
+  buildBasePrompt(content, metadata) {
+    return `You are an expert content analyst and summarization specialist. Analyze this ${metadata.contentType} content:
+
+CONTENT TO ANALYZE:
+${content}
+
+CONTENT METADATA:
+- Type: ${metadata.contentType}
+- Word Count: ${metadata.wordCount}
+- Readability Score: ${metadata.readabilityScore}/100
+- Has Headings: ${metadata.hasHeadings}`;
   }
 
   /**
@@ -32,18 +63,9 @@ class AIPromptBuilder {
       includeConcepts,
     } = promptOptions;
 
-    return `You are an expert content analyst and summarization specialist. Analyze this ${
-      metadata.contentType
-    } content and provide comprehensive summaries in multiple formats for students and professionals.
+    const basePrompt = this.buildBasePrompt(content, metadata);
 
-CONTENT TO ANALYZE:
-${content}
-
-CONTENT METADATA:
-- Type: ${metadata.contentType}
-- Word Count: ${metadata.wordCount}
-- Readability Score: ${metadata.readabilityScore}/100
-- Has Headings: ${metadata.hasHeadings}
+    return `${basePrompt} and provide comprehensive summaries in multiple formats for students and professionals.
 
 TASK: Create multiple summary formats as requested below. Each format serves different reading needs and time constraints.
 
@@ -97,18 +119,10 @@ ${
     ? `✅ Include DETAILED_SUMMARY: Comprehensive, in-depth markdown-formatted analysis with:
    - # Main title reflecting the content theme
    - ## Overview, Key Concepts, Main Arguments sections
-   - ## Practical Applications and Critical Analysis
+   - ## Practical Applications and Critical Analysis sections
    - ## Future Implications and conclusions
-   - Use structured headings, proper bullet points with dashes (- item)
-   - Use numbered lists with proper format (1. item, 2. item)
-   - **Bold** for emphasis, *italic* for subtle emphasis
-   - Include code snippets with \`\`\`language syntax highlighting when relevant
-   - Add tables using markdown table format when data is presented
-   - Include charts/diagrams description or ASCII representations when helpful
-   - Provide extensive examples, data, formulas, and detailed explanations
-   - CRITICAL: Add blank lines before and after all lists, headings, code blocks, and tables
-   - Target complete understanding - be as thorough as needed without time constraints
-   - Include any supplementary content that enhances comprehension`
+   - Include code snippets, tables, examples, and detailed explanations
+   - Target complete understanding - be as thorough as needed`
     : '❌ Skip detailed summary'
 }
 ${
@@ -118,65 +132,18 @@ ${
 }
 ${includeActionItems ? '✅ Include ACTION_ITEMS: Practical takeaways' : '❌ Skip action items'}
 
-✅ ALWAYS Include ELI_SUMMARY: Ultra-simplified explanation that a 15-year-old could understand:
-   - Use analogies and everyday examples
-   - Avoid all jargon and technical terms
-   - Compare complex concepts to familiar things (like comparing databases to filing cabinets)
-   - Focus on the "why it matters" in simple terms
+✅ ALWAYS Include ELI_SUMMARY: Simplified explanation using analogies and everyday examples
 
 ${
   includeConcepts !== false
-    ? '✅ Include CONCEPT_DICTIONARY: Identify and explain technical terms with:'
+    ? '✅ Include CONCEPT_DICTIONARY: Identify and explain technical terms with simple definitions, analogies, and examples'
     : '❌ Skip CONCEPT_DICTIONARY'
-}${
-      includeConcepts !== false
-        ? `
-   - Simple definitions in everyday language
-   - Analogies to familiar concepts when possible
-   - Real-world examples
-   - Focus on terms that might confuse readers`
-        : ''
-    }
+}
 
 - Focus on educational value and practical insights
 - Make everything accessible and easy to understand
-- Use analogies and examples for complex concepts
 - Maintain accuracy while simplifying language
-- Preserve important nuances and qualifications
-- Organize information logically
-
-MARKDOWN FORMATTING REQUIREMENTS:
-- Always add blank lines before and after headings (## Heading)
-- Always add blank lines before and after bullet point lists
-- Use dashes for bullet points: - Item one
-- Use numbers for ordered lists: 1. First item
-- Use **bold** for important terms and *italic* for emphasis
-- Use code blocks with language specification: \`\`\`javascript or \`\`\`python
-- Use tables with proper markdown table syntax including headers and alignment
-- Ensure proper line spacing between sections, code blocks, and tables
-- Example of proper formatting:
-
-## Section Title
-
-This is a paragraph before a list.
-
-- First bullet point
-- Second bullet point
-- Third bullet point
-
-\`\`\`javascript
-// Code example with proper syntax highlighting
-function example() {
-  return "properly formatted code";
-}
-\`\`\`
-
-| Column 1 | Column 2 | Column 3 |
-|----------|----------|----------|
-| Data 1   | Data 2   | Data 3   |
-| Value A  | Value B  | Value C  |
-
-This is a paragraph after the table.
+${this.markdownGuidelines}
 
 Return only the JSON object, no additional text.`;
   }
@@ -189,16 +156,7 @@ Return only the JSON object, no additional text.`;
    * @returns {string} - Focused AI prompt
    */
   buildFocusedPrompt(content, metadata, summaryType) {
-    const basePrompt = `You are an expert content analyst. Analyze this ${metadata.contentType} content:
-
-CONTENT:
-${content}
-
-METADATA:
-- Type: ${metadata.contentType}
-- Word Count: ${metadata.wordCount}
-- Readability Score: ${metadata.readabilityScore}/100
-`;
+    const basePrompt = this.buildBasePrompt(content, metadata);
 
     switch (summaryType) {
       case 'quick':
@@ -213,23 +171,9 @@ Return as plain text, no formatting.`
         return (
           basePrompt +
           `
-TASK: Create a comprehensive, in-depth markdown-formatted summary with:
-- # Main title
-- ## Overview section
-- ## Key Concepts section
-- ## Main Arguments section
-- ## Practical Applications section
-- ## Critical Analysis section
-- ## Future Implications section
-
-Include any relevant content that enhances understanding:
-- Code snippets with proper syntax highlighting (\`\`\`language)
-- Tables with markdown table format when data is presented
-- Detailed examples, formulas, and explanations
-- Charts/diagrams descriptions or ASCII representations
-- Be as thorough as needed - no time constraints
-
-Use proper markdown formatting with structured headings, bullet points, code blocks, and tables.
+TASK: Create a comprehensive, in-depth markdown-formatted summary with structured sections (# title, ## headings).
+Include code snippets, tables, examples, and detailed explanations as needed.
+${this.markdownGuidelines}
 Return only the markdown text.`
         );
 
@@ -237,11 +181,8 @@ Return only the markdown text.`
         return (
           basePrompt +
           `
-TASK: Create an ultra-simplified explanation that a 15-year-old could understand.
-- Use analogies and everyday examples
-- Avoid all jargon and technical terms
-- Compare complex concepts to familiar things
-- Focus on "why it matters" in simple terms
+TASK: Create a simplified explanation using analogies and everyday examples.
+Avoid jargon and focus on "why it matters" in simple terms.
 Return as plain text.`
         );
 
@@ -249,24 +190,16 @@ Return as plain text.`
         return (
           basePrompt +
           `
-TASK: Identify 3-5 key technical terms or concepts and explain them simply.
-Return a JSON array of objects with this structure:
-[
-  {
-    "term": "technical term",
-    "definition": "simple definition in everyday language",
-    "analogy": "comparison to something familiar",
-    "example": "real-world example"
-  }
-]`
+TASK: Identify all key technical terms and explain them simply.
+Return JSON array: [{"term": "", "definition": "", "analogy": "", "example": ""}]`
         );
 
       case 'keyPoints':
         return (
           basePrompt +
           `
-TASK: Extract 3-6 key points or main findings.
-Return a JSON array of strings, each starting with "• ".`
+TASK: Extract all key points or main findings.
+Return JSON array of strings starting with "• ".`
         );
 
       case 'actions':
@@ -274,7 +207,7 @@ Return a JSON array of strings, each starting with "• ".`
           basePrompt +
           `
 TASK: Identify practical takeaways and actionable recommendations.
-Return a JSON array of strings with specific actionable items.`
+Return JSON array of actionable items.`
         );
 
       default:
