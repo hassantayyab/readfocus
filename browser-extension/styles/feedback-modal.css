@@ -116,14 +116,14 @@
   justify-content: center;
   border: none;
   border-radius: var(--rf-radius);
-  background: #000000;
-  color: white;
+  background: var(--rf-primary);
+  color: var(--rf-background);
   cursor: pointer;
   font-weight: 500;
 }
 
 .form-actions .primary-button:hover {
-  background: #333333;
+  background: var(--rf-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -143,14 +143,14 @@
   font-size: 14px;
   border: none;
   border-radius: var(--rf-radius);
-  background: #000000;
-  color: white;
+  background: var(--rf-primary);
+  color: var(--rf-background);
   cursor: pointer;
   font-weight: 500;
 }
 
 .feedback-success .primary-button:hover {
-  background: #333333;
+  background: var(--rf-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -188,7 +188,7 @@
 
 .step-number {
   background: var(--rf-primary);
-  color: white;
+  color: var(--rf-background);
   border-radius: 50%;
   width: 24px;
   height: 24px;

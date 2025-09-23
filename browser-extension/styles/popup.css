@@ -1,20 +1,20 @@
 /* Kuiqlee Popup Styles */
 
 :root {
-  --rf-primary: #000000;
-  --rf-primary-hover: #333333;
-  --rf-secondary: #666666;
-  --rf-background: #ffffff;
-  --rf-surface: #f8f8f8;
-  --rf-border: #d1d1d1;
-  --rf-text: #000000;
-  --rf-text-muted: #666666;
-  --rf-success: #000000;
-  --rf-warning: #666666;
-  --rf-error: #000000;
+  --rf-primary: #3d2f1f;
+  --rf-primary-hover: #8b6914;
+  --rf-secondary: #7a6b57;
+  --rf-background: #fbf9f7;
+  --rf-surface: #f8f6f3;
+  --rf-border: #d4c4a8;
+  --rf-text: #3d2f1f;
+  --rf-text-muted: #7a6b57;
+  --rf-success: #8b6914;
+  --rf-warning: #7a6b57;
+  --rf-error: #8b6914;
   --rf-radius: 8px;
-  --rf-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --rf-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+  --rf-shadow: 0 1px 3px 0 rgb(61 47 31 / 0.1), 0 1px 2px -1px rgb(61 47 31 / 0.1);
+  --rf-shadow-lg: 0 10px 15px -3px rgb(61 47 31 / 0.1), 0 4px 6px -2px rgb(61 47 31 / 0.05);
 }
 
 * {
@@ -45,8 +45,8 @@ body {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: white;
-  color: #000000;
+  background: var(--rf-background);
+  color: var(--rf-text);
   border-bottom: 1px solid var(--rf-border);
   position: relative;
 }
@@ -114,7 +114,7 @@ body {
 }
 
 .page-status.article-detected .status-title {
-  color: #000000;
+  color: var(--rf-text);
 }
 
 .page-status.no-article .status-icon::before {
@@ -122,7 +122,7 @@ body {
 }
 
 .page-status.no-article .status-title {
-  color: #666666;
+  color: var(--rf-text-muted);
 }
 
 /* Mode Selection */
@@ -237,8 +237,8 @@ body {
 }
 
 .badge {
-  background: #f5f5f5;
-  color: #000000;
+  background: var(--rf-surface);
+  color: var(--rf-text);
   font-size: 11px;
   padding: 4px 8px;
   border-radius: 12px;
@@ -274,13 +274,13 @@ body {
 }
 
 .status-dot.connected {
-  background-color: #000000;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+  background-color: var(--rf-primary);
+  box-shadow: 0 0 0 2px rgba(139, 105, 20, 0.2);
 }
 
 .status-dot.disconnected {
-  background-color: #666666;
-  box-shadow: 0 0 0 2px rgba(102, 102, 102, 0.2);
+  background-color: var(--rf-text-muted);
+  box-shadow: 0 0 0 2px rgba(122, 107, 87, 0.2);
 }
 
 .status-text {
@@ -340,12 +340,12 @@ body {
 }
 
 .summary-button:not(.secondary) {
-  background: #000000;
-  color: white;
+  background: var(--rf-primary);
+  color: var(--rf-background);
 }
 
 .summary-button:not(.secondary):hover:not(:disabled) {
-  background: #333333;
+  background: var(--rf-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -380,8 +380,8 @@ body {
   padding: 16px;
   border: none;
   border-radius: var(--rf-radius);
-  background: #000000;
-  color: white;
+  background: var(--rf-primary);
+  color: var(--rf-background);
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
@@ -389,7 +389,7 @@ body {
 }
 
 .focus-button:hover:not(:disabled) {
-  background: #333333;
+  background: var(--rf-primary-hover);
   transform: translateY(-1px);
   box-shadow: var(--rf-shadow-lg);
 }
@@ -657,13 +657,13 @@ kbd {
 }
 
 .status-message {
-  background-color: #000000;
-  color: white;
+  background-color: var(--rf-primary);
+  color: var(--rf-background);
 }
 
 .error-message {
-  background-color: #666666;
-  color: white;
+  background-color: var(--rf-text-muted);
+  color: var(--rf-background);
 }
 
 .status-message.show,
@@ -741,7 +741,7 @@ button:focus-visible {
   position: absolute;
   top: 80%;
   right: 16px;
-  background: white;
+  background: var(--rf-background);
   border: 1px solid var(--rf-border);
   border-radius: var(--rf-radius);
   box-shadow: var(--rf-shadow-lg);
