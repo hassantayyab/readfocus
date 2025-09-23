@@ -22,8 +22,8 @@
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
   margin: 0;
   padding: 0;
   background-color: var(--rf-background);
@@ -48,6 +48,7 @@ body {
   background: white;
   color: #000000;
   border-bottom: 1px solid var(--rf-border);
+  position: relative;
 }
 
 .logo {
@@ -319,7 +320,6 @@ body {
   color: var(--rf-text);
   flex: 1;
 }
-
 
 .summary-description {
   font-size: 13px;
@@ -727,4 +727,83 @@ button:focus-visible {
   .action-row {
     flex-direction: column;
   }
+}
+
+/* Menu Toggle Button */
+.menu-toggle {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--rf-border);
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  color: var(--rf-text);
+}
+
+.menu-toggle:hover {
+  background-color: var(--rf-surface);
+}
+
+.hamburger-icon {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* Menu Dropdown */
+.menu-dropdown {
+  position: absolute;
+  top: 80%;
+  right: 16px;
+  background: white;
+  border: 1px solid var(--rf-border);
+  border-radius: var(--rf-radius);
+  box-shadow: var(--rf-shadow-lg);
+  z-index: 1000;
+  min-width: 160px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.menu-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: var(--rf-text);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+}
+
+.menu-item:hover {
+  background-color: var(--rf-surface);
+}
+
+.menu-item:first-child {
+  border-top-left-radius: var(--rf-radius);
+  border-top-right-radius: var(--rf-radius);
+}
+
+.menu-item:last-child {
+  border-bottom-left-radius: var(--rf-radius);
+  border-bottom-right-radius: var(--rf-radius);
+}
+
+.menu-item .button-icon {
+  font-size: 16px;
 }

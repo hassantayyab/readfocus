@@ -144,14 +144,31 @@ class KuiqleePopup {
    * Bind event listeners
    */
   bindEvents() {
+    // Menu toggle button
+    const menuToggleBtn = document.getElementById('menu-toggle');
+    menuToggleBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleMenu();
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const menuDropdown = document.getElementById('menu-dropdown');
+      const menuToggle = document.getElementById('menu-toggle');
+      if (menuDropdown && menuToggle && !menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+        this.closeMenu();
+      }
+    });
+
     // Settings button
     document.getElementById('open-settings')?.addEventListener('click', () => {
+      this.closeMenu();
       this.openSettings();
     });
 
-
     // Feedback button
     document.getElementById('send-feedback')?.addEventListener('click', () => {
+      this.closeMenu();
       this.openFeedbackForm();
     });
 
@@ -202,6 +219,26 @@ class KuiqleePopup {
   openSettings() {
     chrome.runtime.openOptionsPage();
     window.close();
+  }
+
+  /**
+   * Toggle menu dropdown visibility
+   */
+  toggleMenu() {
+    const menuDropdown = document.getElementById('menu-dropdown');
+    if (menuDropdown) {
+      menuDropdown.classList.toggle('show');
+    }
+  }
+
+  /**
+   * Close menu dropdown
+   */
+  closeMenu() {
+    const menuDropdown = document.getElementById('menu-dropdown');
+    if (menuDropdown) {
+      menuDropdown.classList.remove('show');
+    }
   }
 
   /**
