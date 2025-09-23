@@ -3,12 +3,12 @@
 :root {
   --rf-primary: #3d2f1f;
   --rf-primary-hover: #8b6914;
-  --rf-secondary: #7a6b57;
+  --rf-secondary: #8b6914;
   --rf-background: #fbf9f7;
   --rf-surface: #f8f6f3;
-  --rf-border: #d4c4a8;
+  --rf-border: #8b6914;
   --rf-text: #3d2f1f;
-  --rf-text-muted: #7a6b57;
+  --rf-text-muted: #8b6914;
   --rf-success: #8b6914;
   --rf-warning: #7a6b57;
   --rf-error: #8b6914;
