@@ -306,8 +306,6 @@ class SummaryOverlay {
             <p class="rf-summary-paragraph">${quickSummary.text || 'Summary not available'}</p>
           </div>
         </div>
-        
-        ${this.buildMainTopicsSection()}
       </div>
     `;
   }
@@ -334,12 +332,7 @@ class SummaryOverlay {
           <div class="rf-summary-markdown">
             ${renderedContent}
           </div>
-          <div class="rf-detailed-meta">
-            <span class="rf-reading-time">⏱️ ${detailedSummary.reading_time || '3-5 minutes'}</span>
-          </div>
         </div>
-        
-        ${this.buildMainTopicsSection()}
       </div>
     `;
   }
@@ -1587,19 +1580,7 @@ for i in range(10):
       .rf-code-block .language-json {
         color: #198754;
       }
-      
-      .rf-reading-time {
-        background: #f5f5f5;
-        color: #666666;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        border: 1px solid #d1d1d1;
-      }
-      
+
       .rf-main-topics {
         margin-top: 24px;
         padding-top: 20px;
