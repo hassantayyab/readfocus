@@ -247,20 +247,6 @@ class SummaryOverlay {
         <div class="rf-summary-content">
           ${this.buildTabContent()}
         </div>
-
-        <!-- Footer -->
-        <div class="rf-summary-footer">
-          <div class="rf-summary-stats">
-            <span>📊 ${currentSummary.metadata?.originalWordCount || 'N/A'} words analyzed</span>
-            <span>🎓 ${currentSummary.mainTopics?.length || 0} main topics</span>
-            <span>⏱️ ${currentSummary.estimatedReadTime || '15 minutes'} read</span>
-          </div>
-          <div class="rf-summary-actions">
-            <button class="rf-summary-btn rf-btn-primary" id="rf-start-reading">
-              📚 Continue Reading
-            </button>
-          </div>
-        </div>
       </div>
     `;
   }
@@ -318,9 +304,6 @@ class SummaryOverlay {
         <div class="rf-quick-summary">
           <div class="rf-summary-text">
             <p class="rf-summary-paragraph">${quickSummary.text || 'Summary not available'}</p>
-          </div>
-          <div class="rf-quick-meta">
-            <span class="rf-reading-time">⏱️ ${quickSummary.reading_time || '30 seconds'}</span>
           </div>
         </div>
         
@@ -578,9 +561,6 @@ class SummaryOverlay {
     // Action buttons
     const regenerateBtn = this.overlay.querySelector('#rf-regenerate-summary');
     regenerateBtn?.addEventListener('click', () => this.regenerateSummary());
-
-    const startReadingBtn = this.overlay.querySelector('#rf-start-reading');
-    startReadingBtn?.addEventListener('click', () => this.startReadingMode());
 
     // Error retry button
     const retryBtn = this.overlay.querySelector('#rf-retry-summary');
@@ -944,7 +924,11 @@ class SummaryOverlay {
         } else if (inList === 'ol') {
           if (indentLevel > 0) {
             // This is a nested list item - add with appropriate indentation
-            listItems.push(`<li style="margin-left: ${indentLevel}px;">${this.processInlineMarkdown(content)}</li>`);
+            listItems.push(
+              `<li style="margin-left: ${indentLevel}px;">${this.processInlineMarkdown(
+                content,
+              )}</li>`,
+            );
           } else {
             // Regular list item
             listItems.push(`<li>${this.processInlineMarkdown(content)}</li>`);
@@ -2124,7 +2108,6 @@ for i in range(10):
     if (styleEl) {
       styleEl.remove();
     }
-
   }
 }
 
@@ -2137,4 +2120,3 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = SummaryOverlay;
 }
-
