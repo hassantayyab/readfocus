@@ -1,8 +1,8 @@
-# DESIGN PLAN.md — ReadFocus App
+# DESIGN PLAN.md — Kuiqlee App
 
 ## 🎨 Design Summary
 
-**ReadFocus** is a student-focused reading companion app designed for high school and college students with attention difficulties. The app ensures that reading is engaging and interactive by breaking content into chunks, highlighting key words, and inserting comprehension checks. The design must feel **light, fun, student-friendly, and not intimidating** — closer to a gamified learning tool than a strict productivity app.
+**Kuiqlee** is a student-focused reading companion app designed for high school and college students with attention difficulties. The app ensures that reading is engaging and interactive by breaking content into chunks, highlighting key words, and inserting comprehension checks. The design must feel **light, fun, student-friendly, and not intimidating** — closer to a gamified learning tool than a strict productivity app.
 
 ---
 
@@ -113,4 +113,4 @@
   - Recall prompt pop-up.
   - Session end celebration animation.
 
-➡️ With this plan, a designer can create the full **UI/UX system** for ReadFocus that is student-friendly, engaging, and easy to expand in later phases.
+➡️ With this plan, a designer can create the full **UI/UX system** for Kuiqlee that is student-friendly, engaging, and easy to expand in later phases.

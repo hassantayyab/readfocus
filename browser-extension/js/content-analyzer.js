@@ -51,8 +51,6 @@ class ContentAnalyzer {
    */
   analyzeContent(contentElement) {
     try {
-      console.log('📝 [ContentAnalyzer] Starting content analysis...');
-
       if (!contentElement || !(contentElement instanceof Element)) {
         throw new Error('Invalid content element provided');
       }
@@ -82,14 +80,6 @@ class ContentAnalyzer {
         timestamp: Date.now(),
       };
 
-      console.log('✅ [ContentAnalyzer] Content analysis completed:', {
-        originalLength: rawText.length,
-        cleanedLength: cleanedText.length,
-        processedLength: processedContent.length,
-        isValid: validation.isValid,
-        readabilityScore: metadata.readabilityScore,
-      });
-
       return result;
     } catch (error) {
       console.error('❌ [ContentAnalyzer] Analysis failed:', error);
@@ -107,8 +97,6 @@ class ContentAnalyzer {
    * @returns {string} - Raw extracted text
    */
   extractRawText(contentElement) {
-    console.log('🔍 [ContentAnalyzer] Extracting raw text...');
-
     // Clone element to avoid modifying original
     const clone = contentElement.cloneNode(true);
 
@@ -149,8 +137,6 @@ class ContentAnalyzer {
    * @returns {string} - Cleaned text
    */
   cleanText(rawText) {
-    console.log('🧹 [ContentAnalyzer] Cleaning text...');
-
     let cleaned = rawText;
 
     // Remove excessive whitespace
@@ -187,8 +173,6 @@ class ContentAnalyzer {
    * @returns {Object} - Validation results
    */
   validateContent(text) {
-    console.log('✅ [ContentAnalyzer] Validating content quality...');
-
     const validation = {
       isValid: false,
       issues: [],
@@ -221,7 +205,9 @@ class ContentAnalyzer {
 
     if (validation.metrics.uniqueWordRatio < 0.3) {
       validation.issues.push(
-        `Content appears repetitive (${Math.round(validation.metrics.uniqueWordRatio * 100)}% unique words)`
+        `Content appears repetitive (${Math.round(
+          validation.metrics.uniqueWordRatio * 100,
+        )}% unique words)`,
       );
     }
 
@@ -246,8 +232,6 @@ class ContentAnalyzer {
    * @returns {string} - AI-ready content
    */
   prepareForAI(cleanedText) {
-    console.log('🤖 [ContentAnalyzer] Preparing content for AI...');
-
     let prepared = cleanedText;
 
     // Truncate if too long
@@ -264,10 +248,6 @@ class ContentAnalyzer {
       } else {
         prepared = prepared.substring(0, truncateAt) + '...';
       }
-
-      console.log(
-        `📝 [ContentAnalyzer] Content truncated from ${cleanedText.length} to ${prepared.length} chars`
-      );
     }
 
     // Add enhanced structure markers for better AI understanding
@@ -408,8 +388,6 @@ class ContentAnalyzer {
    * @returns {Object} - Content metadata
    */
   generateMetadata(contentElement, cleanedText) {
-    console.log('📊 [ContentAnalyzer] Generating metadata...');
-
     const words = cleanedText.split(/\s+/);
     const sentences = cleanedText.split(/[.!?]+/).filter((s) => s.trim().length > 0);
 
@@ -570,5 +548,3 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ContentAnalyzer;
 }
-
-console.log('✅ [ContentAnalyzer] Content Analysis Pipeline loaded');

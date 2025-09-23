@@ -26,7 +26,6 @@ class ProxyAIClient {
     try {
       const response = await this.makeRequest(testPrompt);
       if (response && typeof response === 'string' && response.toLowerCase().includes('ok')) {
-        console.log('✅ [ProxyAIClient] Proxy API connection verified');
         return true;
       } else {
         throw new Error('Unexpected response from proxy API');
@@ -88,7 +87,6 @@ class ProxyAIClient {
         throw new Error(data.error || 'Invalid response format');
       }
 
-      console.log('✅ [ProxyAIClient] API request successful');
       return data.response;
     } catch (error) {
       console.error('❌ [ProxyAIClient] API request failed:', error);
@@ -126,7 +124,6 @@ class ProxyAIClient {
       }
 
       content = content.substring(0, cutPoint) + '\n\n[CONTENT_TRUNCATED_FOR_ANALYSIS]';
-      console.log('📝 [ProxyAIClient] Content truncated for analysis');
     }
 
     const prompt = `You are an expert educational content analyst. Analyze this article with deep understanding and provide COMPREHENSIVE highlighting for student learning.
@@ -216,7 +213,6 @@ IMPORTANT:
       const totalHighlights = Object.values(logData).reduce((sum, count) => sum + count, 0);
       logData.total = totalHighlights;
 
-      console.log('🎯 [ProxyAIClient] Analysis complete:', logData);
       return highlights;
     } catch (error) {
       console.error('❌ [ProxyAIClient] Analysis failed:', error);
@@ -295,7 +291,6 @@ IMPORTANT:
    */
   reset() {
     this.lastRequestTime = 0;
-    console.log('🔄 [ProxyAIClient] Client reset');
   }
 }
 
@@ -309,4 +304,3 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = ProxyAIClient;
 }
 
-console.log('✅ [ProxyAIClient] Proxy AI Client module loaded');

@@ -299,4 +299,3 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = AIPromptBuilder;
 }
 
-console.log('✅ [AIPromptBuilder] AI Prompt Builder loaded');

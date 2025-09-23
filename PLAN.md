@@ -1,8 +1,8 @@
-# PLAN.md — ReadFocus Chrome Extension (AI Content Summarization)
+# PLAN.md — Kuiqlee Chrome Extension (AI Content Summarization)
 
 ## 🎯 Product Vision
 
-**ReadFocus** is an AI-powered Chrome extension that **instantly transforms any webpage into digestible, intelligent summaries** to help students, professionals, and researchers quickly understand and retain key information from the web.
+**Kuiqlee** is an AI-powered Chrome extension that **instantly transforms any webpage into digestible, intelligent summaries** to help students, professionals, and researchers quickly understand and retain key information from the web.
 
 **Core Promise:** Click "Summarize" → Get comprehensive, multi-format AI summaries with key insights, action items, and detailed analysis in under 10 seconds.
 
@@ -553,4 +553,4 @@
 
 ---
 
-> **Philosophy**: ReadFocus transforms information overload into knowledge advantage. Every feature should serve the core mission of helping users understand and retain more information in less time.
+> **Philosophy**: Kuiqlee transforms information overload into knowledge advantage. Every feature should serve the core mission of helping users understand and retain more information in less time.

@@ -14,7 +14,6 @@ class SummaryOverlay {
     this.justOpened = false; // Flag to prevent immediate closure
     this.boundKeyboardHandler = this.handleKeyboard.bind(this); // Store bound function
     this.instanceId = 'overlay_' + Date.now(); // Unique instance ID for debugging
-    console.log('📄 [SummaryOverlay] New instance created:', this.instanceId);
   }
 
   /**
@@ -1137,7 +1136,6 @@ function calculateSum(a, b) {
 }
 
 const result = calculateSum(5, 3);
-console.log("Result:", result);
 \`\`\`
 
 ## Table Example
@@ -1177,8 +1175,6 @@ for i in range(10):
 
     try {
       const rendered = this.renderMarkdown(testMarkdown);
-      console.log('✅ Enhanced markdown rendering test passed');
-      console.log('Rendered HTML length:', rendered.length);
       return rendered;
     } catch (error) {
       console.error('❌ Enhanced markdown rendering test failed:', error);
@@ -2129,7 +2125,6 @@ for i in range(10):
       styleEl.remove();
     }
 
-    console.log('📄 [SummaryOverlay] Overlay destroyed');
   }
 }
 
@@ -2143,4 +2138,3 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = SummaryOverlay;
 }
 
-console.log('✅ [SummaryOverlay] Summary Overlay Component loaded');

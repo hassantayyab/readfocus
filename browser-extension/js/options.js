@@ -31,7 +31,6 @@ class KuiqleeOptions {
       if (result.readfocusSettings) {
         this.currentSettings = { ...this.defaultSettings, ...result.readfocusSettings };
       }
-      console.log('Settings loaded:', this.currentSettings);
     } catch (error) {
       console.error('Error loading settings:', error);
       this.showNotification('Error loading settings', 'error');
@@ -48,17 +47,15 @@ class KuiqleeOptions {
       const previousSettings = result.readfocusSettings || {};
 
       await chrome.storage.sync.set({ readfocusSettings: this.currentSettings });
-      console.log('Settings saved:', this.currentSettings);
 
       // Check if summary-related settings changed
       const summarySettingsChanged = this.checkIfSummarySettingsChanged(previousSettings);
 
       if (summarySettingsChanged || clearCache) {
-        console.log('Summary settings changed, clearing cached summaries...');
         await this.clearCachedSummaries(false); // Don't show confirmation dialog
         this.showNotification(
           'Settings saved! Cached summaries cleared for new settings.',
-          'success'
+          'success',
         );
       } else {
         this.showNotification('Settings saved successfully!', 'success');
@@ -144,18 +141,14 @@ class KuiqleeOptions {
       ?.addEventListener('click', () => this.openFeedbackForm());
 
     // Footer links
-    document
-      .getElementById('clear-cache-link')
-      ?.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.clearCachedSummaries();
-      });
-    document
-      .getElementById('view-stats-link')
-      ?.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.showUsageStats();
-      });
+    document.getElementById('clear-cache-link')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.clearCachedSummaries();
+    });
+    document.getElementById('view-stats-link')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.showUsageStats();
+    });
   }
 
   /**
@@ -187,16 +180,11 @@ class KuiqleeOptions {
       'autoSummarize',
     ];
     if (summaryKeys.includes(settingName) && oldValue !== settingValue) {
-      console.log(
-        `Summary setting ${settingName} changed from ${oldValue} to ${settingValue}, auto-saving and clearing cache`
-      );
       this.saveSettings(); // This will automatically clear cache due to setting change
     }
 
     // Visual feedback
     this.markSettingChanged(event.target);
-
-    console.log(`Updated ${settingName}:`, settingValue);
   }
 
   /**
@@ -251,7 +239,7 @@ class KuiqleeOptions {
         // Clear only summary-related data, keep settings
         const result = await chrome.storage.local.get(null);
         const keysToRemove = Object.keys(result).filter(
-          (key) => key.startsWith('summary_') || key.startsWith('readfocus_summary_')
+          (key) => key.startsWith('summary_') || key.startsWith('readfocus_summary_'),
         );
 
         if (keysToRemove.length > 0) {
@@ -259,12 +247,10 @@ class KuiqleeOptions {
           if (showConfirmation) {
             this.showNotification(`Cleared ${keysToRemove.length} cached summaries`, 'success');
           }
-          console.log(`Cleared ${keysToRemove.length} cached summaries`);
         } else {
           if (showConfirmation) {
             this.showNotification('No cached summaries found', 'info');
           }
-          console.log('No cached summaries found to clear');
         }
 
         return keysToRemove.length;
@@ -307,8 +293,6 @@ class KuiqleeOptions {
         this.hideFeedbackSection();
       }
     });
-
-    console.log('Simple feedback initialized for settings');
   }
 
   /**
@@ -381,7 +365,6 @@ class KuiqleeOptions {
         // Show success
         document.getElementById('feedback-form').style.display = 'none';
         document.getElementById('feedback-success').style.display = 'block';
-        console.log('✅ GitHub issue created successfully');
       } else {
         throw new Error('Failed to create GitHub issue');
       }
@@ -414,7 +397,6 @@ class KuiqleeOptions {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(`✅ Created GitHub issue via proxy: ${result.message}`);
         return true;
       } else {
         const errorData = await response.json().catch(() => ({}));
@@ -455,7 +437,7 @@ class KuiqleeOptions {
     try {
       const result = await chrome.storage.local.get(null);
       const summaryKeys = Object.keys(result).filter(
-        (key) => key.startsWith('summary_') || key.startsWith('readfocus_summary')
+        (key) => key.startsWith('summary_') || key.startsWith('readfocus_summary'),
       );
 
       const totalSummaries = summaryKeys.length;

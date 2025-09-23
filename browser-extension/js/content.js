@@ -3,7 +3,6 @@
  * Handles article detection, content extraction, and Focus Mode overlay
  */
 
-
 class KuiqleeContentScript {
   constructor() {
     this.settings = {};
@@ -117,7 +116,6 @@ class KuiqleeContentScript {
       }
     } catch (error) {
       // Fail silently to not interfere with normal page operation
-      console.log('Could not load existing summary on page load:', error);
     }
   }
 
@@ -630,7 +628,7 @@ class KuiqleeContentScript {
   findContentByHeuristics() {
     // Get all potential content containers
     const candidates = Array.from(
-      document.querySelectorAll('div, section, article, main, [role="main"]')
+      document.querySelectorAll('div, section, article, main, [role="main"]'),
     );
 
     let bestCandidate = null;
@@ -768,7 +766,7 @@ class KuiqleeContentScript {
   createEmergencyContent() {
     // Collect all text-containing elements
     const textElements = Array.from(
-      document.querySelectorAll('p, div, span, section, article')
+      document.querySelectorAll('p, div, span, section, article'),
     ).filter((el) => {
       const text = el.textContent?.trim();
       if (!text || text.length < 50) return false;
@@ -869,7 +867,7 @@ class KuiqleeContentScript {
 
     // Strategy 3: Collect all readable paragraphs from the page
     const allParagraphs = document.querySelectorAll(
-      'p, div[data-selectable-paragraph], .graf, [class*="paragraph"], [class*="content"] p'
+      'p, div[data-selectable-paragraph], .graf, [class*="paragraph"], [class*="content"] p',
     );
 
     if (allParagraphs.length > 0) {
@@ -921,7 +919,7 @@ class KuiqleeContentScript {
       // Strategy 2: Look for any paragraph-like elements with substantial text
       () => {
         const paragraphElements = document.querySelectorAll(
-          'p, div[role="paragraph"], [data-testid*="paragraph"], [data-testid*="content"]'
+          'p, div[role="paragraph"], [data-testid*="paragraph"], [data-testid*="content"]',
         );
         if (paragraphElements.length > 5) {
           const container = document.createElement('div');
@@ -1172,23 +1170,12 @@ class KuiqleeContentScript {
    * Start Focus Mode
    */
   async startFocusMode(settings, pageAnalysis) {
-    console.log('🚀 [ContentScript] Starting Focus Mode...');
-    console.log('⚙️ [ContentScript] Settings received:', settings);
-    console.log('📊 [ContentScript] Page analysis received:', pageAnalysis);
-
     try {
       // Update settings
       this.settings = settings || this.settings;
       this.pageAnalysis = pageAnalysis || this.pageAnalysis;
 
-      console.log('🔍 [ContentScript] Final settings:', this.settings);
-      console.log('📋 [ContentScript] Final page analysis:', this.pageAnalysis);
-
       // Validate page analysis
-      console.log('🔍 [ContentScript] Checking page analysis object...');
-      console.log('📊 [ContentScript] Page analysis:', this.pageAnalysis);
-      console.log('📊 [ContentScript] Page analysis type:', typeof this.pageAnalysis);
-      console.log('📊 [ContentScript] Page analysis keys:', Object.keys(this.pageAnalysis || {}));
 
       if (!this.pageAnalysis) {
         console.error('❌ [ContentScript] No page analysis available');
@@ -1197,30 +1184,11 @@ class KuiqleeContentScript {
 
       if (!this.pageAnalysis.isArticle) {
         console.error('❌ [ContentScript] Page analysis indicates this is not an article');
-        console.log('📊 [ContentScript] Analysis details:', {
-          isArticle: this.pageAnalysis.isArticle,
-          wordCount: this.pageAnalysis.wordCount,
-          confidence: this.pageAnalysis.confidence,
-        });
+
         return false;
       }
 
       // Debug mainContent property specifically
-      console.log('🔍 [ContentScript] Checking mainContent property...');
-      console.log('📄 [ContentScript] mainContent value:', this.pageAnalysis.mainContent);
-      console.log('📄 [ContentScript] mainContent type:', typeof this.pageAnalysis.mainContent);
-      console.log(
-        '📄 [ContentScript] mainContent constructor:',
-        this.pageAnalysis.mainContent?.constructor?.name
-      );
-      console.log(
-        '📄 [ContentScript] mainContent is Element?',
-        this.pageAnalysis.mainContent instanceof Element
-      );
-      console.log(
-        '📄 [ContentScript] mainContent has querySelectorAll?',
-        typeof this.pageAnalysis.mainContent?.querySelectorAll === 'function'
-      );
 
       // Check for invalid mainContent (null, undefined, or empty object)
       const isInvalidContent =
@@ -1231,17 +1199,15 @@ class KuiqleeContentScript {
 
       if (isInvalidContent) {
         console.error('❌ [ContentScript] Invalid or missing main content in page analysis');
-        console.log('🔍 [ContentScript] Attempting to re-extract content...');
 
         // Try to re-extract content
         const rawContentElement = this.detectMainContent();
         if (rawContentElement) {
           const validatedContentElement = this.validateContentElement(
             rawContentElement,
-            're-extraction'
+            're-extraction',
           );
           if (validatedContentElement) {
-            console.log('✅ [ContentScript] Re-extracted content successfully');
             this.pageAnalysis.mainContent = validatedContentElement;
           } else {
             console.error('❌ [ContentScript] Re-extracted content failed validation');
@@ -1256,7 +1222,7 @@ class KuiqleeContentScript {
       // Validate the main content element before proceeding
       const validatedContent = this.validateContentElement(
         this.pageAnalysis.mainContent,
-        'startFocusMode'
+        'startFocusMode',
       );
       if (!validatedContent) {
         console.error('❌ [ContentScript] Main content failed validation in startFocusMode');
@@ -1265,33 +1231,7 @@ class KuiqleeContentScript {
 
       this.pageAnalysis.mainContent = validatedContent;
 
-      console.log('📄 [ContentScript] Main content element:', this.pageAnalysis.mainContent);
-      console.log('🏷️ [ContentScript] Content tag name:', this.pageAnalysis.mainContent.tagName);
-      console.log(
-        '📏 [ContentScript] Content text length:',
-        this.pageAnalysis.mainContent.textContent?.length || 0
-      );
-
       // Validate content has text
-      console.log('🔍 [ContentScript] Validating main content text...');
-      console.log('📄 [ContentScript] Main content element details:');
-      console.log('   - Tag:', this.pageAnalysis.mainContent.tagName);
-      console.log('   - Class:', this.pageAnalysis.mainContent.className);
-      console.log('   - ID:', this.pageAnalysis.mainContent.id);
-      console.log('   - Inner HTML length:', this.pageAnalysis.mainContent.innerHTML?.length || 0);
-      console.log(
-        '   - Text content length:',
-        this.pageAnalysis.mainContent.textContent?.length || 0
-      );
-      console.log('   - Children count:', this.pageAnalysis.mainContent.children?.length || 0);
-      console.log(
-        '   - First 500 chars of innerHTML:',
-        this.pageAnalysis.mainContent.innerHTML?.substring(0, 500)
-      );
-      console.log(
-        '   - First 200 chars of textContent:',
-        this.pageAnalysis.mainContent.textContent?.substring(0, 200)
-      );
 
       if (
         !this.pageAnalysis.mainContent.textContent ||
@@ -1300,35 +1240,18 @@ class KuiqleeContentScript {
         console.error('❌ [ContentScript] Main content element has no readable text');
 
         // Try to find any text in child elements
-        console.log('🔍 [ContentScript] Searching for text in child elements...');
         const allTextElements = this.pageAnalysis.mainContent.querySelectorAll('*');
         let foundTextElements = 0;
         for (let i = 0; i < Math.min(10, allTextElements.length); i++) {
           const el = allTextElements[i];
           if (el.textContent && el.textContent.trim().length > 20) {
             foundTextElements++;
-            console.log(
-              `   📝 Child ${i + 1}: ${el.tagName} - "${el.textContent.trim().substring(0, 100)}..."`
-            );
           }
         }
-        console.log(
-          `📊 [ContentScript] Found ${foundTextElements} child elements with text out of ${allTextElements.length} total`
-        );
 
         // Try alternative content extraction
-        console.log('🔄 [ContentScript] Attempting alternative content extraction...');
         const alternativeContent = this.tryAlternativeContentExtraction();
         if (alternativeContent && alternativeContent instanceof Element) {
-          console.log('✅ [ContentScript] Alternative content extraction succeeded!');
-          console.log(
-            '🔍 [ContentScript] Alternative content type:',
-            alternativeContent.constructor.name
-          );
-          console.log(
-            '🔍 [ContentScript] Alternative content has querySelectorAll?',
-            typeof alternativeContent.querySelectorAll === 'function'
-          );
           this.pageAnalysis.mainContent = alternativeContent;
         } else {
           console.error('❌ [ContentScript] All content extraction methods failed');
@@ -1338,8 +1261,6 @@ class KuiqleeContentScript {
         }
       }
 
-      console.log('🎯 [ContentScript] Creating Focus Mode overlay...');
-
       // Check if FocusModeOverlay class is available
       if (typeof FocusModeOverlay === 'undefined') {
         console.error('❌ [ContentScript] FocusModeOverlay class not available');
@@ -1348,10 +1269,8 @@ class KuiqleeContentScript {
 
       // Create and initialize Focus Mode
       this.focusMode = new FocusModeOverlay(this.settings, this.pageAnalysis);
-      console.log('✅ [ContentScript] Focus Mode overlay created, activating...');
 
       await this.focusMode.activate();
-      console.log('🎉 [ContentScript] Focus Mode activated successfully!');
 
       return true;
     } catch (error) {
@@ -1380,10 +1299,6 @@ class KuiqleeContentScript {
    * Start Reading Helper Mode
    */
   async startReadingHelper(settings, pageAnalysis) {
-    console.log('📖 [ContentScript] Starting Reading Helper Mode...');
-    console.log('⚙️ [ContentScript] Settings received:', settings);
-    console.log('📊 [ContentScript] Page analysis received:', pageAnalysis);
-
     try {
       // Exit any existing mode first
       this.exitFocusMode();
@@ -1393,7 +1308,6 @@ class KuiqleeContentScript {
       if (pageAnalysis) {
         this.pageAnalysis = pageAnalysis;
       } else if (!this.pageAnalysis) {
-        console.log('🔍 [ContentScript] No page analysis provided, analyzing now...');
         this.pageAnalysis = await this.analyzePageForArticle();
       }
 
@@ -1411,21 +1325,9 @@ class KuiqleeContentScript {
           Object.keys(this.pageAnalysis.mainContent).length === 0);
 
       if (isInvalidContent) {
-        console.warn(
-          '⚠️ [ContentScript] Reading Helper: Invalid mainContent detected, attempting re-extraction...'
-        );
-        console.log(
-          '🔍 [ContentScript] Current mainContent type:',
-          typeof this.pageAnalysis.mainContent
-        );
-        console.log('🔍 [ContentScript] Current mainContent value:', this.pageAnalysis.mainContent);
-
         // Try alternative content extraction
         const alternativeContent = this.tryAlternativeContentExtraction();
         if (alternativeContent && alternativeContent instanceof Element) {
-          console.log(
-            '✅ [ContentScript] Reading Helper: Alternative content extraction succeeded!'
-          );
           this.pageAnalysis.mainContent = alternativeContent;
         } else {
           console.error('❌ [ContentScript] Reading Helper: Alternative content extraction failed');
@@ -1436,27 +1338,23 @@ class KuiqleeContentScript {
       // Validate content is a proper DOM element
       const validatedContent = this.validateContentElement(
         this.pageAnalysis.mainContent,
-        'startReadingHelper'
+        'startReadingHelper',
       );
       if (!validatedContent) {
         console.error('❌ [ContentScript] Main content failed validation in startReadingHelper');
 
         // One more attempt with alternative extraction
-        console.log(
-          '🔄 [ContentScript] Reading Helper: Attempting final alternative extraction...'
-        );
         const finalAlternative = this.tryAlternativeContentExtraction();
         const finalValidated = this.validateContentElement(
           finalAlternative,
-          'startReadingHelper-final'
+          'startReadingHelper-final',
         );
 
         if (finalValidated) {
-          console.log('✅ [ContentScript] Reading Helper: Final alternative extraction succeeded!');
           this.pageAnalysis.mainContent = finalValidated;
         } else {
           console.error(
-            '❌ [ContentScript] Reading Helper: All content extraction attempts failed'
+            '❌ [ContentScript] Reading Helper: All content extraction attempts failed',
           );
           return false;
         }
@@ -1465,66 +1363,39 @@ class KuiqleeContentScript {
       }
 
       // Validate content has readable text
-      console.log('🔍 [ContentScript] Reading Helper: Validating main content text...');
-      console.log('📄 [ContentScript] Reading Helper: Main content element details:');
-      console.log('   - Tag:', this.pageAnalysis.mainContent.tagName);
-      console.log('   - Class:', this.pageAnalysis.mainContent.className);
-      console.log('   - ID:', this.pageAnalysis.mainContent.id);
-      console.log(
-        '   - Text content length:',
-        this.pageAnalysis.mainContent.textContent?.length || 0
-      );
-      console.log('   - Children count:', this.pageAnalysis.mainContent.children?.length || 0);
 
       if (
         !this.pageAnalysis.mainContent.textContent ||
         this.pageAnalysis.mainContent.textContent.trim().length === 0
       ) {
         console.error(
-          '❌ [ContentScript] Reading Helper: Main content element has no readable text'
+          '❌ [ContentScript] Reading Helper: Main content element has no readable text',
         );
 
         // Try alternative content extraction one more time
-        console.log(
-          '🔄 [ContentScript] Reading Helper: Attempting text-based alternative extraction...'
-        );
         const textAlternative = this.tryAlternativeContentExtraction();
         if (
           textAlternative &&
           textAlternative.textContent &&
           textAlternative.textContent.trim().length > 0
         ) {
-          console.log(
-            '✅ [ContentScript] Reading Helper: Text-based alternative extraction succeeded!'
-          );
           this.pageAnalysis.mainContent = textAlternative;
         } else {
           console.error(
-            '❌ [ContentScript] Reading Helper: No readable text found in content element'
+            '❌ [ContentScript] Reading Helper: No readable text found in content element',
           );
           this.showNotification(
             'This page does not contain readable text for Reading Helper',
-            'error'
+            'error',
           );
           return false;
         }
       }
 
       // Check if ReadingHelperOverlay is available
-      console.log('🔍 [ContentScript] Checking ReadingHelperOverlay availability...');
-      console.log('🔍 [ContentScript] typeof ReadingHelperOverlay:', typeof ReadingHelperOverlay);
-      console.log('🔍 [ContentScript] window.ReadingHelperOverlay:', window.ReadingHelperOverlay);
-      console.log(
-        '🔍 [ContentScript] All window properties containing "Reading":',
-        Object.keys(window).filter((key) => key.includes('Reading'))
-      );
 
       if (typeof ReadingHelperOverlay === 'undefined') {
         console.error('❌ [ContentScript] ReadingHelperOverlay not available');
-        console.error(
-          '❌ [ContentScript] Available window properties:',
-          Object.keys(window).slice(0, 20)
-        );
         return false;
       }
 
@@ -1533,7 +1404,6 @@ class KuiqleeContentScript {
       const result = await this.readingHelper.activate(settings, this.pageAnalysis);
 
       if (result.success) {
-        console.log('✅ [ContentScript] Reading Helper activated successfully');
         return true;
       } else {
         throw new Error('Failed to activate Reading Helper overlay');
@@ -1549,11 +1419,9 @@ class KuiqleeContentScript {
    * Exit Reading Helper Mode
    */
   exitReadingHelper() {
-    console.log('🚪 [ContentScript] Exiting Reading Helper Mode...');
     if (this.readingHelper) {
       this.readingHelper.exit();
       this.readingHelper = null;
-      console.log('✅ [ContentScript] Reading Helper exited');
     }
   }
 
@@ -1639,7 +1507,9 @@ class KuiqleeContentScript {
       font-size: 14px;
       font-weight: 500;
       color: white;
-      background-color: ${type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#10b981'};
+      background-color: ${
+        type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#10b981'
+      };
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       transform: translateX(100%);
       transition: transform 0.3s ease;
@@ -1684,7 +1554,6 @@ class KuiqleeContentScript {
       return false;
     }
   }
-
 
   /**
    * Show summary overlay with given data
@@ -1731,7 +1600,6 @@ class KuiqleeContentScript {
       this.summaryOverlay.hide();
     }
   }
-
 
   /**
    * Get summary service status

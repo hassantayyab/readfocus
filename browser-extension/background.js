@@ -30,11 +30,9 @@ class KuiqleeBackground {
       this.handleIconClick(tab);
     });
 
-    console.log('Kuiqlee background script initialized');
   }
 
   handleInstallation(details) {
-    console.log('Kuiqlee extension installed:', details.reason);
 
     if (details.reason === 'install') {
       // First time installation
@@ -42,7 +40,6 @@ class KuiqleeBackground {
       this.setDefaultSettings();
     } else if (details.reason === 'update') {
       // Extension updated
-      console.log('Kuiqlee extension updated');
     }
   }
 
@@ -119,7 +116,6 @@ class KuiqleeBackground {
 
   handleIconClick(tab) {
     // This is handled by the popup, but we can add fallback behavior
-    console.log('Extension icon clicked');
   }
 
   async sendTextToKuiqlee(text, title = 'Captured Text', sourceUrl = '') {
@@ -193,13 +189,11 @@ class KuiqleeBackground {
   }
 
   showWelcomeNotification() {
-    console.log(
       'Kuiqlee extension installed successfully! Right-click on any text to send it to Kuiqlee for guided reading.'
     );
   }
 
   showSuccessNotification(message) {
-    console.log('Kuiqlee:', message);
   }
 
   showErrorNotification(message) {

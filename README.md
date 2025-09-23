@@ -1,4 +1,4 @@
-# ReadFocus - AI Content Summarization Chrome Extension
+# Kuiqlee - AI Content Summarization Chrome Extension
 
 An AI-powered Chrome extension that **instantly transforms any webpage into intelligent, digestible summaries** to help students, professionals, and researchers quickly understand and retain key information from the web.
 
@@ -74,8 +74,8 @@ Transform information overload into knowledge advantage. Help users understand a
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/hassantayyab/readfocus.git
-cd readfocus
+git clone https://github.com/hassantayyab/kuiqlee.git
+cd kuiqlee
 ```
 
 2. **Install dependencies:**
@@ -115,7 +115,7 @@ npm run package
    - Create account and generate API key
 
 2. **Configure Extension:**
-   - Click ReadFocus extension icon
+   - Click Kuiqlee extension icon
    - Click "Settings"
    - Enter your Claude API key
    - Adjust preferences (theme, font size, etc.)
@@ -123,7 +123,7 @@ npm run package
 ### 🧪 **Testing the Extension**
 
 1. **Navigate to any article** (Medium, Wikipedia, news site, blog)
-2. **Click the ReadFocus extension icon**
+2. **Click the Kuiqlee extension icon**
 3. **Click "Summarize"** button
 4. **View the generated summary** in the overlay
 5. **Use keyboard shortcuts:**

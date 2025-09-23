@@ -477,7 +477,6 @@ class KuiqleePopup {
       }, 3000);
     } else {
       // Fallback: show in console
-      console.log(`${type.toUpperCase()}: ${message}`);
     }
   }
 
