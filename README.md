@@ -1,8 +1,21 @@
-# Kuiqlee - AI Content Summarization Chrome Extension
+# Kuiqlee - AI-Powered Content Summarization
+
+**Transform any webpage into digestible, intelligent summaries with AI-powered content analysis.**
 
 An AI-powered Chrome extension that **instantly transforms any webpage into intelligent, digestible summaries** to help students, professionals, and researchers quickly understand and retain key information from the web.
 
 > **One-click summarization** → Get comprehensive, multi-format AI summaries with key insights, action items, and detailed analysis in under 10 seconds.
+
+## 🌐 Landing Page
+
+A modern, responsive landing page built with Next.js, TypeScript, and Tailwind CSS v4 is now available.
+
+```bash
+# Start the landing page development server
+npm run dev
+```
+
+Visit `http://localhost:3000` to see the landing page showcasing all Kuiqlee features.
 
 ## 🎯 Mission
 

@@ -1,0 +1,198 @@
+'use client';
+import { motion } from 'framer-motion';
+import { Database, FileText, GraduationCap, Shield, Sparkles, Zap } from 'lucide-react';
+
+const Features = () => {
+  const features = [
+    {
+      title: 'AI-Powered Intelligence',
+      description:
+        'Advanced AI provides high-quality, educational summaries that understand context and nuance.',
+      link: '#',
+      icon: <Sparkles className='w-6 h-6' />,
+    },
+    {
+      title: 'Instant Summarization',
+      description:
+        'Get comprehensive summaries in under 10 seconds. One click transforms any webpage into digestible insights.',
+      link: '#',
+      icon: <Zap className='w-6 h-6' />,
+    },
+    {
+      title: 'Multiple Summary Formats',
+      description:
+        'Quick overview, detailed analysis, key points, action items, and ELI15 explanations for different needs.',
+      link: '#',
+      icon: <FileText className='w-6 h-6' />,
+    },
+    {
+      title: 'Persistent Storage',
+      description:
+        'Generate once, access forever. All summaries are saved locally for instant recall and offline access.',
+      link: '#',
+      icon: <Database className='w-6 h-6' />,
+    },
+    {
+      title: 'Educational Focus',
+      description:
+        'Designed for students, researchers, and professionals with academic-quality analysis and concept explanations.',
+      link: '#',
+      icon: <GraduationCap className='w-6 h-6' />,
+    },
+    {
+      title: 'Privacy First',
+      description:
+        'No data collection, no tracking. Your reading habits and summaries stay completely private and secure.',
+      link: '#',
+      icon: <Shield className='w-6 h-6' />,
+    },
+  ];
+
+  return (
+    <section id='features' className='pb-24 pt-16' style={{ backgroundColor: '#fcfbfa' }}>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className='text-center mb-20'
+        >
+          <h2 className='text-4xl lg:text-5xl font-bold mb-6' style={{ color: '#0d1221' }}>
+            Powerful Features for <span style={{ color: '#f75c30' }}>Smarter Reading</span>
+          </h2>
+          <p className='text-xl max-w-3xl mx-auto' style={{ color: '#0d1221' }}>
+            Transform information overload into knowledge advantage with cutting-edge AI technology
+          </p>
+        </motion.div>
+
+        <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20'>
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className='group relative bg-white border border-gray-200 rounded-3xl p-8 transition-all duration-300'
+            >
+              <div className='flex items-center space-x-4 mb-6'>
+                <div
+                  className='w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center border border-orange-100'
+                  style={{ color: '#f75c30' }}
+                >
+                  {feature.icon}
+                </div>
+                <h3 className='text-xl font-bold' style={{ color: '#0d1221' }}>
+                  {feature.title}
+                </h3>
+              </div>
+              <p className='leading-relaxed' style={{ color: '#0d1221' }}>
+                {feature.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+          className='bg-white rounded-3xl p-8 lg:p-12 border border-gray-200'
+        >
+          <div className='grid lg:grid-cols-2 gap-12 items-center'>
+            <div>
+              <h3 className='text-3xl lg:text-4xl font-bold mb-6' style={{ color: '#0d1221' }}>
+                5 Different Summary Types
+              </h3>
+              <p className='mb-8 text-lg' style={{ color: '#0d1221' }}>
+                From quick overviews to detailed analysis, get exactly the level of detail you need
+                for any situation.
+              </p>
+              <div className='space-y-4'>
+                {[
+                  { label: 'Summary', desc: 'Essential points in 2-3 sentences' },
+                  { label: 'Detailed', desc: 'Comprehensive analysis with insights' },
+                  { label: 'ELI15', desc: 'Complex concepts in simple terms' },
+                  { label: 'Concepts', desc: 'Key terms and definitions explained' },
+                  { label: 'Actions', desc: 'Practical steps and takeaways' },
+                ].map((item, index) => (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className='flex items-center space-x-4'
+                  >
+                    <div
+                      className='w-8 h-8 rounded-xl flex items-center justify-center'
+                      style={{ backgroundColor: '#f75c30' }}
+                    >
+                      <div className='w-2 h-2 bg-white rounded-full'></div>
+                    </div>
+                    <span style={{ color: '#0d1221' }}>
+                      <strong style={{ color: '#0d1221' }}>{item.label}:</strong> {item.desc}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+              className='relative'
+            >
+              <div className='bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden'>
+                <div className='flex border-b border-gray-200'>
+                  <div
+                    className='px-6 py-4 font-medium text-sm text-white'
+                    style={{ backgroundColor: 'rgba(247, 92, 48, 0.9)' }}
+                  >
+                    Summary
+                  </div>
+                  <div className='px-6 py-4 text-gray-500 font-medium text-sm'>Detailed</div>
+                  <div className='px-6 py-4 text-gray-500 font-medium text-sm'>ELI15</div>
+                  <div className='px-6 py-4 text-gray-500 font-medium text-sm'>Concepts</div>
+                  <div className='px-6 py-4 text-gray-500 font-medium text-sm'>Actions</div>
+                </div>
+                <div className='p-6 space-y-4'>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: '100%' }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                    viewport={{ once: true }}
+                    className='h-3 rounded-full'
+                    style={{ backgroundColor: 'rgba(247, 92, 48, 0.25)' }}
+                  ></motion.div>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: '85%' }}
+                    transition={{ duration: 0.8, delay: 0.7 }}
+                    viewport={{ once: true }}
+                    className='h-3 rounded-full'
+                    style={{ backgroundColor: 'rgba(247, 92, 48, 0.25)' }}
+                  ></motion.div>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: '75%' }}
+                    transition={{ duration: 0.8, delay: 0.9 }}
+                    viewport={{ once: true }}
+                    className='h-3 rounded-full'
+                    style={{ backgroundColor: 'rgba(247, 92, 48, 0.25)' }}
+                  ></motion.div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default Features;
