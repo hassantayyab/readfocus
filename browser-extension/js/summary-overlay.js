@@ -559,19 +559,8 @@ class SummaryOverlay {
     const settingsBtn = this.overlay.querySelector('#rf-open-settings');
     settingsBtn?.addEventListener('click', () => this.openSettings());
 
-    // Click outside to close - with protection against immediate closure
-    this.overlay.addEventListener(
-      'click',
-      (e) => {
-        // Only close if clicking directly on the overlay background, not if already closed, and not if just opened
-        if (e.target === this.overlay && this.isVisible && !this.justOpened) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.hide();
-        }
-      },
-      true,
-    ); // Use capture phase to handle events before they bubble
+    // Since there's no background overlay now, we'll rely on ESC key and close button only
+    // No click-outside-to-close functionality needed
 
     // Keyboard shortcuts
     document.addEventListener('keydown', this.boundKeyboardHandler);
@@ -1169,20 +1158,20 @@ for i in range(10):
     style.textContent = `
       .rf-summary-overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.75);
-        backdrop-filter: blur(8px);
+        top: 92px;
+        right: 20px;
+        bottom: 92px;
+        width: auto;
+        background: transparent;
         z-index: 2147483647;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        align-items: stretch;
+        justify-content: flex-end;
         opacity: 0;
         visibility: hidden;
         transition: all 0.3s ease;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        pointer-events: none;
       }
       
       .rf-summary-overlay .rf-summary-content * {
@@ -1204,25 +1193,25 @@ for i in range(10):
       .rf-summary-overlay.rf-summary-visible {
         opacity: 1;
         visibility: visible;
+        pointer-events: auto;
       }
       
       .rf-summary-container {
         background: #ffffff;
         border-radius: 12px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
         border: 1px solid #e5e7eb;
-        width: 90%;
-        max-width: 800px;
-        height: 80vh;
+        width: 460px;
+        max-width: calc(100vw - 40px);
         overflow: hidden;
-        transform: scale(0.95) translateY(20px);
+        transform: translateX(20px);
         transition: transform 0.3s ease;
         display: flex;
         flex-direction: column;
+        pointer-events: auto;
       }
       
       .rf-summary-visible .rf-summary-container {
-        transform: scale(1) translateY(0);
+        transform: translateX(0);
       }
       
       .rf-summary-header {
@@ -1303,10 +1292,32 @@ for i in range(10):
         display: flex;
         background: #f5f5f5;
         border-bottom: 1px solid #d1d1d1;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        scrollbar-width: thin;
+        scrollbar-color: #d1d1d1 #f5f5f5;
+      }
+
+      .rf-summary-tabs::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .rf-summary-tabs::-webkit-scrollbar-track {
+        background: #f5f5f5;
+      }
+
+      .rf-summary-tabs::-webkit-scrollbar-thumb {
+        background: #d1d1d1;
+        border-radius: 3px;
+      }
+
+      .rf-summary-tabs::-webkit-scrollbar-thumb:hover {
+        background: #b1b1b1;
       }
       
       .rf-summary-tab {
-        flex: 1;
+        flex: 0 0 auto;
         background: none;
         border: none;
         padding: 16px 12px;
@@ -1319,6 +1330,8 @@ for i in range(10):
         font-size: 14px;
         font-weight: 500;
         color: #666666;
+        min-width: 80px;
+        white-space: nowrap;
       }
       
       .rf-summary-tab:hover {
@@ -1895,10 +1908,16 @@ for i in range(10):
       
       /* Mobile responsive */
       @media (max-width: 768px) {
+        .rf-summary-overlay {
+          top: 10px;
+          right: 10px;
+          bottom: 10px;
+        }
+
         .rf-summary-container {
-          width: 95%;
-          height: 90vh;
-          margin: 10px;
+          width: calc(100vw - 20px);
+          max-width: calc(100vw - 20px);
+          height: calc(100vh - 20px);
         }
         
         .rf-summary-header {
@@ -1908,11 +1927,12 @@ for i in range(10):
         }
         
         .rf-summary-tabs {
-          flex-wrap: wrap;
+          overflow-x: auto;
         }
-        
+
         .rf-summary-tab {
-          min-width: 50%;
+          min-width: 100px;
+          flex: 0 0 auto;
         }
         
         .rf-summary-footer {
