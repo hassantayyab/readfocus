@@ -30,13 +30,13 @@ body {
   color: var(--rf-text);
   line-height: 1.5;
   width: 380px;
-  min-height: 480px;
+  min-height: auto;
 }
 
 .container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
 }
 
 /* Header */
@@ -292,21 +292,6 @@ body {
 /* Summary Section */
 .summary-section {
   padding: 16px;
-  border-bottom: 1px solid var(--rf-border);
-}
-
-.summary-card {
-  background-color: var(--rf-surface);
-  border-radius: var(--rf-radius);
-  padding: 16px;
-  border: 1px solid var(--rf-border);
-}
-
-.summary-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
 }
 
 .summary-icon {

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -21,6 +21,14 @@
         </button>
         <!-- Menu Dropdown -->
         <div class="menu-dropdown" id="menu-dropdown">
+          <button
+            class="menu-item"
+            id="how-to-use"
+            title="Navigate to any article → Click 'Understand' (Ctrl/Cmd+Shift+S) → Use Ctrl/Cmd+1-6 to switch tabs"
+          >
+            <span class="button-icon">⚡</span>
+            How to Use
+          </button>
           <button class="menu-item" id="open-settings">
             <span class="button-icon">⚙️</span>
             Settings
@@ -34,31 +42,15 @@
 
       <!-- Content Summary Section -->
       <div class="summary-section" id="summary-section">
-        <div class="summary-card">
-          <div class="summary-header">
-            <span class="summary-icon">📄</span>
-            <div class="summary-title">AI Content Analyzer</div>
-          </div>
-          <div class="summary-description">Transform any webpage into quick understanding with 5 formats: Quick Overview, Detailed Analysis, ELI5 Explanations, Key Points, and Action Items</div>
-          <div class="summary-actions">
-            <button class="summary-button" id="generate-summary">
-              <span class="button-icon">⚡</span>
-              Understand
-            </button>
-          </div>
+        <div class="summary-description">
+          Transform any webpage into quick understanding with AI.
         </div>
-      </div>
-
-
-      <!-- Quick Tips -->
-      <div class="tips-section">
-        <h4>⚡ How to Use</h4>
-        <ul class="tips-list">
-          <li>Navigate to any article or webpage</li>
-          <li>Click "Understand" or press <kbd>Ctrl/Cmd+Shift+S</kbd></li>
-          <li>View different analysis formats in the overlay</li>
-          <li>Use <kbd>Ctrl/Cmd+1-6</kbd> to switch between tabs</li>
-        </ul>
+        <div class="summary-actions">
+          <button class="summary-button" id="generate-summary">
+            <span class="button-icon">⚡</span>
+            Start
+          </button>
+        </div>
       </div>
 
       <!-- Footer -->

@@ -54,7 +54,7 @@ class KuiqleePopup {
       await Promise.race([
         this.checkSummaryStatus(),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Summary status check timeout')), 3000)
+          setTimeout(() => reject(new Error('Summary status check timeout')), 3000),
         ),
       ]).catch(() => {
         // Default to ready, but try again after a short delay
@@ -155,9 +155,20 @@ class KuiqleePopup {
     document.addEventListener('click', (e) => {
       const menuDropdown = document.getElementById('menu-dropdown');
       const menuToggle = document.getElementById('menu-toggle');
-      if (menuDropdown && menuToggle && !menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+      if (
+        menuDropdown &&
+        menuToggle &&
+        !menuToggle.contains(e.target) &&
+        !menuDropdown.contains(e.target)
+      ) {
         this.closeMenu();
       }
+    });
+
+    // How to Use button
+    document.getElementById('how-to-use')?.addEventListener('click', () => {
+      this.closeMenu();
+      this.showHowToUse();
     });
 
     // Settings button
@@ -212,7 +223,6 @@ class KuiqleePopup {
     }
   }
 
-
   /**
    * Open settings page
    */
@@ -239,6 +249,15 @@ class KuiqleePopup {
     if (menuDropdown) {
       menuDropdown.classList.remove('show');
     }
+  }
+
+  /**
+   * Show how to use information
+   */
+  showHowToUse() {
+    this.showSuccessMessage(
+      '💡 Tip: Navigate to any article → Click "Understand" (Ctrl/Cmd+Shift+S) → Use Ctrl/Cmd+1-6 to switch between tabs',
+    );
   }
 
   /**
@@ -560,7 +579,7 @@ class KuiqleePopup {
     }
 
     this.showErrorMessage(
-      'Kuiqlee only works on regular web pages (http/https). Please navigate to a website to use summary features.'
+      'Kuiqlee only works on regular web pages (http/https). Please navigate to a website to use summary features.',
     );
   }
 
@@ -662,9 +681,9 @@ class KuiqleePopup {
       generateBtn.disabled = isProcessing;
 
       if (isProcessing) {
-        generateBtn.innerHTML = '<span class="button-icon">⏳</span>Working...';
+        generateBtn.innerHTML = '<span class="button-icon">⏳</span>Processing...';
       } else {
-        generateBtn.innerHTML = '<span class="button-icon">⚡</span>Understand';
+        generateBtn.innerHTML = '<span class="button-icon">⚡</span>Start';
       }
     }
 
