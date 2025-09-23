@@ -1462,6 +1462,7 @@ for i in range(10):
       
       .rf-summary-markdown li {
         margin: 8px 0;
+        font-size: 16px;
         line-height: 1.6;
         position: relative;
         display: list-item;
