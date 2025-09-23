@@ -199,17 +199,17 @@ class SummaryOverlay {
           <button class="rf-summary-tab ${
             this.activeTab === 'quick' ? 'active' : ''
           }" data-tab="quick">
-            <span class="rf-tab-icon">⚡</span>Summary
+            Summary
           </button>
           <button class="rf-summary-tab ${
             this.activeTab === 'detailed' ? 'active' : ''
           }" data-tab="detailed">
-            <span class="rf-tab-icon">📖</span>Detailed
+            Detailed
           </button>
           <button class="rf-summary-tab ${
             this.activeTab === 'eli15' ? 'active' : ''
           }" data-tab="eli15">
-            <span class="rf-tab-icon">👶</span>ELI5
+            ELI5
           </button>
           ${
             this.settings?.includeConcepts !== false
@@ -217,7 +217,7 @@ class SummaryOverlay {
           <button class="rf-summary-tab ${
             this.activeTab === 'concepts' ? 'active' : ''
           }" data-tab="concepts">
-            <span class="rf-tab-icon">💡</span>Concepts
+            Concepts
           </button>`
               : ''
           }
@@ -227,7 +227,7 @@ class SummaryOverlay {
           <button class="rf-summary-tab ${
             this.activeTab === 'points' ? 'active' : ''
           }" data-tab="points">
-            <span class="rf-tab-icon">📌</span>Key Points
+            Key Points
           </button>`
               : ''
           }
@@ -237,7 +237,7 @@ class SummaryOverlay {
           <button class="rf-summary-tab ${
             this.activeTab === 'actions' ? 'active' : ''
           }" data-tab="actions">
-            <span class="rf-tab-icon">🎯</span>Actions
+            Actions
           </button>`
               : ''
           }
@@ -416,13 +416,9 @@ class SummaryOverlay {
 
     return `
       <div class="rf-tab-content rf-tab-eli15">
-        <div class="rf-eli15-summary">
-          <div class="rf-eli15-header">
-            <span class="rf-eli15-icon">👶</span>
-            <h4>Super Simple Explanation</h4>
-          </div>
-          <div class="rf-eli15-text">
-            ${eliSummary}
+        <div class="rf-eli15-simple">
+          <div class="rf-summary-text">
+            <p class="rf-summary-paragraph">${eliSummary}</p>
           </div>
         </div>
       </div>
@@ -904,7 +900,7 @@ class SummaryOverlay {
       }
       // Numbered lists - handle both regular and nested
       else if (trimmedLine.match(/^\s*\d+\.\s/)) {
-        const indentLevel = line.length - line.trimLeft().length;
+        const indentLevel = line.length - line.trimStart().length;
         const content = trimmedLine.replace(/^\d+\.\s/, '');
 
         if (!inList || listItems.length === 0) {
@@ -1217,7 +1213,7 @@ for i in range(10):
         border: 1px solid #e5e7eb;
         width: 90%;
         max-width: 800px;
-        max-height: 90vh;
+        height: 80vh;
         overflow: hidden;
         transform: scale(0.95) translateY(20px);
         transition: transform 0.3s ease;
@@ -1344,7 +1340,6 @@ for i in range(10):
         flex: 1;
         overflow-y: auto;
         padding: 24px;
-        min-height: 200px;
         text-align: left;
       }
       
@@ -1902,7 +1897,7 @@ for i in range(10):
       @media (max-width: 768px) {
         .rf-summary-container {
           width: 95%;
-          max-height: 95vh;
+          height: 90vh;
           margin: 10px;
         }
         

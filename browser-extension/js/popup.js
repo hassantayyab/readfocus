@@ -168,7 +168,7 @@ class KuiqleePopup {
     // How to Use button
     document.getElementById('how-to-use')?.addEventListener('click', () => {
       this.closeMenu();
-      this.showHowToUse();
+      this.showHowItWorksPage();
     });
 
     // Settings button
@@ -252,20 +252,23 @@ class KuiqleePopup {
   }
 
   /**
-   * Show how to use information
+   * Show how it works page
    */
-  showHowToUse() {
-    this.showSuccessMessage(
-      '💡 Tip: Navigate to any article → Click "Understand" (Ctrl/Cmd+Shift+S) → Use Ctrl/Cmd+1-6 to switch between tabs',
-    );
+  showHowItWorksPage() {
+    this.showHowItWorksView();
   }
 
   /**
    * Initialize feedback navigation
    */
   initializeFeedbackModal() {
-    // Back to main button
+    // Back to main button (feedback)
     document.getElementById('back-to-main')?.addEventListener('click', () => {
+      this.showMainView();
+    });
+
+    // Back to main button (how it works)
+    document.getElementById('back-to-main-how')?.addEventListener('click', () => {
       this.showMainView();
     });
 
@@ -297,7 +300,7 @@ class KuiqleePopup {
    * Show main view
    */
   showMainView() {
-    // Hide all main content except header
+    // Show all main content elements
     const mainElements = [
       '.feature-header',
       '.summary-section',
@@ -311,9 +314,36 @@ class KuiqleePopup {
       if (element) element.style.display = 'block';
     });
 
+    // Hide feedback and how-it-works content
+    document.getElementById('feedback-content').style.display = 'none';
+    document.getElementById('how-it-works-content').style.display = 'none';
+    this.currentView = 'main';
+  }
+
+  /**
+   * Show how it works view
+   */
+  showHowItWorksView() {
+    // Hide main content except header
+    const mainElements = [
+      '.feature-header',
+      '.summary-section',
+      '.secondary-actions',
+      '.tips-section',
+      '.footer',
+    ];
+
+    mainElements.forEach((selector) => {
+      const element = document.querySelector(selector);
+      if (element) element.style.display = 'none';
+    });
+
     // Hide feedback content
     document.getElementById('feedback-content').style.display = 'none';
-    this.currentView = 'main';
+
+    // Show how it works content
+    document.getElementById('how-it-works-content').style.display = 'block';
+    this.currentView = 'how-it-works';
   }
 
   /**
@@ -333,6 +363,9 @@ class KuiqleePopup {
       const element = document.querySelector(selector);
       if (element) element.style.display = 'none';
     });
+
+    // Hide how it works content
+    document.getElementById('how-it-works-content').style.display = 'none';
 
     // Reset and show feedback form
     const feedbackForm = document.getElementById('feedback-form');
