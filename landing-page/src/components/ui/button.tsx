@@ -28,7 +28,7 @@ const Button = ({
     'font-semibold transition-colors duration-200 cursor-pointer border-0 outline-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black';
 
   const variants = {
-    primary: 'text-white hover:shadow-xl bg-gray-800 hover:bg-gray-900',
+    primary: 'text-white hover:shadow bg-gray-800 hover:bg-gray-900',
     secondary:
       'text-white border border-gray-600 hover:border-gray-500 bg-gray-800 hover:bg-gray-900',
     outline:

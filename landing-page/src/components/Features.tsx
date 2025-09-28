@@ -77,18 +77,12 @@ const Features = () => {
               className='group relative bg-white border border-gray-200 rounded-3xl p-10 transition-all duration-300'
             >
               <div className='flex items-center space-x-4 mb-6'>
-                <div
-                  className='w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center border border-orange-100 text-orange-500'
-                >
+                <div className='w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center border border-orange-100 text-orange-500 shrink-0'>
                   {feature.icon}
                 </div>
-                <h3 className='text-2xl font-bold text-gray-900'>
-                  {feature.title}
-                </h3>
+                <h3 className='text-2xl font-bold text-gray-900'>{feature.title}</h3>
               </div>
-              <p className='leading-relaxed text-lg text-gray-700'>
-                {feature.description}
-              </p>
+              <p className='leading-relaxed text-lg text-gray-700'>{feature.description}</p>
             </motion.div>
           ))}
         </div>
@@ -125,9 +119,7 @@ const Features = () => {
                     viewport={{ once: true }}
                     className='flex items-center space-x-4'
                   >
-                    <div
-                      className='w-8 h-8 rounded-xl flex items-center justify-center bg-orange-500'
-                    >
+                    <div className='w-8 h-8 rounded-xl flex items-center justify-center bg-orange-500'>
                       <div className='w-2 h-2 bg-white rounded-full'></div>
                     </div>
                     <span className='text-lg text-gray-700'>
@@ -147,9 +139,7 @@ const Features = () => {
             >
               <div className='bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden'>
                 <div className='flex border-b border-gray-200'>
-                  <div
-                    className='px-6 py-4 font-medium text-sm text-white bg-orange-500/90'
-                  >
+                  <div className='px-6 py-4 font-medium text-sm text-white bg-orange-500/90'>
                     Summary
                   </div>
                   <div className='px-6 py-4 text-gray-600 font-medium text-base'>Detailed</div>
