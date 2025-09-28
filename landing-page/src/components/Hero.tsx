@@ -69,7 +69,7 @@ const Hero = () => {
           >
             <div className='relative'>
               <div className='bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden p-1'>
-                <div className='bg-white rounded-[20px] border border-gray-100 overflow-hidden'>
+                <div className='bg-white rounded-[14px] border border-gray-100 overflow-hidden'>
                   <div className='bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200'>
                     <div className='flex items-center space-x-3'>
                       <div className='flex space-x-1.5'>
