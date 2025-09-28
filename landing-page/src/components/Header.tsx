@@ -1,6 +1,7 @@
 'use client';
 import Button from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 const Header = () => {
@@ -14,16 +15,12 @@ const Header = () => {
     >
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between items-center h-16'>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className='flex items-center space-x-2'
-            onClick={() => router.push('/')}
-          >
+          <Link className='flex items-center space-x-2 cursor-pointer' href='/'>
             <div className='w-8 h-8 rounded-lg flex items-center justify-center bg-orange-500'>
               <span className='text-white font-bold text-sm'>K</span>
             </div>
             <span className='text-xl font-bold text-gray-900'>Kuiqlee</span>
-          </motion.div>
+          </Link>
 
           <nav className='hidden md:flex items-center space-x-8'>
             <a
