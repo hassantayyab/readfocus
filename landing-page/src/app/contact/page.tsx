@@ -27,7 +27,7 @@ const ContactPage = () => {
                 type='text'
                 id='name'
                 name='name'
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all'
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none bg-white transition-all'
                 placeholder='Your name'
               />
             </div>
@@ -39,7 +39,7 @@ const ContactPage = () => {
                 type='email'
                 id='email'
                 name='email'
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all'
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none bg-white transition-all'
                 placeholder='your@email.com'
               />
             </div>
@@ -50,7 +50,7 @@ const ContactPage = () => {
               <select
                 id='subject'
                 name='subject'
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all'
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none bg-white transition-all'
               >
                 <option value=''>Select a topic</option>
                 <option value='support'>Technical Support</option>
