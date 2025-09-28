@@ -29,11 +29,9 @@ class KuiqleeBackground {
     chrome.action.onClicked.addListener((tab) => {
       this.handleIconClick(tab);
     });
-
   }
 
   handleInstallation(details) {
-
     if (details.reason === 'install') {
       // First time installation
       this.showWelcomeNotification();
@@ -189,12 +187,12 @@ class KuiqleeBackground {
   }
 
   showWelcomeNotification() {
-      'Kuiqlee extension installed successfully! Right-click on any text to send it to Kuiqlee for guided reading.'
+    console.log(
+      'Kuiqlee extension installed successfully! Right-click on any text to send it to Kuiqlee for guided reading.',
     );
   }
 
-  showSuccessNotification(message) {
-  }
+  showSuccessNotification(message) {}
 
   showErrorNotification(message) {
     console.error('Kuiqlee Error:', message);
