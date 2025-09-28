@@ -49,7 +49,7 @@ const Features = () => {
   ];
 
   return (
-    <section id='features' className='pb-24 pt-16' style={{ backgroundColor: '#fcfbfa' }}>
+    <section id='features' className='pb-24 pt-16 bg-orange-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -58,10 +58,10 @@ const Features = () => {
           viewport={{ once: true }}
           className='text-center mb-20'
         >
-          <h2 className='text-4xl lg:text-5xl font-bold mb-6' style={{ color: '#0d1221' }}>
-            Powerful Features for <span style={{ color: '#f75c30' }}>Smarter Reading</span>
+          <h2 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
+            Powerful Features for <span className='text-orange-500'>Smarter Reading</span>
           </h2>
-          <p className='text-xl max-w-3xl mx-auto' style={{ color: '#0d1221' }}>
+          <p className='text-xl max-w-3xl mx-auto text-gray-900'>
             Transform information overload into knowledge advantage with cutting-edge AI technology
           </p>
         </motion.div>
@@ -74,20 +74,19 @@ const Features = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className='group relative bg-white border border-gray-200 rounded-3xl p-8 transition-all duration-300'
+              className='group relative bg-white border border-gray-200 rounded-3xl p-10 transition-all duration-300'
             >
               <div className='flex items-center space-x-4 mb-6'>
                 <div
-                  className='w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center border border-orange-100'
-                  style={{ color: '#f75c30' }}
+                  className='w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center border border-orange-100 text-orange-500'
                 >
                   {feature.icon}
                 </div>
-                <h3 className='text-xl font-bold' style={{ color: '#0d1221' }}>
+                <h3 className='text-2xl font-bold text-gray-900'>
                   {feature.title}
                 </h3>
               </div>
-              <p className='leading-relaxed' style={{ color: '#0d1221' }}>
+              <p className='leading-relaxed text-lg text-gray-700'>
                 {feature.description}
               </p>
             </motion.div>
@@ -103,10 +102,10 @@ const Features = () => {
         >
           <div className='grid lg:grid-cols-2 gap-12 items-center'>
             <div>
-              <h3 className='text-3xl lg:text-4xl font-bold mb-6' style={{ color: '#0d1221' }}>
+              <h3 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
                 5 Different Summary Types
               </h3>
-              <p className='mb-8 text-lg' style={{ color: '#0d1221' }}>
+              <p className='mb-8 text-xl text-gray-700'>
                 From quick overviews to detailed analysis, get exactly the level of detail you need
                 for any situation.
               </p>
@@ -127,13 +126,12 @@ const Features = () => {
                     className='flex items-center space-x-4'
                   >
                     <div
-                      className='w-8 h-8 rounded-xl flex items-center justify-center'
-                      style={{ backgroundColor: '#f75c30' }}
+                      className='w-8 h-8 rounded-xl flex items-center justify-center bg-orange-500'
                     >
                       <div className='w-2 h-2 bg-white rounded-full'></div>
                     </div>
-                    <span style={{ color: '#0d1221' }}>
-                      <strong style={{ color: '#0d1221' }}>{item.label}:</strong> {item.desc}
+                    <span className='text-lg text-gray-700'>
+                      <strong className='text-gray-900'>{item.label}:</strong> {item.desc}
                     </span>
                   </motion.div>
                 ))}
@@ -150,15 +148,14 @@ const Features = () => {
               <div className='bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden'>
                 <div className='flex border-b border-gray-200'>
                   <div
-                    className='px-6 py-4 font-medium text-sm text-white'
-                    style={{ backgroundColor: 'rgba(247, 92, 48, 0.9)' }}
+                    className='px-6 py-4 font-medium text-sm text-white bg-orange-500/90'
                   >
                     Summary
                   </div>
-                  <div className='px-6 py-4 text-gray-500 font-medium text-sm'>Detailed</div>
-                  <div className='px-6 py-4 text-gray-500 font-medium text-sm'>ELI15</div>
-                  <div className='px-6 py-4 text-gray-500 font-medium text-sm'>Concepts</div>
-                  <div className='px-6 py-4 text-gray-500 font-medium text-sm'>Actions</div>
+                  <div className='px-6 py-4 text-gray-600 font-medium text-base'>Detailed</div>
+                  <div className='px-6 py-4 text-gray-600 font-medium text-base'>ELI15</div>
+                  <div className='px-6 py-4 text-gray-600 font-medium text-base'>Concepts</div>
+                  <div className='px-6 py-4 text-gray-600 font-medium text-base'>Actions</div>
                 </div>
                 <div className='p-6 space-y-4'>
                   <motion.div
@@ -166,24 +163,21 @@ const Features = () => {
                     whileInView={{ width: '100%' }}
                     transition={{ duration: 0.8, delay: 0.5 }}
                     viewport={{ once: true }}
-                    className='h-3 rounded-full'
-                    style={{ backgroundColor: 'rgba(249, 115, 22, 0.25)' }}
+                    className='h-3 rounded-full bg-orange-200'
                   ></motion.div>
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: '85%' }}
                     transition={{ duration: 0.8, delay: 0.7 }}
                     viewport={{ once: true }}
-                    className='h-3 rounded-full'
-                    style={{ backgroundColor: 'rgba(249, 115, 22, 0.25)' }}
+                    className='h-3 rounded-full bg-orange-200'
                   ></motion.div>
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: '75%' }}
                     transition={{ duration: 0.8, delay: 0.9 }}
                     viewport={{ once: true }}
-                    className='h-3 rounded-full'
-                    style={{ backgroundColor: 'rgba(249, 115, 22, 0.25)' }}
+                    className='h-3 rounded-full bg-orange-200'
                   ></motion.div>
                 </div>
               </div>
