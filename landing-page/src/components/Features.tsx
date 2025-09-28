@@ -83,7 +83,7 @@ const Features = () => {
             <motion.div
               key={index}
               variants={staggerItem}
-              className='group relative bg-white border border-gray-200 rounded-3xl p-10 transition-all duration-300'
+              className='group relative bg-white border border-gray-200 rounded-2xl p-10 transition-all duration-300'
             >
               <div className='flex items-center space-x-4 mb-6'>
                 <div className='w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center border border-orange-100 text-orange-500 shrink-0'>
@@ -100,7 +100,7 @@ const Features = () => {
           {...fadeInUp}
           whileInView='animate'
           viewport={viewportOnce}
-          className='bg-white rounded-3xl p-8 lg:p-12 border border-gray-200'
+          className='bg-white rounded-2xl p-8 lg:p-12 border border-gray-200'
         >
           <div className='grid lg:grid-cols-2 gap-12 items-center'>
             <motion.div {...slideInLeft} whileInView='animate' viewport={viewportOnce}>

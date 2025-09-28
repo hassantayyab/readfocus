@@ -1,7 +1,7 @@
 'use client';
 import Button from '@/components/ui/button';
-import { motion } from 'framer-motion';
 import { fadeInUp, staggerContainer, staggerItem, viewportOnce } from '@/lib/animations';
+import { motion } from 'framer-motion';
 
 const Pricing = () => {
   const features = [
@@ -36,7 +36,7 @@ const Pricing = () => {
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <motion.div
           {...fadeInUp}
-          whileInView="animate"
+          whileInView='animate'
           viewport={viewportOnce}
           className='text-center mb-20'
         >
@@ -50,29 +50,23 @@ const Pricing = () => {
 
         <motion.div
           {...fadeInUp}
-          whileInView="animate"
+          whileInView='animate'
           viewport={viewportOnce}
           transition={{ duration: 0.6, delay: 0.2 }}
           className='max-w-lg mx-auto mb-20 mt-8'
         >
-          <div className='bg-white rounded-3xl border border-gray-200 overflow-hidden relative'>
+          <div className='bg-white rounded-2xl border border-gray-200 overflow-hidden relative'>
             <div className='p-8 lg:p-10 text-center'>
               <div className='mb-8'>
-                <div className='text-6xl lg:text-7xl font-bold mb-2 text-gray-900'>
-                  $4.99
-                </div>
-                <div className='text-xl font-medium text-gray-900'>
-                  Per Month
-                </div>
-                <div className='text-sm mt-2 text-gray-900'>
-                  Cancel anytime • No hidden fees
-                </div>
+                <div className='text-6xl lg:text-7xl font-bold mb-2 text-gray-900'>$4.99</div>
+                <div className='text-xl font-medium text-gray-900'>Per Month</div>
+                <div className='text-sm mt-2 text-gray-900'>Cancel anytime • No hidden fees</div>
               </div>
 
               <motion.div
                 className='space-y-4 mb-8'
                 variants={staggerContainer}
-                whileInView="animate"
+                whileInView='animate'
                 viewport={viewportOnce}
               >
                 {features.map((feature, index) => (
@@ -81,14 +75,10 @@ const Pricing = () => {
                     variants={staggerItem}
                     className='flex items-center justify-center space-x-3'
                   >
-                    <div
-                      className='w-5 h-5 rounded-full flex items-center justify-center bg-orange-500'
-                    >
+                    <div className='w-5 h-5 rounded-full flex items-center justify-center bg-orange-500'>
                       <span className='text-white text-xs'>✓</span>
                     </div>
-                    <span className='font-medium text-gray-900'>
-                      {feature}
-                    </span>
+                    <span className='font-medium text-gray-900'>{feature}</span>
                   </motion.div>
                 ))}
               </motion.div>
@@ -97,46 +87,76 @@ const Pricing = () => {
                 Add to Chrome - Free
               </Button>
 
-              <p className='text-sm font-medium text-gray-900'>
-                Secure payment
-              </p>
+              <p className='text-sm font-medium text-gray-900'>Secure payment</p>
             </div>
           </div>
         </motion.div>
 
         <motion.div
           {...fadeInUp}
-          whileInView="animate"
+          whileInView='animate'
           viewport={viewportOnce}
-          className='rounded-3xl p-8 lg:p-12 border border-gray-200 bg-orange-50'
+          className='rounded-2xl p-8 lg:p-12'
         >
-          <h3
-            className='text-3xl lg:text-4xl font-bold mb-12 text-center text-gray-900'
-          >
-            Frequently Asked Questions
-          </h3>
+          <div>
+            <div className='text-center mb-16'>
+              <h3 className='text-3xl lg:text-4xl font-bold mb-4 text-gray-900'>
+                Frequently Asked <span className='text-orange-500'>Questions</span>
+              </h3>
+              <p className='text-lg text-gray-700 max-w-2xl mx-auto'>
+                Everything you need to know about Kuiqlee
+              </p>
+            </div>
 
-          <motion.div
-            className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto'
-            variants={staggerContainer}
-            whileInView="animate"
-            viewport={viewportOnce}
-          >
-            {faqs.map((faq, index) => (
-              <motion.div
-                key={index}
-                variants={staggerItem}
-                className='bg-gray-50 rounded-2xl p-6 transition-all duration-300 border border-gray-100'
-              >
-                <h4 className='font-bold mb-4 text-lg text-gray-900'>
-                  {faq.question}
-                </h4>
-                <p className='leading-relaxed text-gray-900'>
-                  {faq.answer}
+            <motion.div
+              className='grid md:grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto'
+              variants={staggerContainer}
+              whileInView='animate'
+              viewport={viewportOnce}
+            >
+              {faqs.map((faq, index) => (
+                <motion.div
+                  key={index}
+                  variants={staggerItem}
+                  className='bg-white rounded-2xl p-8 transition-all duration-300 border border-gray-200 hover:shadow-lg hover:shadow-orange-100/50 hover:border-orange-200'
+                >
+                  <div className='flex items-start space-x-4'>
+                    <div className='flex-shrink-0 w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center'>
+                      <span className='text-white text-sm font-bold'>?</span>
+                    </div>
+                    <div className='flex-1'>
+                      <h4 className='font-bold mb-3 text-lg text-gray-900 transition-colors'>
+                        {faq.question}
+                      </h4>
+                      <p className='leading-relaxed text-gray-700 text-base'>{faq.answer}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <motion.div
+              {...fadeInUp}
+              whileInView='animate'
+              viewport={viewportOnce}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className='text-center mt-12'
+            >
+              <div className='bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/50 max-w-md mx-auto'>
+                <h4 className='font-bold text-gray-900 mb-2'>Still have questions?</h4>
+                <p className='text-gray-700 text-sm mb-4'>
+                  We're here to help you get the most out of Kuiqlee
                 </p>
-              </motion.div>
-            ))}
-          </motion.div>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='text-orange-600 border-orange-300 hover:bg-orange-50'
+                >
+                  Contact Support
+                </Button>
+              </div>
+            </motion.div>
+          </div>
         </motion.div>
       </div>
     </section>

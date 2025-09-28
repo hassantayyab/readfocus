@@ -74,7 +74,7 @@ const HowItWorks = () => {
                   <div className='hidden lg:block absolute top-1/2 left-full w-full h-0.5 bg-orange-200 z-0 transform -translate-y-1/2'></div>
                 )}
 
-                <div className='relative bg-white rounded-3xl p-8 transition-all duration-300 border border-gray-200 z-10'>
+                <div className='relative bg-white rounded-2xl p-8 transition-all duration-300 border border-gray-200 z-10'>
                   <div className='text-orange-200 font-bold text-6xl mb-4'>{step.step}</div>
 
                   <h3 className='text-xl font-bold mb-4 text-gray-900'>{step.title}</h3>

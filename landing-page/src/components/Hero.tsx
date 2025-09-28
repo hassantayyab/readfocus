@@ -1,14 +1,12 @@
 'use client';
 import Button from '@/components/ui/button';
+import { fadeInUp, slideInRight, staggerContainer, staggerItem } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { fadeInUp, fadeIn, slideInRight, staggerContainer, staggerItem, viewportOnce } from '@/lib/animations';
 
 const Hero = () => {
   return (
-    <section
-      className='relative min-h-[90vh] w-full overflow-hidden bg-orange-50'
-    >
+    <section className='relative min-h-[90vh] w-full overflow-hidden bg-orange-50'>
       {/* Grid Background */}
       <div
         className={cn(
@@ -18,17 +16,15 @@ const Hero = () => {
         )}
       />
       {/* Radial gradient overlay for faded look */}
-      <div
-        className='pointer-events-none absolute inset-0 flex items-center justify-center [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] bg-orange-50'
-      ></div>
+      <div className='pointer-events-none absolute inset-0 flex items-center justify-center [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] bg-orange-50'></div>
 
       <div className='relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20'>
         <div className='grid lg:grid-cols-2 gap-16 items-center'>
           <motion.div
             className='text-center lg:text-left'
             variants={staggerContainer}
-            initial="initial"
-            animate="animate"
+            initial='initial'
+            animate='animate'
           >
             <motion.div
               variants={staggerItem}
@@ -41,7 +37,7 @@ const Hero = () => {
               variants={staggerItem}
               className='text-5xl md:text-7xl font-bold leading-tight mb-6 text-gray-900'
             >
-              Understand <span className="text-orange-500">instantly</span>
+              Understand <span className='text-orange-500'>instantly</span>
               <br /> with AI.
             </motion.h1>
 
@@ -72,7 +68,7 @@ const Hero = () => {
             className='relative'
           >
             <div className='relative'>
-              <div className='bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden p-1'>
+              <div className='bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden p-1'>
                 <div className='bg-white rounded-[20px] border border-gray-100 overflow-hidden'>
                   <div className='bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200'>
                     <div className='flex items-center space-x-3'>
@@ -103,14 +99,10 @@ const Hero = () => {
                       className='bg-orange-50 rounded-2xl border border-orange-200 p-4'
                     >
                       <div className='flex items-center space-x-3 mb-3'>
-                        <div
-                          className='w-8 h-8 rounded-xl flex items-center justify-center bg-orange-500'
-                        >
+                        <div className='w-8 h-8 rounded-xl flex items-center justify-center bg-orange-500'>
                           <span className='text-white text-sm font-bold'>K</span>
                         </div>
-                        <span className='font-semibold text-gray-900'>
-                          AI Summary
-                        </span>
+                        <span className='font-semibold text-gray-900'>AI Summary</span>
                       </div>
                       <div className='space-y-2'>
                         <div className='h-2 rounded bg-orange-200 w-full'></div>
