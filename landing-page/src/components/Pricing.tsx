@@ -31,7 +31,7 @@ const Pricing = () => {
   ];
 
   return (
-    <section id='pricing' className='py-24' style={{ backgroundColor: '#fcfbfa' }}>
+    <section id='pricing' className='py-24 bg-orange-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -40,10 +40,10 @@ const Pricing = () => {
           viewport={{ once: true }}
           className='text-center mb-20'
         >
-          <h2 className='text-4xl lg:text-5xl font-bold mb-6' style={{ color: '#0d1221' }}>
-            Simple, <span style={{ color: '#f75c30' }}>Monthly Pricing</span>
+          <h2 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
+            Simple, <span className='text-orange-500'>Monthly Pricing</span>
           </h2>
-          <p className='text-xl max-w-3xl mx-auto' style={{ color: '#0d1221' }}>
+          <p className='text-xl max-w-3xl mx-auto text-gray-900'>
             Get unlimited AI-powered summaries with a simple monthly subscription.
           </p>
         </motion.div>
@@ -58,13 +58,13 @@ const Pricing = () => {
           <div className='bg-white rounded-3xl border border-gray-200 overflow-hidden relative'>
             <div className='p-8 lg:p-10 text-center'>
               <div className='mb-8'>
-                <div className='text-6xl lg:text-7xl font-bold mb-2' style={{ color: '#0d1221' }}>
+                <div className='text-6xl lg:text-7xl font-bold mb-2 text-gray-900'>
                   $4.99
                 </div>
-                <div className='text-xl font-medium' style={{ color: '#0d1221' }}>
+                <div className='text-xl font-medium text-gray-900'>
                   Per Month
                 </div>
-                <div className='text-sm mt-2' style={{ color: '#0d1221' }}>
+                <div className='text-sm mt-2 text-gray-900'>
                   Cancel anytime • No hidden fees
                 </div>
               </div>
@@ -80,12 +80,11 @@ const Pricing = () => {
                     className='flex items-center justify-center space-x-3'
                   >
                     <div
-                      className='w-5 h-5 rounded-full flex items-center justify-center'
-                      style={{ backgroundColor: '#f75c30' }}
+                      className='w-5 h-5 rounded-full flex items-center justify-center bg-orange-500'
                     >
                       <span className='text-white text-xs'>✓</span>
                     </div>
-                    <span className='font-medium' style={{ color: '#0d1221' }}>
+                    <span className='font-medium text-gray-900'>
                       {feature}
                     </span>
                   </motion.div>
@@ -96,7 +95,7 @@ const Pricing = () => {
                 Add to Chrome - Free
               </Button>
 
-              <p className='text-sm font-medium' style={{ color: '#0d1221' }}>
+              <p className='text-sm font-medium text-gray-900'>
                 Secure payment
               </p>
             </div>
@@ -108,12 +107,10 @@ const Pricing = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
-          className='rounded-3xl p-8 lg:p-12 border border-gray-200'
-          style={{ backgroundColor: '#fcfbfa' }}
+          className='rounded-3xl p-8 lg:p-12 border border-gray-200 bg-orange-50'
         >
           <h3
-            className='text-3xl lg:text-4xl font-bold mb-12 text-center'
-            style={{ color: '#0d1221' }}
+            className='text-3xl lg:text-4xl font-bold mb-12 text-center text-gray-900'
           >
             Frequently Asked Questions
           </h3>
@@ -128,10 +125,10 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className='bg-gray-50 rounded-2xl p-6 transition-all duration-300 border border-gray-100'
               >
-                <h4 className='font-bold mb-4 text-lg' style={{ color: '#0d1221' }}>
+                <h4 className='font-bold mb-4 text-lg text-gray-900'>
                   {faq.question}
                 </h4>
-                <p className='leading-relaxed' style={{ color: '#0d1221' }}>
+                <p className='leading-relaxed text-gray-900'>
                   {faq.answer}
                 </p>
               </motion.div>

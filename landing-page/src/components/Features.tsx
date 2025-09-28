@@ -167,7 +167,7 @@ const Features = () => {
                     transition={{ duration: 0.8, delay: 0.5 }}
                     viewport={{ once: true }}
                     className='h-3 rounded-full'
-                    style={{ backgroundColor: 'rgba(247, 92, 48, 0.25)' }}
+                    style={{ backgroundColor: 'rgba(249, 115, 22, 0.25)' }}
                   ></motion.div>
                   <motion.div
                     initial={{ width: 0 }}
@@ -175,7 +175,7 @@ const Features = () => {
                     transition={{ duration: 0.8, delay: 0.7 }}
                     viewport={{ once: true }}
                     className='h-3 rounded-full'
-                    style={{ backgroundColor: 'rgba(247, 92, 48, 0.25)' }}
+                    style={{ backgroundColor: 'rgba(249, 115, 22, 0.25)' }}
                   ></motion.div>
                   <motion.div
                     initial={{ width: 0 }}
@@ -183,7 +183,7 @@ const Features = () => {
                     transition={{ duration: 0.8, delay: 0.9 }}
                     viewport={{ once: true }}
                     className='h-3 rounded-full'
-                    style={{ backgroundColor: 'rgba(247, 92, 48, 0.25)' }}
+                    style={{ backgroundColor: 'rgba(249, 115, 22, 0.25)' }}
                   ></motion.div>
                 </div>
               </div>

@@ -1,6 +1,5 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
 
 interface ButtonProps {
@@ -26,16 +25,14 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const baseClasses =
-    'font-semibold transition-all cursor-pointer border-0 outline-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black';
+    'font-semibold transition-colors duration-200 cursor-pointer border-0 outline-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black';
 
   const variants = {
-    primary: 'text-white hover:shadow-xl' + ` bg-[#28222c] hover:bg-[#1f1a22]`,
+    primary: 'text-white hover:shadow-xl bg-gray-800 hover:bg-gray-900',
     secondary:
-      'text-white border border-gray-600 hover:border-gray-500' +
-      ` bg-[#28222c] hover:bg-[#1f1a22]`,
+      'text-white border border-gray-600 hover:border-gray-500 bg-gray-800 hover:bg-gray-900',
     outline:
-      'border-2 border-gray-600 hover:border-[#f75c30] bg-transparent hover:bg-orange-50' +
-      ` text-[#0d1221] hover:text-[#f75c30]`,
+      'border-2 border-gray-600 hover:border-orange-500 bg-transparent hover:bg-orange-50 text-gray-900 hover:text-orange-500',
   };
 
   const sizes = {
@@ -47,9 +44,7 @@ const Button = ({
   const disabledClasses = 'opacity-50 cursor-not-allowed';
 
   return (
-    <motion.button
-      whileHover={!disabled ? { scale: 1.05 } : {}}
-      whileTap={!disabled ? { scale: 0.95 } : {}}
+    <button
       className={cn(
         baseClasses,
         variants[variant],
@@ -64,7 +59,7 @@ const Button = ({
       {...props}
     >
       {children}
-    </motion.button>
+    </button>
   );
 };
 

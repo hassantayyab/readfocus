@@ -38,7 +38,7 @@ const HowItWorks = () => {
 
   return (
     <>
-      <section id='how-it-works' className='py-24' style={{ backgroundColor: '#fcfbfa' }}>
+      <section id='how-it-works' className='py-24 bg-orange-50'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -47,10 +47,10 @@ const HowItWorks = () => {
             viewport={{ once: true }}
             className='text-center mb-20'
           >
-            <h2 className='text-4xl lg:text-5xl font-bold mb-6' style={{ color: '#0d1221' }}>
-              How Kuiqlee <span style={{ color: '#f75c30' }}>Works</span>
+            <h2 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
+              How Kuiqlee <span className='text-orange-500'>Works</span>
             </h2>
-            <p className='text-xl max-w-3xl mx-auto' style={{ color: '#0d1221' }}>
+            <p className='text-xl max-w-3xl mx-auto text-gray-900'>
               Get started in minutes and transform your reading experience forever
             </p>
           </motion.div>
@@ -71,16 +71,15 @@ const HowItWorks = () => {
 
                 <motion.div className='relative bg-white rounded-3xl p-8 transition-all duration-300 border border-gray-200 z-10'>
                   <div
-                    className='w-14 h-14 rounded-2xl flex items-center justify-center mb-6'
-                    style={{ backgroundColor: '#f75c30' }}
+                    className='w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-orange-500'
                   >
                     <span className='text-white font-bold text-lg'>{step.step}</span>
                   </div>
 
-                  <h3 className='text-xl font-bold mb-4' style={{ color: '#0d1221' }}>
+                  <h3 className='text-xl font-bold mb-4 text-gray-900'>
                     {step.title}
                   </h3>
-                  <p className='mb-6 leading-relaxed' style={{ color: '#0d1221' }}>
+                  <p className='mb-6 leading-relaxed text-gray-900'>
                     {step.description}
                   </p>
 
@@ -88,12 +87,10 @@ const HowItWorks = () => {
                     {step.details.map((detail, detailIndex) => (
                       <li
                         key={detailIndex}
-                        className='flex items-center text-sm'
-                        style={{ color: '#0d1221' }}
+                        className='flex items-center text-sm text-gray-900'
                       >
                         <div
-                          className='w-2 h-2 rounded-full mr-3'
-                          style={{ backgroundColor: '#f75c30' }}
+                          className='w-2 h-2 rounded-full mr-3 bg-orange-500'
                         ></div>
                         {detail}
                       </li>
@@ -106,7 +103,7 @@ const HowItWorks = () => {
         </div>
       </section>
 
-      <section className='py-24' style={{ backgroundColor: '#322630' }}>
+      <section className='py-24 bg-gray-700'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -168,8 +165,7 @@ const HowItWorks = () => {
                 <div className='bg-white rounded-2xl p-6 border border-gray-200'>
                   <div className='flex items-center space-x-3 mb-4'>
                     <div
-                      className='w-6 h-6 rounded-lg flex items-center justify-center'
-                      style={{ backgroundColor: '#f75c30' }}
+                      className='w-6 h-6 rounded-lg flex items-center justify-center bg-orange-500'
                     >
                       <span className='text-white text-xs font-bold'>K</span>
                     </div>
@@ -178,17 +174,17 @@ const HowItWorks = () => {
 
                   <div className='space-y-4'>
                     <div className='bg-white rounded-xl p-4'>
-                      <div className='text-xs font-semibold mb-2' style={{ color: '#f75c30' }}>
+                      <div className='text-xs font-semibold mb-2 text-orange-500'>
                         QUICK SUMMARY
                       </div>
                       <div className='space-y-2'>
                         <div
                           className='h-2 rounded w-full'
-                          style={{ backgroundColor: 'rgba(247, 92, 48, 0.3)' }}
+                          style={{ backgroundColor: 'rgba(249, 115, 22, 0.3)' }}
                         ></div>
                         <div
                           className='h-2 rounded w-4/5'
-                          style={{ backgroundColor: 'rgba(247, 92, 48, 0.3)' }}
+                          style={{ backgroundColor: 'rgba(249, 115, 22, 0.3)' }}
                         ></div>
                       </div>
                     </div>
@@ -243,8 +239,7 @@ const HowItWorks = () => {
               <Button
                 variant='primary'
                 size='lg'
-                className='text-white'
-                style={{ backgroundColor: '#f75c30' }}
+                className='text-white bg-orange-500'
               >
                 Try It Now
               </Button>

@@ -6,8 +6,7 @@ import { motion } from 'framer-motion';
 const Hero = () => {
   return (
     <section
-      style={{ backgroundColor: '#fcfbfa' }}
-      className='relative min-h-[90vh] w-full overflow-hidden'
+      className='relative min-h-[90vh] w-full overflow-hidden bg-orange-50'
     >
       {/* Grid Background */}
       <div
@@ -19,8 +18,7 @@ const Hero = () => {
       />
       {/* Radial gradient overlay for faded look */}
       <div
-        className='pointer-events-none absolute inset-0 flex items-center justify-center [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]'
-        style={{ backgroundColor: '#fcfbfa' }}
+        className='pointer-events-none absolute inset-0 flex items-center justify-center [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] bg-orange-50'
       ></div>
 
       <div className='relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20'>
@@ -39,10 +37,9 @@ const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className='text-5xl md:text-7xl font-bold leading-tight mb-6'
-              style={{ color: '#0d1221' }}
+              className='text-5xl md:text-7xl font-bold leading-tight mb-6 text-gray-900'
             >
-              Understand <span style={{ color: '#f75c30' }}>instantly</span>
+              Understand <span className="text-orange-500">instantly</span>
               <br /> with AI.
             </motion.h1>
 
@@ -50,8 +47,7 @@ const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className='text-xl mb-8 leading-relaxed max-w-lg mx-auto lg:mx-0'
-              style={{ color: '#0d1221' }}
+              className='text-xl mb-8 leading-relaxed max-w-lg mx-auto lg:mx-0 text-gray-900'
             >
               Transform any webpage into digestible, intelligent summaries with AI-powered content
               analysis. Save time and understand more.
@@ -130,12 +126,11 @@ const Hero = () => {
                     >
                       <div className='flex items-center space-x-3 mb-3'>
                         <div
-                          className='w-8 h-8 rounded-xl flex items-center justify-center'
-                          style={{ backgroundColor: '#f75c30' }}
+                          className='w-8 h-8 rounded-xl flex items-center justify-center bg-orange-500'
                         >
                           <span className='text-white text-sm font-bold'>K</span>
                         </div>
-                        <span className='font-semibold' style={{ color: '#0d1221' }}>
+                        <span className='font-semibold text-gray-900'>
                           AI Summary
                         </span>
                       </div>
@@ -144,22 +139,19 @@ const Hero = () => {
                           initial={{ width: 0 }}
                           animate={{ width: '100%' }}
                           transition={{ duration: 0.8, delay: 2.3 }}
-                          className='h-2 rounded'
-                          style={{ backgroundColor: 'rgba(247, 92, 48, 0.25)' }}
+                          className='h-2 rounded bg-orange-200'
                         ></motion.div>
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: '85%' }}
                           transition={{ duration: 0.8, delay: 2.5 }}
-                          className='h-2 rounded'
-                          style={{ backgroundColor: 'rgba(247, 92, 48, 0.25)' }}
+                          className='h-2 rounded bg-orange-200'
                         ></motion.div>
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: '75%' }}
                           transition={{ duration: 0.8, delay: 2.7 }}
-                          className='h-2 rounded'
-                          style={{ backgroundColor: 'rgba(247, 92, 48, 0.25)' }}
+                          className='h-2 rounded bg-orange-200'
                         ></motion.div>
                       </div>
                     </motion.div>
