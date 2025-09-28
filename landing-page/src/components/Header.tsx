@@ -24,27 +24,24 @@ const Header = () => {
           </motion.div>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <motion.a
-              whileHover={{ scale: 1.05 }}
+            <a
               href="#features"
-              className="transition-colors font-medium text-gray-900"
+              className="transition-colors font-medium text-gray-700 hover:text-orange-600"
             >
               Features
-            </motion.a>
-            <motion.a
-              whileHover={{ scale: 1.05 }}
+            </a>
+            <a
               href="#how-it-works"
-              className="transition-colors font-medium text-gray-900"
+              className="transition-colors font-medium text-gray-700 hover:text-orange-600"
             >
               How it Works
-            </motion.a>
-            <motion.a
-              whileHover={{ scale: 1.05 }}
+            </a>
+            <a
               href="#pricing"
-              className="transition-colors font-medium text-gray-900"
+              className="transition-colors font-medium text-gray-700 hover:text-orange-600"
             >
               Pricing
-            </motion.a>
+            </a>
           </nav>
 
           <div className="flex items-center space-x-4">
