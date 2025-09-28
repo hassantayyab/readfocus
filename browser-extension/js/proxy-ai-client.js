@@ -52,54 +52,106 @@ class ProxyAIClient {
   }
 
   /**
-   * Make request to your proxy API
+   * Make request to your proxy API with retry logic
    * @param {string} prompt - The prompt to send
    * @param {Object} options - Additional options
    */
   async makeRequest(prompt, options = {}) {
     await this.checkRateLimit();
 
-    try {
-      const response = await fetch(`${this.baseURL}/claude`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt,
-          options: {
-            maxTokens: options.maxTokens || 8192,
-            temperature: options.temperature || 0.3,
+    const maxRetries = 3;
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+        const response = await fetch(`${this.baseURL}/claude`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        }),
-      });
+          body: JSON.stringify({
+            prompt,
+            options: {
+              maxTokens: options.maxTokens || 8192,
+              temperature: options.temperature || 0.3,
+            },
+          }),
+          signal: controller.signal,
+        });
 
-      this.lastRequestTime = Date.now();
+        clearTimeout(timeoutId);
+        this.lastRequestTime = Date.now();
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Request failed: ${response.status}`);
-      }
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const error = new Error(
+            errorData.error || `Request failed: ${response.status} ${response.statusText}`,
+          );
+          error.status = response.status;
+          throw error;
+        }
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!data.success || !data.response) {
-        throw new Error(data.error || 'Invalid response format');
-      }
+        if (!data.success || !data.response) {
+          throw new Error(data.error || 'Invalid response format from API');
+        }
 
-      return data.response;
-    } catch (error) {
-      console.error('❌ [ProxyAIClient] API request failed:', error);
+        return data.response;
+      } catch (error) {
+        lastError = error;
+        console.error(`❌ [ProxyAIClient] Attempt ${attempt} failed:`, error.message);
 
-      // Provide user-friendly error messages
-      if (error.message.includes('Rate limit')) {
-        throw new Error('Rate limit exceeded. Please wait a moment and try again.');
-      } else if (error.message.includes('quota')) {
-        throw new Error('Service temporarily unavailable. Please try again later.');
-      } else {
-        throw new Error(`AI analysis failed: ${error.message}`);
+        // Don't retry certain errors
+        if (error.name === 'AbortError') {
+          throw new Error('Request timeout. Please try again.');
+        }
+
+        if (error.status === 401) {
+          throw new Error('API authentication failed. Please check your API key configuration.');
+        }
+
+        if (error.status === 400) {
+          throw new Error('Invalid request format. Please try again.');
+        }
+
+        // Don't retry if it's the last attempt
+        if (attempt === maxRetries) {
+          break;
+        }
+
+        // Wait before retrying (exponential backoff)
+        const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
       }
     }
+
+    // Handle final error after all retries
+    if (lastError) {
+      console.error('❌ [ProxyAIClient] All retry attempts failed:', lastError);
+
+      // Provide user-friendly error messages
+      if (lastError.message.includes('Failed to fetch') || lastError.message.includes('network')) {
+        throw new Error(
+          'Network connection error. Please check your internet connection and try again.',
+        );
+      } else if (lastError.message.includes('Rate limit') || lastError.status === 429) {
+        throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+      } else if (lastError.message.includes('quota') || lastError.status === 529) {
+        throw new Error('AI service temporarily unavailable. Please try again later.');
+      } else if (lastError.message.includes('authentication') || lastError.status === 401) {
+        throw new Error('API authentication failed. Please check your API key configuration.');
+      } else if (lastError.message.includes('temporarily unavailable')) {
+        throw new Error('AI service temporarily unavailable. Please try again in a few minutes.');
+      } else {
+        throw new Error(`AI analysis failed: ${lastError.message}`);
+      }
+    }
+
+    throw new Error('Unexpected error occurred. Please try again.');
   }
 
   /**
@@ -264,7 +316,7 @@ IMPORTANT:
       // Filter out empty or invalid selections
       Object.keys(result).forEach((key) => {
         result[key] = result[key].filter(
-          (text) => typeof text === 'string' && text.trim().length > 2
+          (text) => typeof text === 'string' && text.trim().length > 2,
         );
       });
 
@@ -303,4 +355,3 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ProxyAIClient;
 }
-
