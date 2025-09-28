@@ -70,28 +70,15 @@ const HowItWorks = () => {
                 )}
 
                 <motion.div className='relative bg-white rounded-3xl p-8 transition-all duration-300 border border-gray-200 z-10'>
-                  <div
-                    className='w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-orange-500'
-                  >
-                    <span className='text-white font-bold text-lg'>{step.step}</span>
-                  </div>
+                  <div className='text-orange-200 font-bold text-6xl mb-4'>{step.step}</div>
 
-                  <h3 className='text-xl font-bold mb-4 text-gray-900'>
-                    {step.title}
-                  </h3>
-                  <p className='mb-6 leading-relaxed text-gray-900'>
-                    {step.description}
-                  </p>
+                  <h3 className='text-xl font-bold mb-4 text-gray-900'>{step.title}</h3>
+                  <p className='mb-6 leading-relaxed text-gray-900'>{step.description}</p>
 
                   <ul className='space-y-3'>
                     {step.details.map((detail, detailIndex) => (
-                      <li
-                        key={detailIndex}
-                        className='flex items-center text-sm text-gray-900'
-                      >
-                        <div
-                          className='w-2 h-2 rounded-full mr-3 bg-orange-500'
-                        ></div>
+                      <li key={detailIndex} className='flex items-center text-sm text-gray-900'>
+                        <div className='w-2 h-2 rounded-full mr-3 bg-orange-500'></div>
                         {detail}
                       </li>
                     ))}
@@ -164,9 +151,7 @@ const HowItWorks = () => {
                 </h4>
                 <div className='bg-white rounded-2xl p-6 border border-gray-200'>
                   <div className='flex items-center space-x-3 mb-4'>
-                    <div
-                      className='w-6 h-6 rounded-lg flex items-center justify-center bg-orange-500'
-                    >
+                    <div className='w-6 h-6 rounded-lg flex items-center justify-center bg-orange-500'>
                       <span className='text-white text-xs font-bold'>K</span>
                     </div>
                     <span className='text-sm font-semibold text-white'>Kuiqlee Summary</span>
@@ -236,11 +221,7 @@ const HowItWorks = () => {
               viewport={{ once: true }}
               className='text-center mt-12'
             >
-              <Button
-                variant='primary'
-                size='lg'
-                className='text-white bg-orange-500'
-              >
+              <Button variant='primary' size='lg' className='text-white bg-orange-500'>
                 Try It Now
               </Button>
             </motion.div>
