@@ -2,6 +2,7 @@
 import Button from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { fadeInUp, fadeIn, slideInRight, staggerContainer, staggerItem, viewportOnce } from '@/lib/animations';
 
 const Hero = () => {
   return (
@@ -23,20 +24,21 @@ const Hero = () => {
 
       <div className='relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20'>
         <div className='grid lg:grid-cols-2 gap-16 items-center'>
-          <div className='text-center lg:text-left'>
+          <motion.div
+            className='text-center lg:text-left'
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+          >
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              variants={staggerItem}
               className='inline-flex items-center px-4 py-2 bg-orange-100 text-orange-700 rounded-full text-sm font-medium mb-8 border border-orange-200'
             >
               ✨ AI-Powered Content Summarization
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
+              variants={staggerItem}
               className='text-5xl md:text-7xl font-bold leading-tight mb-6 text-gray-900'
             >
               Understand <span className="text-orange-500">instantly</span>
@@ -44,9 +46,7 @@ const Hero = () => {
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              variants={staggerItem}
               className='text-xl mb-8 leading-relaxed max-w-lg mx-auto lg:mx-0 text-gray-900'
             >
               Transform any webpage into digestible, intelligent summaries with AI-powered content
@@ -54,9 +54,7 @@ const Hero = () => {
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              variants={staggerItem}
               className='flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12'
             >
               <Button variant='primary' size='lg' className='text-lg'>
@@ -66,19 +64,15 @@ const Hero = () => {
                 Watch Demo
               </Button>
             </motion.div>
-          </div>
+          </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            {...slideInRight}
+            transition={{ duration: 0.8, delay: 0.2 }}
             className='relative'
           >
             <div className='relative'>
-              <motion.div
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                className='bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden p-1'
-              >
+              <div className='bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden p-1'>
                 <div className='bg-white rounded-[20px] border border-gray-100 overflow-hidden'>
                   <div className='bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200'>
                     <div className='flex items-center space-x-3'>
@@ -98,30 +92,14 @@ const Hero = () => {
 
                   <div className='p-6 bg-white relative'>
                     <div className='space-y-4 mb-6'>
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: '85%' }}
-                        transition={{ duration: 1, delay: 1 }}
-                        className='h-3 bg-gray-200 rounded'
-                      ></motion.div>
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: '100%' }}
-                        transition={{ duration: 1, delay: 1.2 }}
-                        className='h-3 bg-gray-200 rounded'
-                      ></motion.div>
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: '70%' }}
-                        transition={{ duration: 1, delay: 1.4 }}
-                        className='h-3 bg-gray-200 rounded'
-                      ></motion.div>
+                      <div className='h-3 bg-gray-200 rounded w-4/5'></div>
+                      <div className='h-3 bg-gray-200 rounded w-full'></div>
+                      <div className='h-3 bg-gray-200 rounded w-3/4'></div>
                     </div>
 
                     <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 2 }}
+                      {...fadeInUp}
+                      transition={{ duration: 0.6, delay: 1 }}
                       className='bg-orange-50 rounded-2xl border border-orange-200 p-4'
                     >
                       <div className='flex items-center space-x-3 mb-3'>
@@ -135,29 +113,14 @@ const Hero = () => {
                         </span>
                       </div>
                       <div className='space-y-2'>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: '100%' }}
-                          transition={{ duration: 0.8, delay: 2.3 }}
-                          className='h-2 rounded bg-orange-200'
-                        ></motion.div>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: '85%' }}
-                          transition={{ duration: 0.8, delay: 2.5 }}
-                          className='h-2 rounded bg-orange-200'
-                        ></motion.div>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: '75%' }}
-                          transition={{ duration: 0.8, delay: 2.7 }}
-                          className='h-2 rounded bg-orange-200'
-                        ></motion.div>
+                        <div className='h-2 rounded bg-orange-200 w-full'></div>
+                        <div className='h-2 rounded bg-orange-200 w-4/5'></div>
+                        <div className='h-2 rounded bg-orange-200 w-3/4'></div>
                       </div>
                     </motion.div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </motion.div>
         </div>

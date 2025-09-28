@@ -8,14 +8,22 @@ An AI-powered Chrome extension that **instantly transforms any webpage into inte
 
 ## 🌐 Landing Page
 
-A modern, responsive landing page built with Next.js, TypeScript, and Tailwind CSS v4 is now available.
+A modern, responsive landing page built with Next.js, TypeScript, and Tailwind CSS v4 is now available with **smooth, optimized scroll animations**.
 
 ```bash
 # Start the landing page development server
+cd landing-page
 npm run dev
 ```
 
-Visit `http://localhost:3000` to see the landing page showcasing all Kuiqlee features.
+Visit `http://localhost:3001` to see the landing page showcasing all Kuiqlee features.
+
+### ✨ **Recent Landing Page Improvements**
+
+- **🎭 Smooth Scroll Animations**: Fixed jittery animations with simplified, consistent motion design
+- **⚡ Performance Optimized**: Reduced animation complexity for better performance
+- **🎨 Cohesive Animation System**: Unified animation utilities for consistent user experience
+- **📱 Mobile Responsive**: All animations work smoothly across devices
 
 ## 🎯 Mission
 

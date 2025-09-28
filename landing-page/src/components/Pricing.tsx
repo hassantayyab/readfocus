@@ -1,6 +1,7 @@
 'use client';
 import Button from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem, viewportOnce } from '@/lib/animations';
 
 const Pricing = () => {
   const features = [
@@ -34,10 +35,9 @@ const Pricing = () => {
     <section id='pricing' className='py-24 bg-orange-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
+          whileInView="animate"
+          viewport={viewportOnce}
           className='text-center mb-20'
         >
           <h2 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
@@ -49,10 +49,10 @@ const Pricing = () => {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          {...fadeInUp}
+          whileInView="animate"
+          viewport={viewportOnce}
           transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
           className='max-w-lg mx-auto mb-20 mt-8'
         >
           <div className='bg-white rounded-3xl border border-gray-200 overflow-hidden relative'>
@@ -69,14 +69,16 @@ const Pricing = () => {
                 </div>
               </div>
 
-              <div className='space-y-4 mb-8'>
+              <motion.div
+                className='space-y-4 mb-8'
+                variants={staggerContainer}
+                whileInView="animate"
+                viewport={viewportOnce}
+              >
                 {features.map((feature, index) => (
                   <motion.div
                     key={feature}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
-                    viewport={{ once: true }}
+                    variants={staggerItem}
                     className='flex items-center justify-center space-x-3'
                   >
                     <div
@@ -89,7 +91,7 @@ const Pricing = () => {
                     </span>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
               <Button variant='primary' size='lg' className='w-full mb-4'>
                 Add to Chrome - Free
@@ -103,10 +105,9 @@ const Pricing = () => {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
+          whileInView="animate"
+          viewport={viewportOnce}
           className='rounded-3xl p-8 lg:p-12 border border-gray-200 bg-orange-50'
         >
           <h3
@@ -115,14 +116,16 @@ const Pricing = () => {
             Frequently Asked Questions
           </h3>
 
-          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto'>
+          <motion.div
+            className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto'
+            variants={staggerContainer}
+            whileInView="animate"
+            viewport={viewportOnce}
+          >
             {faqs.map((faq, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
-                viewport={{ once: true }}
+                variants={staggerItem}
                 className='bg-gray-50 rounded-2xl p-6 transition-all duration-300 border border-gray-100'
               >
                 <h4 className='font-bold mb-4 text-lg text-gray-900'>
@@ -133,7 +136,7 @@ const Pricing = () => {
                 </p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

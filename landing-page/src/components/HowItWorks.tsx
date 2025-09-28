@@ -1,5 +1,13 @@
 'use client';
 import Button from '@/components/ui/button';
+import {
+  fadeInUp,
+  slideInLeft,
+  slideInRight,
+  staggerContainer,
+  staggerItem,
+  viewportOnce,
+} from '@/lib/animations';
 import { motion } from 'framer-motion';
 
 const HowItWorks = () => {
@@ -41,10 +49,9 @@ const HowItWorks = () => {
       <section id='how-it-works' className='py-24 bg-orange-50'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            {...fadeInUp}
+            whileInView='animate'
+            viewport={viewportOnce}
             className='text-center mb-20'
           >
             <h2 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
@@ -55,21 +62,19 @@ const HowItWorks = () => {
             </p>
           </motion.div>
 
-          <div className='grid lg:grid-cols-4 gap-8 mb-20'>
+          <motion.div
+            className='grid lg:grid-cols-4 gap-8 mb-20'
+            variants={staggerContainer}
+            whileInView='animate'
+            viewport={viewportOnce}
+          >
             {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className='relative'
-              >
+              <motion.div key={index} variants={staggerItem} className='relative'>
                 {index < steps.length - 1 && (
                   <div className='hidden lg:block absolute top-1/2 left-full w-full h-0.5 bg-orange-200 z-0 transform -translate-y-1/2'></div>
                 )}
 
-                <motion.div className='relative bg-white rounded-3xl p-8 transition-all duration-300 border border-gray-200 z-10'>
+                <div className='relative bg-white rounded-3xl p-8 transition-all duration-300 border border-gray-200 z-10'>
                   <div className='text-orange-200 font-bold text-6xl mb-4'>{step.step}</div>
 
                   <h3 className='text-xl font-bold mb-4 text-gray-900'>{step.title}</h3>
@@ -83,21 +88,16 @@ const HowItWorks = () => {
                       </li>
                     ))}
                   </ul>
-                </motion.div>
+                </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       <section className='py-24 bg-gray-700'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
+          <motion.div {...fadeInUp} whileInView='animate' viewport={viewportOnce}>
             <div className='text-center mb-12'>
               <h3 className='text-3xl lg:text-4xl font-bold mb-6 text-white'>See It In Action</h3>
               <p className='text-xl max-w-2xl mx-auto text-gray-300'>
@@ -107,12 +107,7 @@ const HowItWorks = () => {
             </div>
 
             <div className='grid lg:grid-cols-2 gap-12 items-center'>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                viewport={{ once: true }}
-              >
+              <motion.div {...slideInLeft} whileInView='animate' viewport={viewportOnce}>
                 <h4 className='text-xl font-semibold mb-6 flex items-center text-white'>
                   <span className='w-8 h-8 bg-red-100 text-red-600 rounded-xl flex items-center justify-center text-sm font-bold mr-3'>
                     1
@@ -137,12 +132,7 @@ const HowItWorks = () => {
                 </div>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                viewport={{ once: true }}
-              >
+              <motion.div {...slideInRight} whileInView='animate' viewport={viewportOnce}>
                 <h4 className='text-xl font-semibold mb-6 flex items-center text-white'>
                   <span className='w-8 h-8 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-sm font-bold mr-3'>
                     2
@@ -154,55 +144,33 @@ const HowItWorks = () => {
                     <div className='w-6 h-6 rounded-lg flex items-center justify-center bg-orange-500'>
                       <span className='text-white text-xs font-bold'>K</span>
                     </div>
-                    <span className='text-sm font-semibold text-white'>Kuiqlee Summary</span>
+                    <span className='text-sm font-semibold text-gray-900'>Kuiqlee Summary</span>
                   </div>
 
                   <div className='space-y-4'>
-                    <div className='bg-white rounded-xl p-4'>
+                    <div className='bg-orange-50 rounded-xl p-4'>
                       <div className='text-xs font-semibold mb-2 text-orange-500'>
                         QUICK SUMMARY
                       </div>
                       <div className='space-y-2'>
-                        <div
-                          className='h-2 rounded w-full'
-                          style={{ backgroundColor: 'rgba(249, 115, 22, 0.3)' }}
-                        ></div>
-                        <div
-                          className='h-2 rounded w-4/5'
-                          style={{ backgroundColor: 'rgba(249, 115, 22, 0.3)' }}
-                        ></div>
+                        <div className='h-2 rounded w-full bg-orange-200'></div>
+                        <div className='h-2 rounded w-4/5 bg-orange-200'></div>
                       </div>
                     </div>
 
-                    <div className='bg-white rounded-xl p-4'>
-                      <div className='text-xs font-semibold mb-2' style={{ color: '#8b5cf6' }}>
-                        KEY CONCEPTS
-                      </div>
+                    <div className='bg-purple-50 rounded-xl p-4'>
+                      <div className='text-xs font-semibold mb-2 text-purple-600'>KEY CONCEPTS</div>
                       <div className='space-y-2'>
-                        <div
-                          className='h-2 rounded w-3/4'
-                          style={{ backgroundColor: 'rgba(139, 92, 246, 0.3)' }}
-                        ></div>
-                        <div
-                          className='h-2 rounded w-5/6'
-                          style={{ backgroundColor: 'rgba(139, 92, 246, 0.3)' }}
-                        ></div>
+                        <div className='h-2 rounded w-3/4 bg-purple-200'></div>
+                        <div className='h-2 rounded w-5/6 bg-purple-200'></div>
                       </div>
                     </div>
 
-                    <div className='bg-white rounded-xl p-4'>
-                      <div className='text-xs font-semibold mb-2' style={{ color: '#10b981' }}>
-                        ACTION ITEMS
-                      </div>
+                    <div className='bg-green-50 rounded-xl p-4'>
+                      <div className='text-xs font-semibold mb-2 text-green-600'>ACTION ITEMS</div>
                       <div className='space-y-2'>
-                        <div
-                          className='h-2 rounded w-2/3'
-                          style={{ backgroundColor: 'rgba(16, 185, 129, 0.3)' }}
-                        ></div>
-                        <div
-                          className='h-2 rounded w-3/4'
-                          style={{ backgroundColor: 'rgba(16, 185, 129, 0.3)' }}
-                        ></div>
+                        <div className='h-2 rounded w-2/3 bg-green-200'></div>
+                        <div className='h-2 rounded w-3/4 bg-green-200'></div>
                       </div>
                     </div>
                   </div>
@@ -215,13 +183,17 @@ const HowItWorks = () => {
             </div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              viewport={{ once: true }}
+              {...fadeInUp}
+              whileInView='animate'
+              viewport={viewportOnce}
+              transition={{ duration: 0.6, delay: 0.3 }}
               className='text-center mt-12'
             >
-              <Button variant='primary' size='lg' className='text-white bg-orange-500'>
+              <Button
+                variant='primary'
+                size='lg'
+                className='text-white bg-orange-500 hover:bg-orange-500/90'
+              >
                 Try It Now
               </Button>
             </motion.div>

@@ -1,4 +1,12 @@
 'use client';
+import {
+  fadeInUp,
+  slideInLeft,
+  slideInRight,
+  staggerContainer,
+  staggerItem,
+  viewportOnce,
+} from '@/lib/animations';
 import { motion } from 'framer-motion';
 import { Database, FileText, GraduationCap, Shield, Sparkles, Zap } from 'lucide-react';
 
@@ -52,10 +60,9 @@ const Features = () => {
     <section id='features' className='pb-24 pt-16 bg-orange-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
+          whileInView='animate'
+          viewport={viewportOnce}
           className='text-center mb-20'
         >
           <h2 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
@@ -66,14 +73,16 @@ const Features = () => {
           </p>
         </motion.div>
 
-        <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20'>
+        <motion.div
+          className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20'
+          variants={staggerContainer}
+          whileInView='animate'
+          viewport={viewportOnce}
+        >
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
+              variants={staggerItem}
               className='group relative bg-white border border-gray-200 rounded-3xl p-10 transition-all duration-300'
             >
               <div className='flex items-center space-x-4 mb-6'>
@@ -85,25 +94,29 @@ const Features = () => {
               <p className='leading-relaxed text-lg text-gray-700'>{feature.description}</p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
+          whileInView='animate'
+          viewport={viewportOnce}
           className='bg-white rounded-3xl p-8 lg:p-12 border border-gray-200'
         >
           <div className='grid lg:grid-cols-2 gap-12 items-center'>
-            <div>
+            <motion.div {...slideInLeft} whileInView='animate' viewport={viewportOnce}>
               <h3 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
-                5 Different Summary Types
+                <span className='text-orange-500'>5</span> Different Summary Types
               </h3>
               <p className='mb-8 text-xl text-gray-700'>
                 From quick overviews to detailed analysis, get exactly the level of detail you need
                 for any situation.
               </p>
-              <div className='space-y-4'>
+              <motion.div
+                className='space-y-4'
+                variants={staggerContainer}
+                whileInView='animate'
+                viewport={viewportOnce}
+              >
                 {[
                   { label: 'Summary', desc: 'Essential points in 2-3 sentences' },
                   { label: 'Detailed', desc: 'Comprehensive analysis with insights' },
@@ -113,13 +126,10 @@ const Features = () => {
                 ].map((item, index) => (
                   <motion.div
                     key={item.label}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
-                    viewport={{ once: true }}
+                    variants={staggerItem}
                     className='flex items-center space-x-4'
                   >
-                    <div className='w-8 h-8 rounded-xl flex items-center justify-center bg-orange-500'>
+                    <div className='w-5 h-5 rounded-lg flex items-center justify-center bg-orange-500'>
                       <div className='w-2 h-2 bg-white rounded-full'></div>
                     </div>
                     <span className='text-lg text-gray-700'>
@@ -127,14 +137,13 @@ const Features = () => {
                     </span>
                   </motion.div>
                 ))}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              viewport={{ once: true }}
+              {...slideInRight}
+              whileInView='animate'
+              viewport={viewportOnce}
               className='relative'
             >
               <div className='bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden'>
@@ -148,27 +157,9 @@ const Features = () => {
                   <div className='px-6 py-4 text-gray-600 font-medium text-base'>Actions</div>
                 </div>
                 <div className='p-6 space-y-4'>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: '100%' }}
-                    transition={{ duration: 0.8, delay: 0.5 }}
-                    viewport={{ once: true }}
-                    className='h-3 rounded-full bg-orange-200'
-                  ></motion.div>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: '85%' }}
-                    transition={{ duration: 0.8, delay: 0.7 }}
-                    viewport={{ once: true }}
-                    className='h-3 rounded-full bg-orange-200'
-                  ></motion.div>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: '75%' }}
-                    transition={{ duration: 0.8, delay: 0.9 }}
-                    viewport={{ once: true }}
-                    className='h-3 rounded-full bg-orange-200'
-                  ></motion.div>
+                  <div className='h-3 rounded-full bg-orange-200 w-full'></div>
+                  <div className='h-3 rounded-full bg-orange-200 w-4/5'></div>
+                  <div className='h-3 rounded-full bg-orange-200 w-3/4'></div>
                 </div>
               </div>
             </motion.div>
