@@ -73,22 +73,17 @@ const Footer = () => {
             <h4 className='font-semibold mb-4'>Support</h4>
             <ul className='space-y-2 text-gray-400'>
               <li>
-                <a href='#' className='hover:text-white transition-colors'>
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a href='#' className='hover:text-white transition-colors'>
+                <a href='/setup' className='hover:text-white transition-colors'>
                   Setup Guide
                 </a>
               </li>
               <li>
-                <a href='#' className='hover:text-white transition-colors'>
+                <a href='/faq' className='hover:text-white transition-colors'>
                   FAQ
                 </a>
               </li>
               <li>
-                <a href='#' className='hover:text-white transition-colors'>
+                <a href='/contact' className='hover:text-white transition-colors'>
                   Contact
                 </a>
               </li>
@@ -101,14 +96,11 @@ const Footer = () => {
             © {new Date().getFullYear()} Kuiqlee. All rights reserved.
           </p>
           <div className='flex space-x-6 mt-4 md:mt-0'>
-            <a href='#' className='text-gray-400 hover:text-white text-sm transition-colors'>
+            <a href='/privacy' className='text-gray-400 hover:text-white text-sm transition-colors'>
               Privacy Policy
             </a>
-            <a href='#' className='text-gray-400 hover:text-white text-sm transition-colors'>
+            <a href='/terms' className='text-gray-400 hover:text-white text-sm transition-colors'>
               Terms of Service
-            </a>
-            <a href='#' className='text-gray-400 hover:text-white text-sm transition-colors'>
-              Cookie Policy
             </a>
           </div>
         </div>
