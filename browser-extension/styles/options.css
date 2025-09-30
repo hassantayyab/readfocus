@@ -1,18 +1,18 @@
 /* Kuiqlee Options Page Styles */
 
 :root {
-  --rf-primary: #3d2f1f;
-  --rf-primary-hover: #8b6914;
-  --rf-secondary: #8b6914;
-  --rf-background: #fbf9f7;
-  --rf-surface: #f8f6f3;
-  --rf-border: #8b6914;
-  --rf-text: #3d2f1f;
-  --rf-text-muted: #6b5b47;
-  --rf-success: #3d2f1f;
-  --rf-warning: #8b6914;
+  --rf-primary: #f97316;
+  --rf-primary-hover: #ea580c;
+  --rf-secondary: #fb923c;
+  --rf-background: #fef7ed;
+  --rf-surface: #fed7aa;
+  --rf-border: #fb923c;
+  --rf-text: #1f2937;
+  --rf-text-muted: #6b7280;
+  --rf-success: #10b981;
+  --rf-warning: #f59e0b;
   --rf-radius: 8px;
-  --rf-shadow: 0 1px 3px 0 rgb(61 47 31 / 0.1), 0 1px 2px -1px rgb(61 47 31 / 0.1);
+  --rf-shadow: 0 1px 3px 0 rgb(31 41 55 / 0.1), 0 1px 2px -1px rgb(31 41 55 / 0.1);
 }
 
 * {
@@ -35,7 +35,7 @@ body {
   margin: 0 auto;
   background-color: var(--rf-background);
   min-height: 100vh;
-  box-shadow: 0 0 50px rgb(61 47 31 / 0.1);
+  box-shadow: 0 0 50px rgb(31 41 55 / 0.1);
 }
 
 /* Header */
@@ -56,7 +56,7 @@ body {
   width: 56px;
   height: 56px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgb(61 47 31 / 0.15);
+  box-shadow: 0 4px 12px rgb(31 41 55 / 0.15);
 }
 
 .header-text h1 {
@@ -93,12 +93,12 @@ body {
   border-radius: 16px;
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 8px 25px rgb(61 47 31 / 0.1);
+  box-shadow: 0 8px 25px rgb(31 41 55 / 0.1);
   transition: box-shadow 0.3s ease;
 }
 
 .main-setting-card:hover {
-  box-shadow: 0 12px 40px rgb(61 47 31 / 0.15);
+  box-shadow: 0 12px 40px rgb(31 41 55 / 0.15);
 }
 
 .setting-header {
@@ -343,7 +343,7 @@ select {
 select:focus {
   outline: none;
   border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgb(61 47 31 / 0.1);
+  box-shadow: 0 0 0 3px rgb(31 41 55 / 0.1);
 }
 
 textarea {
@@ -362,7 +362,7 @@ textarea {
 textarea:focus {
   outline: none;
   border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgb(61 47 31 / 0.1);
+  box-shadow: 0 0 0 3px rgb(31 41 55 / 0.1);
 }
 
 .setting-value {
@@ -561,7 +561,7 @@ button:focus {
 .api-key-input:focus {
   outline: none;
   border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgb(61 47 31 / 0.1);
+  box-shadow: 0 0 0 3px rgb(31 41 55 / 0.1);
 }
 
 .test-button {
@@ -664,7 +664,7 @@ button:focus {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(61, 47, 31, 0.5);
+  background: rgba(31, 41, 55, 0.5);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -685,7 +685,7 @@ button:focus {
 .feedback-modal {
   background: var(--rf-background);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(61, 47, 31, 0.3);
+  box-shadow: 0 20px 60px rgba(31, 41, 55, 0.3);
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
@@ -760,7 +760,7 @@ button:focus {
 .feedback-form textarea:focus {
   outline: none;
   border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgba(61, 47, 31, 0.1);
+  box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
 }
 
 .feedback-form textarea {

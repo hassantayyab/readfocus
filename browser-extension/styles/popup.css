@@ -1,20 +1,20 @@
 /* Kuiqlee Popup Styles */
 
 :root {
-  --rf-primary: #3d2f1f;
-  --rf-primary-hover: #8b6914;
-  --rf-secondary: #8b6914;
-  --rf-background: #fbf9f7;
-  --rf-surface: #f8f6f3;
-  --rf-border: #8b6914;
-  --rf-text: #3d2f1f;
-  --rf-text-muted: #8b6914;
-  --rf-success: #8b6914;
-  --rf-warning: #7a6b57;
-  --rf-error: #8b6914;
+  --rf-primary: #f97316;
+  --rf-primary-hover: #ea580c;
+  --rf-secondary: #fb923c;
+  --rf-background: #fef7ed;
+  --rf-surface: #fed7aa;
+  --rf-border: #fb923c;
+  --rf-text: #1f2937;
+  --rf-text-muted: #6b7280;
+  --rf-success: #10b981;
+  --rf-warning: #f59e0b;
+  --rf-error: #ef4444;
   --rf-radius: 8px;
-  --rf-shadow: 0 1px 3px 0 rgb(61 47 31 / 0.1), 0 1px 2px -1px rgb(61 47 31 / 0.1);
-  --rf-shadow-lg: 0 10px 15px -3px rgb(61 47 31 / 0.1), 0 4px 6px -2px rgb(61 47 31 / 0.05);
+  --rf-shadow: 0 1px 3px 0 rgb(31 41 55 / 0.1), 0 1px 2px -1px rgb(31 41 55 / 0.1);
+  --rf-shadow-lg: 0 10px 15px -3px rgb(31 41 55 / 0.1), 0 4px 6px -2px rgb(31 41 55 / 0.05);
 }
 
 * {
@@ -275,12 +275,12 @@ body {
 
 .status-dot.connected {
   background-color: var(--rf-primary);
-  box-shadow: 0 0 0 2px rgba(139, 105, 20, 0.2);
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
 }
 
 .status-dot.disconnected {
   background-color: var(--rf-text-muted);
-  box-shadow: 0 0 0 2px rgba(122, 107, 87, 0.2);
+  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.2);
 }
 
 .status-text {
