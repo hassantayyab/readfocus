@@ -1,8 +1,14 @@
+import jwt from 'jsonwebtoken';
+import db from './db.js';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'CHANGE_THIS_SECRET_IN_PRODUCTION';
+const FREE_TIER_LIMIT = 3;
+
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -13,13 +19,89 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, options = {} } = req.body;
+    const { prompt, options = {}, domain, url } = req.body;
 
     if (!prompt) {
       return res.status(400).json({
         success: false,
         error: 'Prompt is required'
       });
+    }
+
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.substring(7)
+      : null;
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required. Please sign in to use Kuiqlee.',
+        requiresAuth: true,
+      });
+    }
+
+    // Verify JWT
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (error) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid or expired token. Please sign in again.',
+        requiresAuth: true,
+      });
+    }
+
+    const userId = decoded.userId;
+
+    // Check subscription status
+    const subscriptionResult = await db.subscriptions.hasActiveSubscription(userId);
+    if (!subscriptionResult.success) {
+      return res.status(500).json({
+        success: false,
+        error: 'Database error checking subscription',
+      });
+    }
+
+    const isPremium = subscriptionResult.isActive;
+
+    // If not premium, check usage limits
+    if (!isPremium && domain) {
+      // Check if domain is already used
+      const domainCheckResult = await db.usage.hasDomain({ userId, domain });
+      if (!domainCheckResult.success) {
+        return res.status(500).json({
+          success: false,
+          error: 'Database error checking usage',
+        });
+      }
+
+      const domainAlreadyUsed = domainCheckResult.exists;
+
+      // If new domain, check if limit reached
+      if (!domainAlreadyUsed) {
+        const usageResult = await db.usage.getCount(userId);
+        if (!usageResult.success) {
+          return res.status(500).json({
+            success: false,
+            error: 'Database error checking usage count',
+          });
+        }
+
+        const used = usageResult.count;
+
+        if (used >= FREE_TIER_LIMIT) {
+          return res.status(403).json({
+            success: false,
+            error: `Free tier limit reached (${FREE_TIER_LIMIT} summaries). Upgrade to Premium for unlimited access.`,
+            limitReached: true,
+            used,
+            limit: FREE_TIER_LIMIT,
+          });
+        }
+      }
     }
 
     // Get Claude API key from environment
@@ -102,10 +184,22 @@ export default async function handler(req, res) {
 
     console.log('✅ [API] Claude request successful');
 
+    // Log usage for non-premium users after successful summary
+    if (!isPremium && domain) {
+      const logResult = await db.usage.log({ userId, domain, url });
+      if (!logResult.success) {
+        console.error('⚠️ Failed to log usage:', logResult.error);
+        // Don't fail the request if logging fails
+      } else {
+        console.log(`📊 Usage logged for user ${decoded.email} on domain ${domain}`);
+      }
+    }
+
     return res.status(200).json({
       success: true,
       response: data.content[0].text,
-      usage: data.usage || {}
+      usage: data.usage || {},
+      isPremium,
     });
 
   } catch (error) {

@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "AI-powered content analyzer that transforms any webpage into quick, understandable summaries with key points, explanations, and action items",
 
-  "permissions": ["activeTab", "storage", "contextMenus", "scripting"],
+  "permissions": ["activeTab", "storage", "contextMenus", "scripting", "notifications"],
 
   "host_permissions": ["https://*/*"],
 
@@ -49,6 +49,10 @@
     {
       "matches": ["<all_urls>"],
       "js": [
+        "js/config.js",
+        "js/auth-manager.js",
+        "js/usage-tracker.js",
+        "js/stripe-manager.js",
         "js/proxy-ai-client.js",
         "js/content-analyzer.js",
         "js/ai-prompt-builder.js",
@@ -74,7 +78,7 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["icons/*"],
+      "resources": ["icons/*", "auth.html", "upgrade.html"],
       "matches": ["<all_urls>"]
     }
   ]

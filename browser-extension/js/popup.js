@@ -25,6 +25,14 @@ class KuiqleePopup {
         this.showBasicInterface();
       }, 3000);
 
+      // Initialize auth and usage managers
+      if (typeof authManager !== 'undefined') {
+        await authManager.initialize();
+      }
+      if (typeof usageTracker !== 'undefined') {
+        await usageTracker.initialize();
+      }
+
       // Get current tab
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tabs.length) {
@@ -46,6 +54,10 @@ class KuiqleePopup {
 
       // Initialize feedback modal
       this.initializeFeedbackModal();
+
+      // Update auth and usage UI
+      this.updateAuthUI();
+      this.updateUsageUI();
 
       // Check API status (may reference non-existent elements, handle gracefully)
       await this.checkApiStatus();
@@ -183,10 +195,40 @@ class KuiqleePopup {
       this.openFeedbackForm();
     });
 
+    // Auth action button (Sign In / Sign Out)
+    document.getElementById('auth-action-button')?.addEventListener('click', async () => {
+      if (typeof authManager !== 'undefined') {
+        if (authManager.isAuthenticated()) {
+          await this.handleSignOut();
+        } else {
+          this.handleSignIn();
+        }
+      }
+    });
+
+    // Upgrade button
+    document.getElementById('upgrade-button')?.addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('upgrade.html') });
+    });
+
     // Simplified summarize button - always triggers summarization flow
     document.getElementById('generate-summary')?.addEventListener('click', async () => {
       const button = document.getElementById('generate-summary');
-      if (!button || button.disabled) return;
+      if (!button) return;
+
+      // Check if user is authenticated
+      if (authManager && !authManager.isAuthenticated()) {
+        // Redirect to sign in
+        this.handleSignIn();
+        return;
+      }
+
+      // User is authenticated, proceed with summarization
+      if (button.disabled) return;
+
+      // Immediately disable button and show processing state
+      button.disabled = true;
+      button.innerHTML = '<span class="button-icon">⏳</span>Processing...';
 
       await this.handleSummarizeAction();
     });
@@ -441,7 +483,7 @@ class KuiqleePopup {
    */
   async createGitHubIssue(feedbackData) {
     try {
-      const proxyURL = 'https://readfocus-api.vercel.app/api/github-feedback';
+      const proxyURL = `${CONFIG.API_BASE_URL}/github-feedback`;
 
       const response = await fetch(proxyURL, {
         method: 'POST',
@@ -711,12 +753,32 @@ class KuiqleePopup {
     if (generateBtn) {
       const isProcessing = status === 'processing';
 
-      generateBtn.disabled = isProcessing;
+      // Check authentication first
+      const isAuthenticated = authManager && authManager.isAuthenticated();
 
-      if (isProcessing) {
-        generateBtn.innerHTML = '<span class="button-icon">⏳</span>Processing...';
+      if (!isAuthenticated) {
+        // Not logged in - show login prompt
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<span class="button-icon">🔑</span>Login to Start';
+        generateBtn.title = 'Sign in to use AI summaries';
       } else {
-        generateBtn.innerHTML = '<span class="button-icon">⚡</span>Start';
+        // Logged in - check usage limits
+        const isPremium = authManager.isPremium();
+        const stats = usageTracker ? usageTracker.getUsageStats() : { remaining: 0 };
+        const hasUsageRemaining = isPremium || stats.remaining > 0;
+
+        // Only enable if processing OR has usage remaining
+        generateBtn.disabled = isProcessing ? true : !hasUsageRemaining;
+
+        if (isProcessing) {
+          generateBtn.innerHTML = '<span class="button-icon">⏳</span>Processing...';
+        } else if (!hasUsageRemaining) {
+          generateBtn.innerHTML = '<span class="button-icon">🚫</span>Limit Reached';
+          generateBtn.title = 'Upgrade to Premium for unlimited summaries';
+        } else {
+          generateBtn.innerHTML = '<span class="button-icon">⚡</span>Start';
+          generateBtn.title = '';
+        }
       }
     }
 
@@ -805,6 +867,112 @@ class KuiqleePopup {
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(36);
+  }
+
+  /**
+   * Update auth UI based on authentication state
+   */
+  updateAuthUI() {
+    const authStatusDiv = document.getElementById('auth-status');
+    const authEmailSpan = document.getElementById('auth-user-email');
+    const authBadge = document.getElementById('auth-badge');
+    const authButton = document.getElementById('auth-action-button');
+
+    if (!authStatusDiv || !authEmailSpan || !authButton) return;
+
+    authStatusDiv.style.display = 'flex';
+
+    if (typeof authManager !== 'undefined' && authManager.isAuthenticated()) {
+      const user = authManager.getUser();
+      const isPremium = authManager.isPremium();
+
+      authEmailSpan.textContent = user.email || 'Signed in';
+      authButton.textContent = 'Sign Out';
+
+      if (isPremium) {
+        authBadge.style.display = 'inline-block';
+      } else {
+        authBadge.style.display = 'none';
+      }
+    } else {
+      authEmailSpan.textContent = 'Not signed in';
+      authButton.textContent = 'Sign In';
+      authBadge.style.display = 'none';
+    }
+  }
+
+  /**
+   * Update usage UI based on usage stats
+   */
+  async updateUsageUI() {
+    const usageStatusDiv = document.getElementById('usage-status');
+    const usageText = document.getElementById('usage-text');
+    const upgradeButton = document.getElementById('upgrade-button');
+    const generateBtn = document.getElementById('generate-summary');
+
+    if (!usageStatusDiv || !usageText || !upgradeButton) return;
+
+    if (typeof authManager !== 'undefined' && typeof usageTracker !== 'undefined') {
+      // Check if authenticated
+      if (!authManager.isAuthenticated()) {
+        usageStatusDiv.style.display = 'none';
+        return;
+      }
+
+      // Check if premium
+      if (authManager.isPremium()) {
+        usageStatusDiv.style.display = 'none';
+        // Enable button for premium users
+        if (generateBtn) {
+          generateBtn.disabled = false;
+          generateBtn.innerHTML = '<span class="button-icon">⚡</span>Start';
+          generateBtn.title = '';
+        }
+        return;
+      }
+
+      // Show usage for free users
+      const stats = usageTracker.getUsageStats();
+      usageStatusDiv.style.display = 'flex';
+      usageText.textContent = usageTracker.getUsageDisplayText();
+
+      if (stats.remaining <= 0) {
+        // Keep button disabled
+        upgradeButton.style.display = 'inline-flex';
+      } else {
+        // Enable button - user has summaries remaining
+        upgradeButton.style.display = 'none';
+        if (generateBtn) {
+          generateBtn.disabled = false;
+          generateBtn.innerHTML = '<span class="button-icon">⚡</span>Start';
+          generateBtn.title = '';
+        }
+      }
+    } else {
+      usageStatusDiv.style.display = 'none';
+    }
+  }
+
+  /**
+   * Handle sign in action
+   */
+  handleSignIn() {
+    chrome.tabs.create({ url: chrome.runtime.getURL('auth.html') });
+  }
+
+  /**
+   * Handle sign out action
+   */
+  async handleSignOut() {
+    if (typeof authManager !== 'undefined') {
+      const confirmed = confirm('Are you sure you want to sign out?');
+      if (confirmed) {
+        await authManager.logout();
+        this.updateAuthUI();
+        this.updateUsageUI();
+        this.showSuccessMessage('Signed out successfully');
+      }
+    }
   }
 }
 

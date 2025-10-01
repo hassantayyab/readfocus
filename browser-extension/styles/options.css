@@ -836,6 +836,61 @@ button:focus {
   transform: translateY(-1px);
 }
 
+/* Account Section */
+.account-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px 0 rgb(31 41 55 / 0.1);
+}
+
+.account-details {
+  margin-top: 1.5rem;
+}
+
+.account-info {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row label {
+  font-weight: 600;
+  color: var(--rf-text-muted);
+  font-size: 0.9rem;
+}
+
+.info-row span {
+  font-weight: 500;
+  color: var(--rf-text);
+  text-align: right;
+}
+
+.account-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.account-actions .action-button {
+  flex: 1;
+  min-width: 150px;
+}
+
 /* Mobile responsive for feedback */
 @media (max-width: 768px) {
   .feedback-section {
@@ -861,5 +916,17 @@ button:focus {
 
   .feedback-success {
     padding: 2rem 1.5rem;
+  }
+
+  .account-section {
+    padding: 1.5rem;
+  }
+
+  .account-actions {
+    flex-direction: column;
+  }
+
+  .account-actions .action-button {
+    width: 100%;
   }
 }

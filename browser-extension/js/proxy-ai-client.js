@@ -5,7 +5,7 @@
 
 class ProxyAIClient {
   constructor() {
-    this.baseURL = 'https://readfocus-api.vercel.app/api';
+    this.baseURL = CONFIG.API_BASE_URL;
     this.rateLimitDelay = 1000;
     this.lastRequestTime = 0;
   }
@@ -57,6 +57,11 @@ class ProxyAIClient {
    * @param {Object} options - Additional options
    */
   async makeRequest(prompt, options = {}) {
+    // Check authentication first
+    if (typeof authManager !== 'undefined' && !authManager.isAuthenticated()) {
+      throw new Error('Authentication required. Please sign in to use Kuiqlee.');
+    }
+
     await this.checkRateLimit();
 
     const maxRetries = 3;
@@ -65,19 +70,44 @@ class ProxyAIClient {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds
+
+        // Prepare headers
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+
+        // Add authorization token if available
+        if (typeof authManager !== 'undefined') {
+          const token = authManager.getToken();
+          if (token) {
+            headers.Authorization = `Bearer ${token}`;
+          }
+        }
+
+        // Get current page domain for usage tracking
+        let domain = '';
+        let url = '';
+        if (typeof window !== 'undefined' && window.location) {
+          try {
+            url = window.location.href;
+            domain = new URL(url).hostname;
+          } catch (e) {
+            // Ignore URL parsing errors
+          }
+        }
 
         const response = await fetch(`${this.baseURL}/claude`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
           body: JSON.stringify({
             prompt,
             options: {
               maxTokens: options.maxTokens || 8192,
               temperature: options.temperature || 0.3,
             },
+            domain,
+            url,
           }),
           signal: controller.signal,
         });
@@ -87,10 +117,28 @@ class ProxyAIClient {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+
+          // Handle authentication errors
+          if (response.status === 401 && errorData.requiresAuth) {
+            if (typeof authManager !== 'undefined') {
+              await authManager.handleAuthError();
+            }
+            throw new Error('Authentication required. Please sign in to continue.');
+          }
+
+          // Handle usage limit errors
+          if (response.status === 403 && errorData.limitReached) {
+            if (typeof usageTracker !== 'undefined') {
+              usageTracker.handleLimitReached(errorData);
+            }
+            throw new Error(errorData.error || 'Free tier limit reached. Upgrade to continue.');
+          }
+
           const error = new Error(
             errorData.error || `Request failed: ${response.status} ${response.statusText}`,
           );
           error.status = response.status;
+          error.data = errorData;
           throw error;
         }
 
@@ -98,6 +146,13 @@ class ProxyAIClient {
 
         if (!data.success || !data.response) {
           throw new Error(data.error || 'Invalid response format from API');
+        }
+
+        // Refresh usage count after successful API call
+        if (typeof usageTracker !== 'undefined') {
+          usageTracker.forceRefresh().catch(err => {
+            console.error('Failed to refresh usage:', err);
+          });
         }
 
         return data.response;

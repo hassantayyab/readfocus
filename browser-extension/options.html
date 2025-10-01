@@ -48,6 +48,49 @@
             </div>
           </section>
 
+          <!-- Account Section -->
+          <section class="account-section" id="account-section" style="display: none">
+            <div class="setting-header">
+              <div class="setting-icon">👤</div>
+              <div class="setting-title">
+                <h2>Account</h2>
+                <p>Manage your Kuiqlee account and subscription</p>
+              </div>
+            </div>
+
+            <div class="account-details">
+              <div class="account-info">
+                <div class="info-row">
+                  <label>Email:</label>
+                  <span id="account-email">Loading...</span>
+                </div>
+                <div class="info-row">
+                  <label>Status:</label>
+                  <span id="account-status">Loading...</span>
+                </div>
+                <div class="info-row">
+                  <label>Usage:</label>
+                  <span id="account-usage">Loading...</span>
+                </div>
+              </div>
+
+              <div class="account-actions">
+                <button type="button" id="manage-subscription-btn" class="action-button primary" style="display: none">
+                  <span class="button-icon">✨</span>
+                  Manage Subscription
+                </button>
+                <button type="button" id="upgrade-premium-btn" class="action-button primary" style="display: none">
+                  <span class="button-icon">✨</span>
+                  Upgrade to Premium
+                </button>
+                <button type="button" id="logout-btn" class="action-button secondary">
+                  <span class="button-icon">🚪</span>
+                  Logout
+                </button>
+              </div>
+            </div>
+          </section>
+
           <!-- Info Cards -->
           <div class="info-cards">
             <div class="info-card">
@@ -140,6 +183,10 @@
       </div>
     </div>
 
+    <script src="js/config.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/usage-tracker.js"></script>
+    <script src="js/stripe-manager.js"></script>
     <script src="js/options.js"></script>
   </body>
 </html>

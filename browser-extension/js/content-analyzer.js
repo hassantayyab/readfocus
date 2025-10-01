@@ -6,7 +6,7 @@
 class ContentAnalyzer {
   constructor() {
     this.minContentLength = 100;
-    this.maxContentLength = 25000; // Increased for comprehensive AI analysis (~5000-6000 tokens)
+    this.maxContentLength = CONFIG.MAX_CONTENT_LENGTH; // Configurable - reduce if getting timeouts
     this.cleaningRules = {
       removeElements: [
         'script',

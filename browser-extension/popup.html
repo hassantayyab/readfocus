@@ -40,13 +40,33 @@
         </div>
       </div>
 
+      <!-- Auth Status Bar -->
+      <div class="auth-status" id="auth-status" style="display: none">
+        <div class="auth-info">
+          <span id="auth-user-email">Not signed in</span>
+          <span id="auth-badge" class="premium-badge" style="display: none">✨ Premium</span>
+        </div>
+        <button class="auth-button" id="auth-action-button">Sign In</button>
+      </div>
+
+      <!-- Usage Status (for free users) -->
+      <div class="usage-status" id="usage-status" style="display: none">
+        <div class="usage-info">
+          <span id="usage-text">Loading...</span>
+        </div>
+        <button class="upgrade-button" id="upgrade-button" style="display: none">
+          <span class="button-icon">✨</span>
+          Upgrade to Premium
+        </button>
+      </div>
+
       <!-- Content Summary Section -->
       <div class="summary-section" id="summary-section">
         <div class="summary-description">
           Transform any webpage into quick understanding with AI.
         </div>
         <div class="summary-actions">
-          <button class="summary-button" id="generate-summary">
+          <button class="summary-button" id="generate-summary" disabled>
             <span class="button-icon">⚡</span>
             Start
           </button>
@@ -79,7 +99,10 @@
             <div class="step-number">1</div>
             <div class="step-content">
               <h4>Navigate to any article</h4>
-              <p>Go to any webpage with an article or long-form content you want to understand quickly.</p>
+              <p>
+                Go to any webpage with an article or long-form content you want to understand
+                quickly.
+              </p>
             </div>
           </div>
 
@@ -87,7 +110,10 @@
             <div class="step-number">2</div>
             <div class="step-content">
               <h4>Click "Start" button</h4>
-              <p>Use the Start button in this popup or press <strong>Ctrl/Cmd+Shift+S</strong> to begin analysis.</p>
+              <p>
+                Use the Start button in this popup or press <strong>Ctrl/Cmd+Shift+S</strong> to
+                begin analysis.
+              </p>
             </div>
           </div>
 
@@ -109,9 +135,11 @@
             <div class="step-number">4</div>
             <div class="step-content">
               <h4>Quick tips</h4>
-              <p>• Press <strong>Esc</strong> to close the summary overlay<br>
-                 • Use the keyboard shortcuts for fastest navigation<br>
-                 • Summaries are cached for quick re-access</p>
+              <p>
+                • Press <strong>Esc</strong> to close the summary overlay<br />
+                • Use the keyboard shortcuts for fastest navigation<br />
+                • Summaries are cached for quick re-access
+              </p>
             </div>
           </div>
         </div>
@@ -175,6 +203,10 @@
       </div>
     </div>
 
+    <script src="js/config.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/usage-tracker.js"></script>
+    <script src="js/stripe-manager.js"></script>
     <script src="js/popup.js"></script>
   </body>
 </html>

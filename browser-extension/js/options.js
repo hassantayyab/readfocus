@@ -16,10 +16,19 @@ class KuiqleeOptions {
   }
 
   async init() {
+    // Initialize auth and usage managers
+    if (typeof authManager !== 'undefined') {
+      await authManager.initialize();
+    }
+    if (typeof usageTracker !== 'undefined') {
+      await usageTracker.initialize();
+    }
+
     await this.loadSettings();
     this.bindEvents();
     this.initializeFeedbackModal();
     this.updateUI();
+    this.updateAccountUI();
   }
 
   /**
@@ -139,6 +148,15 @@ class KuiqleeOptions {
     document
       .getElementById('send-feedback-settings')
       ?.addEventListener('click', () => this.openFeedbackForm());
+
+    // Account management buttons
+    document.getElementById('logout-btn')?.addEventListener('click', () => this.handleLogout());
+    document
+      .getElementById('manage-subscription-btn')
+      ?.addEventListener('click', () => this.handleManageSubscription());
+    document
+      .getElementById('upgrade-premium-btn')
+      ?.addEventListener('click', () => this.handleUpgrade());
 
     // Footer links
     document.getElementById('clear-cache-link')?.addEventListener('click', (e) => {
@@ -385,7 +403,7 @@ class KuiqleeOptions {
    */
   async createGitHubIssue(feedbackData) {
     try {
-      const proxyURL = 'https://readfocus-api.vercel.app/api/github-feedback';
+      const proxyURL = `${CONFIG.API_BASE_URL}/github-feedback`;
 
       const response = await fetch(proxyURL, {
         method: 'POST',
@@ -481,6 +499,93 @@ Usage Statistics:
       notification.classList.remove('show');
       setTimeout(() => notification.remove(), 300);
     }, 3000);
+  }
+
+  /**
+   * Update account UI based on authentication state
+   */
+  async updateAccountUI() {
+    const accountSection = document.getElementById('account-section');
+    const accountEmail = document.getElementById('account-email');
+    const accountStatus = document.getElementById('account-status');
+    const accountUsage = document.getElementById('account-usage');
+    const manageBtn = document.getElementById('manage-subscription-btn');
+    const upgradeBtn = document.getElementById('upgrade-premium-btn');
+
+    if (!accountSection) return;
+
+    if (typeof authManager !== 'undefined' && authManager.isAuthenticated()) {
+      accountSection.style.display = 'block';
+
+      const user = authManager.getUser();
+      const isPremium = authManager.isPremium();
+
+      accountEmail.textContent = user.email || 'N/A';
+
+      if (isPremium) {
+        accountStatus.innerHTML = '<span style="color: #10b981; font-weight: 600;">✨ Premium</span>';
+        accountUsage.textContent = 'Unlimited summaries';
+        manageBtn.style.display = 'inline-flex';
+        upgradeBtn.style.display = 'none';
+      } else {
+        accountStatus.textContent = 'Free Tier';
+
+        if (typeof usageTracker !== 'undefined') {
+          const stats = usageTracker.getUsageStats();
+          accountUsage.textContent = usageTracker.getUsageDisplayText();
+        } else {
+          accountUsage.textContent = 'Loading...';
+        }
+
+        manageBtn.style.display = 'none';
+        upgradeBtn.style.display = 'inline-flex';
+      }
+    } else {
+      accountSection.style.display = 'none';
+    }
+  }
+
+  /**
+   * Handle logout action
+   */
+  async handleLogout() {
+    if (typeof authManager !== 'undefined') {
+      const confirmed = confirm('Are you sure you want to sign out?');
+      if (confirmed) {
+        await authManager.logout();
+        this.updateAccountUI();
+        this.showNotification('Signed out successfully', 'success');
+
+        // Optionally redirect to auth page
+        setTimeout(() => {
+          chrome.tabs.create({ url: chrome.runtime.getURL('auth.html') });
+        }, 1000);
+      }
+    }
+  }
+
+  /**
+   * Handle manage subscription action
+   */
+  async handleManageSubscription() {
+    if (typeof stripeManager !== 'undefined') {
+      try {
+        const result = await stripeManager.openCustomerPortal();
+        if (result.success) {
+          this.showNotification('Opening subscription management...', 'info');
+        }
+      } catch (error) {
+        console.error('Error opening customer portal:', error);
+        this.showNotification('Failed to open subscription management', 'error');
+      }
+    }
+  }
+
+  /**
+   * Handle upgrade to premium action
+   */
+  handleUpgrade() {
+    chrome.tabs.create({ url: chrome.runtime.getURL('upgrade.html') });
   }
 }
 

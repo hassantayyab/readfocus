@@ -30,6 +30,16 @@ class ContentSummaryService {
         throw new Error('AIPromptBuilder not available. Make sure ai-prompt-builder.js is loaded.');
       }
 
+      // Initialize auth manager if available
+      if (typeof authManager !== 'undefined') {
+        await authManager.initialize();
+      }
+
+      // Initialize usage tracker if available
+      if (typeof usageTracker !== 'undefined') {
+        await usageTracker.initialize();
+      }
+
       // Initialize Proxy AI client (no API key needed)
       this.aiClient = new ProxyAIClient();
       await this.aiClient.initialize();
@@ -59,6 +69,40 @@ class ContentSummaryService {
     try {
       if (!this.initialized) {
         throw new Error('Summary service not initialized. Please refresh the page and try again.');
+      }
+
+      // Check authentication first
+      if (typeof authManager !== 'undefined' && !authManager.isAuthenticated()) {
+        return {
+          success: false,
+          error: 'Please sign in to use Kuiqlee summaries.',
+          requiresAuth: true,
+          timestamp: Date.now(),
+        };
+      }
+
+      // Get current domain for usage tracking
+      let domain = '';
+      try {
+        domain = new URL(window.location.href).hostname;
+      } catch (e) {
+        console.error('Failed to extract domain:', e);
+      }
+
+      // Check usage limits before proceeding (only for non-premium users)
+      if (typeof usageTracker !== 'undefined' && domain) {
+        const usageCheck = await usageTracker.canUseDomain(domain);
+
+        if (!usageCheck.canUse) {
+          return {
+            success: false,
+            error: 'You have reached your free tier limit. Upgrade to Premium for unlimited summaries.',
+            limitReached: true,
+            used: usageCheck.used || 3,
+            limit: 3,
+            timestamp: Date.now(),
+          };
+        }
       }
 
       // Load user settings to determine what to generate
@@ -102,6 +146,27 @@ class ContentSummaryService {
       }
     } catch (error) {
       console.error('Summary generation failed:', error);
+
+      // Check if error is auth-related
+      if (error.message && error.message.includes('Authentication required')) {
+        return {
+          success: false,
+          error: error.message,
+          requiresAuth: true,
+          timestamp: Date.now(),
+        };
+      }
+
+      // Check if error is limit-related
+      if (error.message && error.message.includes('limit reached')) {
+        return {
+          success: false,
+          error: error.message,
+          limitReached: true,
+          timestamp: Date.now(),
+        };
+      }
+
       return {
         success: false,
         error: error.message,
