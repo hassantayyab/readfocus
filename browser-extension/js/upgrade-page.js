@@ -40,6 +40,10 @@ function loadPricingFromConfig() {
   document.getElementById('annual-price').textContent = `$${annualPlan.priceValue}`;
   document.getElementById('annual-period').textContent = `/${annualPlan.interval}`;
 
+  // Calculate and display monthly equivalent
+  const monthlyEquivalent = (annualPlan.priceValue / 12).toFixed(2);
+  document.getElementById('monthly-equivalent').textContent = `Just $${monthlyEquivalent}/month`;
+
   // Calculate and update savings
   if (annualPlan.savings) {
     document.getElementById('annual-savings').textContent = annualPlan.savings;

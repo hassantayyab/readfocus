@@ -7,8 +7,8 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
-    Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
   background: #fef7ed;
   min-height: 100vh;
   padding: 40px 20px;
@@ -121,11 +121,8 @@ body {
   border-radius: 12px;
   padding: 32px 24px;
   transition: all 0.3s ease;
-}
-
-.plan-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
 }
 
 .plan-card.popular {
@@ -180,6 +177,13 @@ body {
   font-weight: 500;
 }
 
+.monthly-equivalent {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
 .savings-badge {
   margin-top: 8px;
   display: inline-block;
@@ -226,29 +230,33 @@ body {
 .btn-plan {
   width: 100%;
   padding: 14px 24px;
-  background: #f97316;
-  color: white;
-  border: none;
+  background: transparent;
+  color: #f97316;
+  border: 2px solid #f97316;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  margin-top: auto;
   transition: all 0.2s ease;
 }
 
 .btn-plan:hover {
-  background: #ea580c;
+  background: #fef7ed;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
 }
 
 .btn-plan-popular {
   background: #f97316;
+  color: white;
+  border-color: #f97316;
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
 }
 
 .btn-plan-popular:hover {
   background: #ea580c;
+  border-color: #ea580c;
   box-shadow: 0 6px 16px rgba(249, 115, 22, 0.5);
 }
 
