@@ -30,9 +30,9 @@ const CONFIG = {
     ANNUAL: {
       id: 'annual',
       name: 'Annual Plan',
-      price: '$35.88/year',
-      priceValue: 35.88,
-      monthlyPrice: 2.99,
+      price: '$35.99/year',
+      priceValue: 35.99,
+      monthlyPrice: 3,
       interval: 'year',
       description: 'Save 40% with annual billing',
       savings: 'Save $24/year',
