@@ -4,9 +4,11 @@
   --rf-primary: #f97316;
   --rf-primary-hover: #ea580c;
   --rf-secondary: #fb923c;
-  --rf-background: #fef7ed;
-  --rf-surface: #fed7aa;
-  --rf-border: #fb923c;
+  --rf-background: #ffffff;
+  --rf-surface: #f9fafb;
+  --rf-surface-light: #fef7ed;
+  --rf-border: #e5e7eb;
+  --rf-border-accent: #f97316;
   --rf-text: #1f2937;
   --rf-text-muted: #6b7280;
   --rf-success: #10b981;
@@ -24,7 +26,7 @@ body {
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, var(--rf-surface) 0%, var(--rf-background) 100%);
+  background: var(--rf-surface);
   color: var(--rf-text);
   line-height: 1.6;
   min-height: 100vh;
@@ -40,7 +42,7 @@ body {
 
 /* Header */
 .header {
-  background: linear-gradient(135deg, var(--rf-background) 0%, var(--rf-surface) 100%);
+  background: var(--rf-background);
   color: var(--rf-text);
   padding: 2rem 2rem 1.5rem 2rem;
   border-bottom: 1px solid var(--rf-border);
@@ -63,10 +65,7 @@ body {
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--rf-primary) 0%, var(--rf-primary-hover) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--rf-text);
 }
 
 .header-text p {
@@ -115,9 +114,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--rf-surface) 0%, var(--rf-background) 100%);
+  background: var(--rf-surface-light);
   border-radius: 50%;
-  border: 2px solid var(--rf-border);
+  border: 2px solid var(--rf-border-accent);
 }
 
 .setting-title h2 {
@@ -219,12 +218,14 @@ input:checked + .slider:before {
   border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .info-card:hover {
+  border-color: var(--rf-border-accent);
   transform: translateY(-2px);
 }
+
 
 .info-icon {
   font-size: 1.5rem;
@@ -287,7 +288,7 @@ input:checked + .slider:before {
 
 .action-button.secondary:hover {
   background-color: var(--rf-surface);
-  border-color: var(--rf-secondary);
+  border-color: var(--rf-border-accent);
   transform: translateY(-1px);
 }
 
@@ -369,7 +370,7 @@ textarea:focus {
   display: inline-block;
   margin-left: 1rem;
   padding: 0.25rem 0.5rem;
-  background-color: var(--rf-surface);
+  background-color: var(--rf-surface-light);
   border-radius: 4px;
   font-size: 0.875rem;
   font-weight: 500;
@@ -410,14 +411,14 @@ textarea:focus {
 
 .secondary-button:hover {
   background-color: var(--rf-surface);
-  border-color: var(--rf-secondary);
+  border-color: var(--rf-border-accent);
 }
 
 /* Footer */
 .footer {
   border-top: 1px solid var(--rf-border);
   padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, var(--rf-surface) 0%, var(--rf-background) 100%);
+  background: var(--rf-background);
 }
 
 .footer-content {
@@ -502,7 +503,7 @@ textarea:focus {
 
 /* Success/Error States */
 .save-success {
-  background-color: var(--rf-surface);
+  background-color: var(--rf-surface-light);
   color: var(--rf-text);
   padding: 0.75rem 1.5rem;
   border: 1px solid var(--rf-border);
@@ -533,7 +534,7 @@ button:focus {
 }
 
 .setting-group.changed {
-  background-color: var(--rf-surface);
+  background-color: var(--rf-surface-light);
   border-radius: var(--rf-radius);
   padding: 0.5rem;
   margin: -0.5rem;
@@ -595,7 +596,7 @@ button:focus {
 }
 
 .api-status.success {
-  background: var(--rf-surface);
+  background: var(--rf-surface-light);
   color: var(--rf-text);
   border: 1px solid var(--rf-border);
 }
@@ -613,7 +614,7 @@ button:focus {
 }
 
 .usage-stats {
-  background: var(--rf-surface);
+  background: var(--rf-surface-light);
   border: 1px solid var(--rf-border);
   border-radius: var(--rf-radius);
   padding: 12px;
@@ -731,7 +732,7 @@ button:focus {
 }
 
 .close-feedback:hover {
-  background: var(--rf-surface);
+  background: var(--rf-surface-light);
   color: var(--rf-text);
 }
 
@@ -793,7 +794,7 @@ button:focus {
 
 .feedback-actions .secondary-button:hover {
   background-color: var(--rf-surface);
-  border-color: var(--rf-secondary);
+  border-color: var(--rf-border-accent);
 }
 
 .feedback-actions .primary-button {
@@ -850,7 +851,7 @@ button:focus {
 }
 
 .account-info {
-  background: #f9fafb;
+  background: var(--rf-surface);
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
