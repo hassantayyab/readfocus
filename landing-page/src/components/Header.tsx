@@ -22,29 +22,29 @@ const Header = () => {
             <span className='text-xl font-bold text-gray-900'>Kuiqlee</span>
           </Link>
 
-          <nav className='hidden md:flex items-center space-x-8'>
+          <nav className='hidden md:flex items-center space-x-4 lg:space-x-8'>
             <a
               href='#features'
-              className='transition-colors font-medium text-gray-700 hover:text-orange-600'
+              className='transition-colors font-medium text-sm lg:text-base text-gray-700 hover:text-orange-600'
             >
               Features
             </a>
             <a
               href='#how-it-works'
-              className='transition-colors font-medium text-gray-700 hover:text-orange-600'
+              className='transition-colors font-medium text-sm lg:text-base text-gray-700 hover:text-orange-600'
             >
               How it Works
             </a>
             <a
               href='#pricing'
-              className='transition-colors font-medium text-gray-700 hover:text-orange-600'
+              className='transition-colors font-medium text-sm lg:text-base text-gray-700 hover:text-orange-600'
             >
               Pricing
             </a>
           </nav>
 
-          <div className='flex items-center space-x-4'>
-            <Button variant='primary' size='md'>
+          <div className='flex items-center space-x-2 sm:space-x-4'>
+            <Button variant='primary' size='md' className='text-sm sm:text-base px-3 sm:px-4'>
               Add to Chrome
             </Button>
           </div>

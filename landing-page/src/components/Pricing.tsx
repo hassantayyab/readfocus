@@ -32,18 +32,18 @@ const Pricing = () => {
   ];
 
   return (
-    <section id='pricing' className='py-24 bg-orange-50'>
+    <section id='pricing' className='py-12 sm:py-16 lg:py-24 bg-orange-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <motion.div
           {...fadeInUp}
           whileInView='animate'
           viewport={viewportOnce}
-          className='text-center mb-20'
+          className='text-center mb-12 sm:mb-16 lg:mb-20'
         >
-          <h2 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
+          <h2 className='text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-gray-900'>
             Simple, <span className='text-orange-500'>Monthly Pricing</span>
           </h2>
-          <p className='text-xl max-w-3xl mx-auto text-gray-900'>
+          <p className='text-base sm:text-lg lg:text-xl max-w-3xl mx-auto text-gray-900 px-4'>
             Get unlimited AI-powered summaries with a simple monthly subscription.
           </p>
         </motion.div>
@@ -53,18 +53,22 @@ const Pricing = () => {
           whileInView='animate'
           viewport={viewportOnce}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className='max-w-lg mx-auto mb-20 mt-8'
+          className='max-w-lg mx-auto mb-12 sm:mb-16 lg:mb-20 mt-6 sm:mt-8'
         >
-          <div className='bg-white rounded-2xl border border-gray-200 overflow-hidden relative'>
-            <div className='p-8 lg:p-10 text-center'>
-              <div className='mb-8'>
-                <div className='text-6xl lg:text-7xl font-bold mb-2 text-gray-900'>$4.99</div>
-                <div className='text-xl font-medium text-gray-900'>Per Month</div>
-                <div className='text-sm mt-2 text-gray-900'>Cancel anytime • No hidden fees</div>
+          <div className='bg-white rounded-xl sm:rounded-2xl border border-gray-200 overflow-hidden relative'>
+            <div className='p-6 sm:p-8 lg:p-10 text-center'>
+              <div className='mb-6 sm:mb-8'>
+                <div className='text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-2 text-gray-900'>
+                  $4.99
+                </div>
+                <div className='text-lg sm:text-xl font-medium text-gray-900'>Per Month</div>
+                <div className='text-xs sm:text-sm mt-2 text-gray-900'>
+                  Cancel anytime • No hidden fees
+                </div>
               </div>
 
               <motion.div
-                className='space-y-4 mb-8'
+                className='space-y-3 sm:space-y-4 mb-6 sm:mb-8'
                 variants={staggerContainer}
                 whileInView='animate'
                 viewport={viewportOnce}
@@ -73,21 +77,27 @@ const Pricing = () => {
                   <motion.div
                     key={feature}
                     variants={staggerItem}
-                    className='flex items-center justify-center space-x-3'
+                    className='flex items-center justify-center space-x-2 sm:space-x-3'
                   >
-                    <div className='w-5 h-5 rounded-full flex items-center justify-center bg-orange-500'>
+                    <div className='w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center bg-orange-500 flex-shrink-0'>
                       <span className='text-white text-xs'>✓</span>
                     </div>
-                    <span className='font-medium text-gray-900'>{feature}</span>
+                    <span className='font-medium text-sm sm:text-base text-gray-900'>
+                      {feature}
+                    </span>
                   </motion.div>
                 ))}
               </motion.div>
 
-              <Button variant='primary' size='lg' className='w-full mb-4'>
+              <Button
+                variant='primary'
+                size='lg'
+                className='w-full mb-3 sm:mb-4 text-sm sm:text-base'
+              >
                 Add to Chrome - Free
               </Button>
 
-              <p className='text-sm font-medium text-gray-900'>Secure payment</p>
+              <p className='text-xs sm:text-sm font-medium text-gray-900'>Secure payment</p>
             </div>
           </div>
         </motion.div>
@@ -96,20 +106,20 @@ const Pricing = () => {
           {...fadeInUp}
           whileInView='animate'
           viewport={viewportOnce}
-          className='rounded-2xl p-8 lg:p-12'
+          className='rounded-xl sm:rounded-2xl'
         >
           <div>
-            <div className='text-center mb-16'>
-              <h3 className='text-3xl lg:text-4xl font-bold mb-4 text-gray-900'>
+            <div className='text-center mb-10 sm:mb-12 lg:mb-16'>
+              <h3 className='text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 text-gray-900'>
                 Frequently Asked <span className='text-orange-500'>Questions</span>
               </h3>
-              <p className='text-lg text-gray-700 max-w-2xl mx-auto'>
+              <p className='text-base sm:text-lg text-gray-700 max-w-2xl mx-auto px-4'>
                 Everything you need to know about Kuiqlee
               </p>
             </div>
 
             <motion.div
-              className='grid md:grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto'
+              className='grid md:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto'
               variants={staggerContainer}
               whileInView='animate'
               viewport={viewportOnce}
@@ -118,17 +128,19 @@ const Pricing = () => {
                 <motion.div
                   key={index}
                   variants={staggerItem}
-                  className='bg-white rounded-2xl p-8 transition-all duration-300 border border-gray-200 hover:shadow-lg hover:shadow-orange-100/50 hover:border-orange-200'
+                  className='bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 transition-all duration-300 border border-gray-200 hover:shadow-lg hover:shadow-orange-100/50 hover:border-orange-200'
                 >
-                  <div className='flex items-start space-x-4'>
-                    <div className='flex-shrink-0 w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center'>
-                      <span className='text-white text-sm font-bold'>?</span>
+                  <div className='flex items-start space-x-3 sm:space-x-4'>
+                    <div className='flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-orange-500 rounded-lg sm:rounded-xl flex items-center justify-center'>
+                      <span className='text-white text-xs sm:text-sm font-bold'>?</span>
                     </div>
                     <div className='flex-1'>
-                      <h4 className='font-bold mb-3 text-lg text-gray-900 transition-colors'>
+                      <h4 className='font-bold mb-2 sm:mb-3 text-base sm:text-lg text-gray-900 transition-colors'>
                         {faq.question}
                       </h4>
-                      <p className='leading-relaxed text-gray-700 text-base'>{faq.answer}</p>
+                      <p className='leading-relaxed text-gray-700 text-sm sm:text-base'>
+                        {faq.answer}
+                      </p>
                     </div>
                   </div>
                 </motion.div>
@@ -140,17 +152,19 @@ const Pricing = () => {
               whileInView='animate'
               viewport={viewportOnce}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className='text-center mt-12'
+              className='text-center mt-8 sm:mt-10 lg:mt-12'
             >
-              <div className='bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/50 max-w-md mx-auto'>
-                <h4 className='font-bold text-gray-900 mb-2'>Still have questions?</h4>
-                <p className='text-gray-700 text-sm mb-4'>
+              <div className='bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-5 sm:p-6 border border-white/50 max-w-md mx-auto'>
+                <h4 className='font-bold text-gray-900 mb-2 text-base sm:text-lg'>
+                  Still have questions?
+                </h4>
+                <p className='text-gray-700 text-xs sm:text-sm mb-3 sm:mb-4'>
                   We're here to help you get the most out of Kuiqlee
                 </p>
                 <Button
                   variant='outline'
                   size='sm'
-                  className='text-orange-600 border-orange-300 hover:bg-orange-50'
+                  className='text-orange-600 border-orange-300 hover:bg-orange-50 text-xs sm:text-sm'
                 >
                   Contact Support
                 </Button>

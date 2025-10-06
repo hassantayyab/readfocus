@@ -57,24 +57,24 @@ const Features = () => {
   ];
 
   return (
-    <section id='features' className='pb-24 pt-16 bg-orange-50'>
+    <section id='features' className='pb-12 sm:pb-16 lg:pb-24 pt-8 sm:pt-12 lg:pt-16 bg-orange-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <motion.div
           {...fadeInUp}
           whileInView='animate'
           viewport={viewportOnce}
-          className='text-center mb-20'
+          className='text-center mb-12 sm:mb-16 lg:mb-20'
         >
-          <h2 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
+          <h2 className='text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-gray-900'>
             Powerful Features for <span className='text-orange-500'>Smarter Reading</span>
           </h2>
-          <p className='text-xl max-w-3xl mx-auto text-gray-900'>
+          <p className='text-base sm:text-lg lg:text-xl max-w-3xl mx-auto text-gray-900 px-4'>
             Transform information overload into knowledge advantage with cutting-edge AI technology
           </p>
         </motion.div>
 
         <motion.div
-          className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20'
+          className='grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16 lg:mb-20'
           variants={staggerContainer}
           whileInView='animate'
           viewport={viewportOnce}
@@ -83,15 +83,17 @@ const Features = () => {
             <motion.div
               key={index}
               variants={staggerItem}
-              className='group relative bg-white border border-gray-200 rounded-2xl p-10 transition-all duration-300'
+              className='group relative bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-10 transition-all duration-300'
             >
-              <div className='flex items-center space-x-4 mb-6'>
-                <div className='w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center border border-orange-100 text-orange-500 shrink-0'>
+              <div className='flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4 sm:mb-6'>
+                <div className='w-12 h-12 sm:w-14 sm:h-14 bg-orange-50 rounded-xl sm:rounded-2xl flex items-center justify-center border border-orange-100 text-orange-500 shrink-0'>
                   {feature.icon}
                 </div>
-                <h3 className='text-2xl font-bold text-gray-900'>{feature.title}</h3>
+                <h3 className='text-xl sm:text-2xl font-bold text-gray-900'>{feature.title}</h3>
               </div>
-              <p className='leading-relaxed text-lg text-gray-700'>{feature.description}</p>
+              <p className='leading-relaxed text-base sm:text-lg text-gray-700'>
+                {feature.description}
+              </p>
             </motion.div>
           ))}
         </motion.div>
@@ -100,19 +102,19 @@ const Features = () => {
           {...fadeInUp}
           whileInView='animate'
           viewport={viewportOnce}
-          className='bg-white rounded-2xl p-8 lg:p-12 border border-gray-200'
+          className='bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 xl:p-12 border border-gray-200'
         >
-          <div className='grid lg:grid-cols-2 gap-12 items-center'>
+          <div className='grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start lg:items-center'>
             <motion.div {...slideInLeft} whileInView='animate' viewport={viewportOnce}>
-              <h3 className='text-4xl lg:text-5xl font-bold mb-6 text-gray-900'>
+              <h3 className='text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-3 sm:mb-4 lg:mb-6 text-gray-900'>
                 <span className='text-orange-500'>5</span> Different Summary Types
               </h3>
-              <p className='mb-8 text-xl text-gray-700'>
+              <p className='mb-4 sm:mb-6 lg:mb-8 text-base lg:text-lg text-gray-700'>
                 From quick overviews to detailed analysis, get exactly the level of detail you need
                 for any situation.
               </p>
               <motion.div
-                className='space-y-4'
+                className='space-y-2 sm:space-y-3'
                 variants={staggerContainer}
                 whileInView='animate'
                 viewport={viewportOnce}
@@ -127,12 +129,12 @@ const Features = () => {
                   <motion.div
                     key={item.label}
                     variants={staggerItem}
-                    className='flex items-center space-x-4'
+                    className='flex items-start sm:items-center space-x-2 sm:space-x-3'
                   >
-                    <div className='w-5 h-5 rounded-lg flex items-center justify-center bg-orange-500'>
-                      <div className='w-2 h-2 bg-white rounded-full'></div>
+                    <div className='w-4 h-4 sm:w-5 sm:h-5 rounded-lg flex items-center justify-center bg-orange-500 flex-shrink-0 mt-0.5 sm:mt-0'>
+                      <div className='w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full'></div>
                     </div>
-                    <span className='text-lg text-gray-700'>
+                    <span className='text-xs sm:text-sm lg:text-base text-gray-700'>
                       <strong className='text-gray-900'>{item.label}:</strong> {item.desc}
                     </span>
                   </motion.div>
@@ -144,22 +146,30 @@ const Features = () => {
               {...slideInRight}
               whileInView='animate'
               viewport={viewportOnce}
-              className='relative'
+              className='relative mt-6 lg:mt-0'
             >
-              <div className='bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden'>
-                <div className='flex border-b border-gray-200'>
-                  <div className='px-6 py-4 font-medium text-sm text-white bg-orange-500/90'>
+              <div className='bg-white rounded-xl sm:rounded-2xl shadow-xl border border-gray-200 overflow-hidden'>
+                <div className='flex border-b border-gray-200 overflow-x-auto scrollbar-hide'>
+                  <div className='px-2 sm:px-3 lg:px-4 xl:px-6 py-2 sm:py-2.5 lg:py-3 font-medium text-[10px] sm:text-xs lg:text-sm text-white bg-orange-500/90 whitespace-nowrap flex-shrink-0'>
                     Summary
                   </div>
-                  <div className='px-6 py-4 text-gray-600 font-medium text-base'>Detailed</div>
-                  <div className='px-6 py-4 text-gray-600 font-medium text-base'>ELI15</div>
-                  <div className='px-6 py-4 text-gray-600 font-medium text-base'>Concepts</div>
-                  <div className='px-6 py-4 text-gray-600 font-medium text-base'>Actions</div>
+                  <div className='px-2 sm:px-3 lg:px-4 xl:px-6 py-2 sm:py-2.5 lg:py-3 text-gray-600 font-medium text-[10px] sm:text-xs lg:text-sm whitespace-nowrap flex-shrink-0'>
+                    Detailed
+                  </div>
+                  <div className='px-2 sm:px-3 lg:px-4 xl:px-6 py-2 sm:py-2.5 lg:py-3 text-gray-600 font-medium text-[10px] sm:text-xs lg:text-sm whitespace-nowrap flex-shrink-0'>
+                    ELI15
+                  </div>
+                  <div className='px-2 sm:px-3 lg:px-4 xl:px-6 py-2 sm:py-2.5 lg:py-3 text-gray-600 font-medium text-[10px] sm:text-xs lg:text-sm whitespace-nowrap flex-shrink-0'>
+                    Concepts
+                  </div>
+                  <div className='px-2 sm:px-3 lg:px-4 xl:px-6 py-2 sm:py-2.5 lg:py-3 text-gray-600 font-medium text-[10px] sm:text-xs lg:text-sm whitespace-nowrap flex-shrink-0'>
+                    Actions
+                  </div>
                 </div>
-                <div className='p-6 space-y-4'>
-                  <div className='h-3 rounded-full bg-orange-200 w-full'></div>
-                  <div className='h-3 rounded-full bg-orange-200 w-4/5'></div>
-                  <div className='h-3 rounded-full bg-orange-200 w-3/4'></div>
+                <div className='p-3 sm:p-4 lg:p-6 space-y-2 sm:space-y-3'>
+                  <div className='h-1.5 sm:h-2 lg:h-3 rounded-full bg-orange-200 w-full'></div>
+                  <div className='h-1.5 sm:h-2 lg:h-3 rounded-full bg-orange-200 w-4/5'></div>
+                  <div className='h-1.5 sm:h-2 lg:h-3 rounded-full bg-orange-200 w-3/4'></div>
                 </div>
               </div>
             </motion.div>
