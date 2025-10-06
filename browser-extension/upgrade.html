@@ -7,6 +7,23 @@
     <link rel="stylesheet" href="styles/upgrade.css" />
   </head>
   <body>
+    <script>
+      // Handle success/cancel redirects from Stripe
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('success') === 'true') {
+        // Show success notification
+        const statusCard = document.getElementById('status-card');
+        if (statusCard) {
+          statusCard.querySelector('.status-icon').textContent = '🎉';
+          statusCard.style.borderColor = '#10b981';
+          statusCard.style.background = '#f0fdf4';
+          statusCard.querySelector('.status-text').innerHTML = `
+            <strong>Payment Successful!</strong>
+            <p>Welcome to Premium! Your account is being upgraded...</p>
+          `;
+        }
+      }
+    </script>
     <div class="upgrade-container">
       <!-- Header -->
       <div class="upgrade-header">

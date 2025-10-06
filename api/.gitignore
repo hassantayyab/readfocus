@@ -1,0 +1,12 @@
+.vercel
+.env
+.env.local
+
+# Old payment redirect files (replaced with landing page routes)
+checkout-success.html
+checkout-success.js
+checkout-canceled.html
+checkout-canceled.js
+payment-success.js
+success.js
+.env*.local

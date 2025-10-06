@@ -84,7 +84,7 @@ class KuiqleeBackground {
   }
 
   handleMessage(request, sender, sendResponse) {
-    switch (request.action) {
+    switch (request.action || request.type) {
       case 'openKuiqlee':
         this.openKuiqlee(request.text, request.title);
         sendResponse({ success: true });
@@ -107,8 +107,37 @@ class KuiqleeBackground {
         this.notifyPopup(request);
         break;
 
+      case 'payment_success':
+      case 'PREMIUM_STATUS_UPDATED':
+        // Payment successful - refresh auth status and show notification
+        this.handlePremiumStatusUpdate(sendResponse);
+        return true; // Keep message channel open
+
       default:
         sendResponse({ error: 'Unknown action' });
+    }
+  }
+
+  async handlePremiumStatusUpdate(sendResponse) {
+    try {
+      // Show notification
+      chrome.notifications.create({
+        type: 'basic',
+        iconUrl: chrome.runtime.getURL('icons/icon128.png'),
+        title: 'Welcome to Premium! 🎉',
+        message: 'You now have unlimited AI summaries. Thank you for upgrading!',
+        priority: 2,
+      });
+
+      // Refresh auth manager state by verifying token
+      if (typeof authManager !== 'undefined' && authManager.isAuthenticated()) {
+        await authManager.verifyToken();
+      }
+
+      sendResponse({ success: true });
+    } catch (error) {
+      console.error('Error handling premium status update:', error);
+      sendResponse({ success: false, error: error.message });
     }
   }
 

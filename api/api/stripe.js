@@ -8,8 +8,25 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import Stripe from 'stripe';
 
+// Helper to read raw body for webhook verification
+async function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || 'CHANGE_THIS_SECRET_IN_PRODUCTION';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Disable body parsing for webhook endpoint
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export default async function handler(req, res) {
   // Set CORS headers (except for webhook)
@@ -126,6 +143,9 @@ async function handleCreateCheckout(req, res) {
   }
 
   // Create checkout session
+  // IMPORTANT: Update LANDING_PAGE_URL with your actual landing page URL
+  const LANDING_PAGE_URL = process.env.LANDING_PAGE_URL || 'https://YOUR-LANDING-PAGE.vercel.app';
+
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
@@ -136,8 +156,8 @@ async function handleCreateCheckout(req, res) {
         quantity: 1,
       },
     ],
-    success_url: `${process.env.APP_URL || 'chrome-extension://YOUR_EXTENSION_ID'}/upgrade.html?success=true`,
-    cancel_url: `${process.env.APP_URL || 'chrome-extension://YOUR_EXTENSION_ID'}/upgrade.html?canceled=true`,
+    success_url: `${LANDING_PAGE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${LANDING_PAGE_URL}/payment/canceled`,
     metadata: {
       user_id: userId,
       plan_id: planId,
@@ -171,10 +191,19 @@ async function handleWebhook(req, res) {
     return res.status(500).json({ success: false, error: 'Webhook not configured' });
   }
 
+  // Read raw body as buffer for Stripe webhook verification
+  let rawBody;
+  try {
+    rawBody = await getRawBody(req);
+  } catch (err) {
+    console.error('Failed to read raw body:', err.message);
+    return res.status(400).json({ success: false, error: 'Failed to read request body' });
+  }
+
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).json({ success: false, error: `Webhook Error: ${err.message}` });
@@ -239,9 +268,11 @@ async function handlePortal(req, res) {
   }
 
   // Create portal session
+  const LANDING_PAGE_URL = process.env.LANDING_PAGE_URL || 'https://YOUR-LANDING-PAGE.vercel.app';
+
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: subscription.stripe_customer_id,
-    return_url: `${process.env.APP_URL || 'chrome-extension://YOUR_EXTENSION_ID'}/options.html`,
+    return_url: `${LANDING_PAGE_URL}`,
   });
 
   return res.status(200).json({
@@ -287,12 +318,38 @@ async function handleCheckSubscription(req, res) {
 
 // Webhook helpers
 async function handleCheckoutCompleted(session) {
-  const userId = session.metadata.user_id;
-  const planId = session.metadata.plan_id;
+  const userId = session.metadata?.user_id;
+  const planId = session.metadata?.plan_id;
 
-  console.log('Checkout completed:', { userId, planId, sessionId: session.id });
+  if (!userId) {
+    console.error('No user_id in session metadata');
+    return;
+  }
 
-  // Subscription will be created/updated via subscription.created event
+  // If there's a subscription ID, fetch it and create/update the DB entry
+  if (session.subscription) {
+    try {
+      const subscription = await stripe.subscriptions.retrieve(session.subscription);
+
+      // Create/update subscription in DB
+      const result = await db.subscriptions.upsert({
+        userId,
+        stripeCustomerId: subscription.customer,
+        stripeSubscriptionId: subscription.id,
+        status: subscription.status,
+        planId,
+        currentPeriodStart: new Date(subscription.current_period_start * 1000).toISOString(),
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      });
+
+      if (!result.success) {
+        console.error('Database upsert failed:', result.error);
+      }
+    } catch (error) {
+      console.error('Error creating subscription from checkout:', error);
+    }
+  }
 }
 
 async function handleSubscriptionUpdate(subscription) {

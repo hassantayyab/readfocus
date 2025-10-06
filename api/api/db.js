@@ -203,17 +203,14 @@ const db = {
           .from('subscriptions')
           .select('status')
           .eq('user_id', userId)
-          .eq('status', 'active')
-          .single();
+          .in('status', ['active', 'trialing'])
+          .maybeSingle(); // Use maybeSingle instead of single
 
         if (error) {
-          if (error.code === 'PGRST116') {
-            return { success: true, isActive: false };
-          }
           throw error;
         }
 
-        return { success: true, isActive: !!data };
+        return { success: true, hasSubscription: !!data };
       } catch (error) {
         console.error('❌ Error checking active subscription:', error);
         return { success: false, error: error.message };
