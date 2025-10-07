@@ -1,5 +1,5 @@
 /**
- * Proxy AI Client - Uses your Vercel API instead of direct Claude API
+ * Proxy AI Client - Uses your Vercel API instead of direct AI API
  * No API keys needed in the extension!
  */
 
@@ -97,7 +97,7 @@ class ProxyAIClient {
           }
         }
 
-        const response = await fetch(`${this.baseURL}/claude`, {
+        const response = await fetch(`${this.baseURL}/smart-summarizer`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -150,7 +150,7 @@ class ProxyAIClient {
 
         // Refresh usage count after successful API call
         if (typeof usageTracker !== 'undefined') {
-          usageTracker.forceRefresh().catch(err => {
+          usageTracker.forceRefresh().catch((err) => {
             console.error('Failed to refresh usage:', err);
           });
         }
