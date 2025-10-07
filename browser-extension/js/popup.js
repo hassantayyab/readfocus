@@ -195,6 +195,12 @@ class KuiqleePopup {
       this.openFeedbackForm();
     });
 
+    // Menu sign out button
+    document.getElementById('menu-sign-out')?.addEventListener('click', async () => {
+      this.closeMenu();
+      await this.handleSignOut();
+    });
+
     // Auth action button (Sign In / Sign Out)
     document.getElementById('auth-action-button')?.addEventListener('click', async () => {
       if (typeof authManager !== 'undefined') {
@@ -877,6 +883,7 @@ class KuiqleePopup {
     const authEmailSpan = document.getElementById('auth-user-email');
     const authBadge = document.getElementById('auth-badge');
     const authButton = document.getElementById('auth-action-button');
+    const menuSignOutButton = document.getElementById('menu-sign-out');
 
     if (!authStatusDiv || !authEmailSpan || !authButton) return;
 
@@ -887,7 +894,14 @@ class KuiqleePopup {
       const isPremium = authManager.isPremium();
 
       authEmailSpan.textContent = user.email || 'Signed in';
-      authButton.textContent = 'Sign Out';
+
+      // Hide the auth button when signed in (sign out is in menu now)
+      authButton.style.display = 'none';
+
+      // Show sign out button in menu
+      if (menuSignOutButton) {
+        menuSignOutButton.style.display = 'block';
+      }
 
       if (isPremium) {
         authBadge.style.display = 'inline-block';
@@ -897,7 +911,13 @@ class KuiqleePopup {
     } else {
       authEmailSpan.textContent = 'Not signed in';
       authButton.textContent = 'Sign In';
+      authButton.style.display = 'block';
       authBadge.style.display = 'none';
+
+      // Hide sign out button in menu
+      if (menuSignOutButton) {
+        menuSignOutButton.style.display = 'none';
+      }
     }
   }
 
@@ -970,6 +990,7 @@ class KuiqleePopup {
         await authManager.logout();
         this.updateAuthUI();
         this.updateUsageUI();
+        this.updateSummaryStatus('ready');
         this.showSuccessMessage('Signed out successfully');
       }
     }

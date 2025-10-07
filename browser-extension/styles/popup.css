@@ -86,6 +86,7 @@ body {
 .auth-info {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   flex: 1;
   font-size: 13px;
@@ -110,6 +111,7 @@ body {
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
+  margin-left: auto;
 }
 
 .auth-button {
@@ -429,7 +431,7 @@ body {
   border: none;
   border-radius: var(--rf-radius);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
@@ -821,7 +823,7 @@ button:focus-visible {
   background: none;
   border: 1px solid var(--rf-border);
   cursor: pointer;
-  padding: 6px 12px;
+  padding: 8px 8px;
   border-radius: 4px;
   transition: all 0.2s;
   color: var(--rf-text);
