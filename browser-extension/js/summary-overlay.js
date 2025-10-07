@@ -1197,7 +1197,7 @@ for i in range(10):
       }
       
       .rf-summary-container {
-        background: #fbf9f7;
+        background: #fffaf3;
         border-radius: 0;
         box-shadow: -2px 0 12px rgba(0, 0, 0, 0.08);
         width: 500px;
@@ -1216,14 +1216,14 @@ for i in range(10):
       }
       
       .rf-summary-header {
-        background: #f7f4f0;
-        color: #3d2f1f;
+        background: #fffaf3;
+        color: #101828;
         padding: 20px 24px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         position: relative;
-        border-bottom: 1px solid #d4c4a8;
+        border-bottom: 1px solid #62748e;
         border-radius: 0;
       }
       
@@ -1271,12 +1271,12 @@ for i in range(10):
       }
       
       .rf-summary-close {
-        background: #f3f0ec;
+        background: #fffaf3;
         border: 1px solid #c9b896;
         border-radius: 6px;
         width: 32px;
         height: 32px;
-        color: #3d2f1f;
+        color: #101828;
         font-size: 18px;
         cursor: pointer;
         display: flex;
@@ -1292,13 +1292,13 @@ for i in range(10):
       
       .rf-summary-tabs {
         display: flex;
-        background: #f3f0ec;
-        border-bottom: 1px solid #d4c4a8;
+        background: #fffaf3;
+        border-bottom: 1px solid #62748e;
         overflow-x: auto;
         overflow-y: hidden;
         white-space: nowrap;
         scrollbar-width: thin;
-        scrollbar-color: #c9b896 #f3f0ec;
+        scrollbar-color: #c9b896 #fffaf3;
       }
 
       .rf-summary-tabs::-webkit-scrollbar {
@@ -1306,7 +1306,7 @@ for i in range(10):
       }
 
       .rf-summary-tabs::-webkit-scrollbar-track {
-        background: #f3f0ec;
+        background: #fffaf3;
       }
 
       .rf-summary-tabs::-webkit-scrollbar-thumb {
@@ -1331,7 +1331,7 @@ for i in range(10):
         gap: 8px;
         font-size: 14px;
         font-weight: 500;
-        color: #7a6b57;
+        color: #364153;
         min-width: 80px;
         white-space: nowrap;
       }
@@ -1342,9 +1342,9 @@ for i in range(10):
       }
       
       .rf-summary-tab.active {
-        background: #fbf9f7;
-        color: #3d2f1f;
-        border-bottom: 2px solid #8b6914;
+        background: #fffaf3;
+        color: #101828;
+        border-bottom: 2px solid #101828;
       }
       
       .rf-tab-icon {
@@ -1371,31 +1371,31 @@ for i in range(10):
       .rf-summary-paragraph {
         line-height: 1.7;
         font-size: 16px;
-        color: #3d2f1f;
+        color: #101828;
         margin: 0 0 16px 0;
         text-align: left;
       }
       
       .rf-summary-markdown {
         line-height: 1.7;
-        color: #3d2f1f;
+        color: #101828;
         text-align: left;
       }
       
       .rf-summary-markdown h1 {
         font-size: 24px;
         font-weight: 700;
-        color: #3d2f1f;
+        color: #101828;
         margin: 0 0 16px 0;
         padding-bottom: 8px;
-        border-bottom: 2px solid #d4c4a8;
+        border-bottom: 2px solid #62748e;
         text-align: left;
       }
       
       .rf-summary-markdown h2 {
         font-size: 20px;
         font-weight: 600;
-        color: #3d2f1f;
+        color: #101828;
         margin: 24px 0 12px 0;
         text-align: left;
       }
@@ -1425,7 +1425,7 @@ for i in range(10):
       
       .rf-summary-markdown strong {
         font-weight: 600;
-        color: #3d2f1f;
+        color: #101828;
       }
       
       .rf-summary-markdown em {
@@ -1434,8 +1434,8 @@ for i in range(10):
       }
       
       .rf-summary-markdown code {
-        background: #f6f3f0;
-        color: #3d2f1f;
+        background: #ffffff;
+        color: #101828;
         padding: 2px 6px;
         border-radius: 4px;
         font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
@@ -1444,11 +1444,11 @@ for i in range(10):
       }
       
       .rf-summary-markdown blockquote {
-        background: #f8f6f3;
-        border-left: 4px solid #8b6914;
+        background: #ffffff;
+        border-left: 4px solid #101828;
         margin: 16px 0;
         padding: 12px 16px;
-        color: #7a6b57;
+        color: #364153;
         font-style: italic;
         border-radius: 0 6px 6px 0;
         text-align: left;
@@ -1473,7 +1473,7 @@ for i in range(10):
       }
       
       .rf-summary-markdown li::marker {
-        color: #3d2f1f;
+        color: #101828;
       }
       
       .rf-summary-markdown ol {
@@ -1491,28 +1491,28 @@ for i in range(10):
       /* Code block styles */
       .rf-code-block {
         margin: 16px 0;
-        background: #f7f4f0;
-        border: 1px solid #d4c4a8;
+        background: #fffaf3;
+        border: 1px solid #101828;
         border-radius: 8px;
         overflow: hidden;
         text-align: left;
       }
 
       .rf-code-language {
-        background: #f3f0ec;
-        color: #7a6b57;
+        background: #fffaf3;
+        color: #364153;
         padding: 8px 16px;
         font-size: 12px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        border-bottom: 1px solid #d4c4a8;
+        border-bottom: 1px solid #62748e;
       }
 
       .rf-code-block pre {
         margin: 0;
         padding: 16px;
-        background: #f7f4f0;
+        background: #fffaf3;
         overflow-x: auto;
         font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
         font-size: 14px;
@@ -1521,7 +1521,7 @@ for i in range(10):
 
       .rf-code-block code {
         background: none;
-        color: #3d2f1f;
+        color: #101828;
         padding: 0;
         border: none;
         border-radius: 0;
@@ -1534,7 +1534,7 @@ for i in range(10):
       .rf-table-container {
         margin: 16px 0;
         overflow-x: auto;
-        border: 1px solid #d4c4a8;
+        border: 1px solid #101828;
         border-radius: 8px;
       }
 
@@ -1543,27 +1543,27 @@ for i in range(10):
         border-collapse: collapse;
         font-size: 14px;
         text-align: left;
-        background: #fbf9f7;
+        background: #fffaf3;
       }
 
       .rf-markdown-table th {
-        background: #f7f4f0;
-        color: #3d2f1f;
+        background: #fffaf3;
+        color: #101828;
         font-weight: 600;
         padding: 12px 16px;
-        border-bottom: 2px solid #d4c4a8;
+        border-bottom: 2px solid #62748e;
         text-align: left;
       }
 
       .rf-markdown-table td {
         padding: 12px 16px;
-        border-bottom: 1px solid #d4c4a8;
-        color: #3d2f1f;
+        border-bottom: 1px solid #62748e;
+        color: #101828;
         vertical-align: top;
       }
 
       .rf-markdown-table tbody tr:hover {
-        background: #f6f3f0;
+        background: #ffffff;
       }
 
       .rf-markdown-table tbody tr:last-child td {
@@ -1595,12 +1595,12 @@ for i in range(10):
       .rf-main-topics {
         margin-top: 24px;
         padding-top: 20px;
-        border-top: 1px solid #d4c4a8;
+        border-top: 1px solid #62748e;
       }
       
       .rf-main-topics h4 {
         margin: 0 0 12px 0;
-        color: #3d2f1f;
+        color: #101828;
         font-size: 16px;
         font-weight: 600;
         text-align: left;
@@ -1615,8 +1615,8 @@ for i in range(10):
       }
       
       .rf-topic-tag {
-        background: #f6f3f0;
-        color: #3d2f1f;
+        background: #ffffff;
+        color: #101828;
         padding: 6px 12px;
         border-radius: 16px;
         font-size: 14px;
@@ -1651,10 +1651,10 @@ for i in range(10):
         display: flex;
         gap: 16px;
         padding: 16px;
-        background: #f8f6f3;
+        background: #ffffff;
         border-radius: 12px;
-        border-left: 4px solid #8b6914;
-        border: 1px solid #d4c4a8;
+        border-left: 4px solid #101828;
+        border: 2px solid #101828;
       }
       
       .rf-key-point ul {
@@ -1674,7 +1674,7 @@ for i in range(10):
       }
       
       .rf-point-number {
-        background: #8b6914;
+        background: #101828;
         color: #faf6f2;
         width: 28px;
         height: 28px;
@@ -1688,7 +1688,7 @@ for i in range(10):
       }
       
       .rf-point-text {
-        color: #3d2f1f;
+        color: #101828;
         line-height: 1.6;
         font-size: 15px;
         text-align: left;
@@ -1742,10 +1742,10 @@ for i in range(10):
         display: flex;
         gap: 16px;
         padding: 16px;
-        background: #f8f6f3;
+        background: #ffffff;
         border-radius: 12px;
-        border-left: 4px solid #8b6914;
-        border: 1px solid #d4c4a8;
+        border-left: 4px solid #101828;
+        border: 2px solid #101828;
       }
 
       .rf-action-item ul {
@@ -1765,7 +1765,7 @@ for i in range(10):
       }
 
       .rf-action-number {
-        background: #8b6914;
+        background: #101828;
         color: #faf6f2;
         width: 28px;
         height: 28px;
@@ -1779,7 +1779,7 @@ for i in range(10):
       }
 
       .rf-action-text {
-        color: #3d2f1f;
+        color: #101828;
         line-height: 1.6;
         font-size: 15px;
         text-align: left;
@@ -1845,7 +1845,7 @@ for i in range(10):
       }
       
       .rf-btn-primary {
-        background: #8b6914;
+        background: #101828;
         color: #faf6f2;
       }
 
@@ -1855,19 +1855,19 @@ for i in range(10):
       }
       
       .rf-btn-secondary {
-        background: #fbf9f7;
-        color: #7a6b57;
+        background: #fffaf3;
+        color: #364153;
         border: 1px solid #c9b896;
       }
 
       .rf-btn-secondary:hover {
-        background: #f7f4f0;
-        border-color: #8b6914;
+        background: #fffaf3;
+        border-color: #101828;
       }
       
       .rf-summary-empty {
         text-align: center;
-        color: #7a6b57;
+        color: #364153;
         font-style: italic;
         padding: 40px 20px;
       }
@@ -1881,7 +1881,7 @@ for i in range(10):
         width: 40px;
         height: 40px;
         border: 3px solid #e8e8e8;
-        border-top: 3px solid #3d2f1f;
+        border-top: 3px solid #101828;
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin: 0 auto 16px;
@@ -1892,7 +1892,7 @@ for i in range(10):
       }
       
       .rf-summary-error .rf-error-message {
-        color: #3d2f1f;
+        color: #101828;
         margin-bottom: 16px;
         font-weight: 600;
       }
@@ -1957,7 +1957,7 @@ for i in range(10):
         background: #f5f1eb;
         border-radius: 12px;
         padding: 24px;
-        border: 2px solid #d4c4a8;
+        border: 2px solid #101828;
         text-align: left;
       }
       
@@ -1972,7 +1972,7 @@ for i in range(10):
       
       .rf-eli15-header h4 {
         margin: 0;
-        color: #3d2f1f;
+        color: #101828;
         font-size: 18px;
         font-weight: 600;
         text-align: left;
@@ -1986,13 +1986,13 @@ for i in range(10):
       .rf-eli15-text {
         font-size: 16px;
         line-height: 1.8;
-        color: #3d2f1f;
+        color: #101828;
         background: #faf6f2;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #8b6914;
-        border: 1px solid #d4c4a8;
+        border-left: 4px solid #101828;
+        border: 1px solid #101828;
         text-align: left;
       }
       
@@ -2005,8 +2005,8 @@ for i in range(10):
       }
       
       .rf-concept-item {
-        background: #fbf9f7;
-        border: 2px solid #d4c4a8;
+        background: #fffaf3;
+        border: 2px solid #101828;
         border-radius: 12px;
         padding: 20px;
         transition: all 0.2s ease;
@@ -2019,14 +2019,14 @@ for i in range(10):
         margin-bottom: 12px;
         font-size: 18px;
         font-weight: 700;
-        color: #3d2f1f;
+        color: #101828;
         padding-bottom: 8px;
-        border-bottom: 2px solid #d4c4a8;
+        border-bottom: 2px solid #62748e;
         text-align: left;
       }
       
       .rf-concept-icon {
-        background: #8b6914;
+        background: #101828;
         color: #faf6f2;
         font-size: 14px;
         font-weight: 600;
@@ -2042,38 +2042,38 @@ for i in range(10):
       .rf-concept-definition {
         font-size: 15px;
         line-height: 1.6;
-        color: #3d2f1f;
+        color: #101828;
         margin-bottom: 12px;
-        background: #f8f6f3;
+        background: #ffffff;
         padding: 12px;
         border-radius: 8px;
-        border-left: 3px solid #8b6914;
-        border: 1px solid #d4c4a8;
+        border-left: 3px solid #101828;
+        border: 1px solid #101828;
         text-align: left;
       }
       
       .rf-concept-analogy {
         font-size: 14px;
         line-height: 1.5;
-        color: #3d2f1f;
+        color: #101828;
         margin-bottom: 8px;
-        background: #f6f3f0;
+        background: #ffffff;
         padding: 10px 12px;
         border-radius: 6px;
         border-left: 3px solid #c9b896;
-        border: 1px solid #d4c4a8;
+        border: 1px solid #101828;
         text-align: left;
       }
       
       .rf-concept-example {
         font-size: 14px;
         line-height: 1.5;
-        color: #3d2f1f;
-        background: #f6f3f0;
+        color: #101828;
+        background: #ffffff;
         padding: 10px 12px;
         border-radius: 6px;
         border-left: 3px solid #c9b896;
-        border: 1px solid #d4c4a8;
+        border: 1px solid #101828;
         text-align: left;
       }
       
