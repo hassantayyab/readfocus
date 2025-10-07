@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 
 const Hero = () => {
   return (
-    <section className='relative min-h-[90vh] w-full overflow-hidden bg-orange-50'>
+    <section className='relative min-h-[90vh] w-full overflow-hidden bg-background'>
       {/* Grid Background */}
       <div
         className={cn(
@@ -16,7 +16,7 @@ const Hero = () => {
         )}
       />
       {/* Radial gradient overlay for faded look */}
-      <div className='pointer-events-none absolute inset-0 flex items-center justify-center [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] bg-orange-50'></div>
+      <div className='pointer-events-none absolute inset-0 flex items-center justify-center [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] bg-background'></div>
 
       <div className='relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 lg:pt-32 pb-12 sm:pb-16 lg:pb-20'>
         <div className='grid lg:grid-cols-2 gap-8 lg:gap-16 items-center'>
@@ -81,7 +81,11 @@ const Hero = () => {
                         https://example.com/article
                       </div>
                     </div>
-                    <Button variant='primary' size='sm' className='text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap'>
+                    <Button
+                      variant='primary'
+                      size='sm'
+                      className='text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap'
+                    >
                       📚 Summarize
                     </Button>
                   </div>
@@ -96,13 +100,15 @@ const Hero = () => {
                     <motion.div
                       {...fadeInUp}
                       transition={{ duration: 0.6, delay: 1 }}
-                      className='bg-orange-50 rounded-xl sm:rounded-2xl border border-orange-200 p-3 sm:p-4'
+                      className='bg-background rounded-xl sm:rounded-2xl border border-orange-200 p-3 sm:p-4'
                     >
                       <div className='flex items-center space-x-2 sm:space-x-3 mb-2 sm:mb-3'>
                         <div className='w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl flex items-center justify-center bg-orange-500 flex-shrink-0'>
                           <span className='text-white text-xs sm:text-sm font-bold'>K</span>
                         </div>
-                        <span className='font-semibold text-sm sm:text-base text-gray-900'>AI Summary</span>
+                        <span className='font-semibold text-sm sm:text-base text-gray-900'>
+                          AI Summary
+                        </span>
                       </div>
                       <div className='space-y-2'>
                         <div className='h-1.5 sm:h-2 rounded bg-orange-200 w-full'></div>

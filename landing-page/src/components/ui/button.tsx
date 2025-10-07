@@ -32,7 +32,7 @@ const Button = ({
     secondary:
       'text-white border border-gray-600 hover:border-gray-500 bg-gray-800 hover:bg-gray-900',
     outline:
-      'border-2 border-gray-600 hover:border-orange-500 bg-transparent hover:bg-orange-50 text-gray-900 hover:text-orange-500',
+      'border-2 border-gray-600 hover:border-orange-500 bg-transparent hover:bg-background text-gray-900 hover:text-orange-500',
   };
 
   const sizes = {

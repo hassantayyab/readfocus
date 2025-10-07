@@ -32,7 +32,7 @@ const Pricing = () => {
   ];
 
   return (
-    <section id='pricing' className='py-12 sm:py-16 lg:py-24 bg-orange-50'>
+    <section id='pricing' className='py-12 sm:py-16 lg:py-24 bg-background'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <motion.div
           {...fadeInUp}
@@ -164,7 +164,7 @@ const Pricing = () => {
                 <Button
                   variant='outline'
                   size='sm'
-                  className='text-orange-600 border-orange-300 hover:bg-orange-50 text-xs sm:text-sm'
+                  className='text-orange-600 border-orange-300 hover:bg-background text-xs sm:text-sm'
                 >
                   Contact Support
                 </Button>

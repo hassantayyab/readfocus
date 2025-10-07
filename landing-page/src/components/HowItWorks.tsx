@@ -46,7 +46,7 @@ const HowItWorks = () => {
 
   return (
     <>
-      <section id='how-it-works' className='py-12 sm:py-16 lg:py-24 bg-orange-50'>
+      <section id='how-it-works' className='py-12 sm:py-16 lg:py-24 bg-background'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <motion.div
             {...fadeInUp}
@@ -75,14 +75,23 @@ const HowItWorks = () => {
                 )}
 
                 <div className='relative bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 transition-all duration-300 border border-gray-200 z-10'>
-                  <div className='text-orange-200 font-bold text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4'>{step.step}</div>
+                  <div className='text-orange-200 font-bold text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4'>
+                    {step.step}
+                  </div>
 
-                  <h3 className='text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-900'>{step.title}</h3>
-                  <p className='mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base text-gray-900'>{step.description}</p>
+                  <h3 className='text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-900'>
+                    {step.title}
+                  </h3>
+                  <p className='mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base text-gray-900'>
+                    {step.description}
+                  </p>
 
                   <ul className='space-y-2 sm:space-y-3'>
                     {step.details.map((detail, detailIndex) => (
-                      <li key={detailIndex} className='flex items-center text-xs sm:text-sm text-gray-900'>
+                      <li
+                        key={detailIndex}
+                        className='flex items-center text-xs sm:text-sm text-gray-900'
+                      >
                         <div className='w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mr-2 sm:mr-3 bg-orange-500 flex-shrink-0'></div>
                         {detail}
                       </li>
@@ -99,7 +108,9 @@ const HowItWorks = () => {
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <motion.div {...fadeInUp} whileInView='animate' viewport={viewportOnce}>
             <div className='text-center mb-8 sm:mb-10 lg:mb-12'>
-              <h3 className='text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 text-white'>See It In Action</h3>
+              <h3 className='text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 text-white'>
+                See It In Action
+              </h3>
               <p className='text-base sm:text-lg lg:text-xl max-w-2xl mx-auto text-gray-300 px-4'>
                 Watch how Kuiqlee transforms a complex research article into multiple digestible
                 summary formats
@@ -115,7 +126,9 @@ const HowItWorks = () => {
                   Before: Dense Research Article
                 </h4>
                 <div className='bg-gray-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-3 sm:space-y-4'>
-                  <div className='text-xs sm:text-sm text-gray-500 font-mono'>research-paper.pdf</div>
+                  <div className='text-xs sm:text-sm text-gray-500 font-mono'>
+                    research-paper.pdf
+                  </div>
                   <div className='space-y-2 sm:space-y-3'>
                     <div className='h-2 sm:h-3 bg-gray-300 rounded w-full'></div>
                     <div className='h-2 sm:h-3 bg-gray-300 rounded w-5/6'></div>
@@ -144,11 +157,13 @@ const HowItWorks = () => {
                     <div className='w-5 h-5 sm:w-6 sm:h-6 rounded-lg flex items-center justify-center bg-orange-500 flex-shrink-0'>
                       <span className='text-white text-xs font-bold'>K</span>
                     </div>
-                    <span className='text-xs sm:text-sm font-semibold text-gray-900'>Kuiqlee Summary</span>
+                    <span className='text-xs sm:text-sm font-semibold text-gray-900'>
+                      Kuiqlee Summary
+                    </span>
                   </div>
 
                   <div className='space-y-3 sm:space-y-4'>
-                    <div className='bg-orange-50 rounded-lg sm:rounded-xl p-3 sm:p-4'>
+                    <div className='bg-background rounded-lg sm:rounded-xl p-3 sm:p-4'>
                       <div className='text-xs font-semibold mb-2 text-orange-500'>
                         QUICK SUMMARY
                       </div>

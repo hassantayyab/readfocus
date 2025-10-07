@@ -57,7 +57,7 @@ const Features = () => {
   ];
 
   return (
-    <section id='features' className='pb-12 sm:pb-16 lg:pb-24 pt-8 sm:pt-12 lg:pt-16 bg-orange-50'>
+    <section id='features' className='pb-12 sm:pb-16 lg:pb-24 pt-8 sm:pt-12 lg:pt-16 bg-background'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <motion.div
           {...fadeInUp}
@@ -86,7 +86,7 @@ const Features = () => {
               className='group relative bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-10 transition-all duration-300'
             >
               <div className='flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4 sm:mb-6'>
-                <div className='w-12 h-12 sm:w-14 sm:h-14 bg-orange-50 rounded-xl sm:rounded-2xl flex items-center justify-center border border-orange-100 text-orange-500 shrink-0'>
+                <div className='w-12 h-12 sm:w-14 sm:h-14 bg-background rounded-xl sm:rounded-2xl flex items-center justify-center border border-orange-100 text-orange-500 shrink-0'>
                   {feature.icon}
                 </div>
                 <h3 className='text-xl sm:text-2xl font-bold text-gray-900'>{feature.title}</h3>

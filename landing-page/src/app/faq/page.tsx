@@ -73,7 +73,7 @@ const FAQPage = () => {
           </div>
         ))}
 
-        <div className='bg-orange-50 border border-orange-200 p-6 rounded-lg mt-8'>
+        <div className='bg-background border border-orange-200 p-6 rounded-lg mt-8'>
           <h3 className='text-lg font-semibold text-orange-900 mb-3'>Still have questions?</h3>
           <p className='text-orange-800 mb-4'>
             Can't find the answer you're looking for? Our support team is here to help.
