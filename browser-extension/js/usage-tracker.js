@@ -243,8 +243,7 @@ class UsageTracker {
       return '<span class="usage-badge limit-reached">0/3 summaries</span>';
     }
 
-    const badgeClass =
-      remaining === 1 ? 'usage-badge warning' : 'usage-badge';
+    const badgeClass = remaining === 1 ? 'usage-badge warning' : 'usage-badge';
 
     return `<span class="${badgeClass}">${remaining}/${limit} left</span>`;
   }
@@ -270,6 +269,12 @@ class UsageTracker {
     if (this.cachedUsage) {
       this.cachedUsage.remaining = 0;
       this.cachedUsage.used = errorData.used || this.FREE_TIER_LIMIT;
+    }
+
+    // Only show upgrade prompt for non-premium users
+    if (typeof authManager !== 'undefined' && authManager.isPremium()) {
+      console.log('ℹ️ User is premium, skipping upgrade prompt');
+      return;
     }
 
     // Show upgrade prompt

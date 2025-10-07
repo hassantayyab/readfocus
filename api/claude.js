@@ -24,15 +24,13 @@ export default async function handler(req, res) {
     if (!prompt) {
       return res.status(400).json({
         success: false,
-        error: 'Prompt is required'
+        error: 'Prompt is required',
       });
     }
 
     // Get token from Authorization header
     const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith('Bearer ')
-      ? authHeader.substring(7)
-      : null;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
 
     if (!token) {
       return res.status(401).json({
@@ -65,7 +63,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const isPremium = subscriptionResult.isActive;
+    const isPremium = subscriptionResult.hasSubscription;
 
     // If not premium, check usage limits
     if (!isPremium && domain) {
@@ -110,7 +108,7 @@ export default async function handler(req, res) {
       console.error('❌ CLAUDE_API_KEY not found in environment variables');
       return res.status(500).json({
         success: false,
-        error: 'AI service configuration error'
+        error: 'AI service configuration error',
       });
     }
 
@@ -152,22 +150,22 @@ export default async function handler(req, res) {
       if (response.status === 401) {
         return res.status(500).json({
           success: false,
-          error: 'AI service authentication failed'
+          error: 'AI service authentication failed',
         });
       } else if (response.status === 429) {
         return res.status(429).json({
           success: false,
-          error: 'AI service rate limit exceeded. Please try again in a moment.'
+          error: 'AI service rate limit exceeded. Please try again in a moment.',
         });
       } else if (response.status === 529) {
         return res.status(529).json({
           success: false,
-          error: 'AI service temporarily unavailable. Please try again later.'
+          error: 'AI service temporarily unavailable. Please try again later.',
         });
       } else {
         return res.status(500).json({
           success: false,
-          error: 'AI service temporarily unavailable'
+          error: 'AI service temporarily unavailable',
         });
       }
     }
@@ -178,7 +176,7 @@ export default async function handler(req, res) {
       console.error('❌ Unexpected Claude API response structure:', data);
       return res.status(500).json({
         success: false,
-        error: 'Invalid response from AI service'
+        error: 'Invalid response from AI service',
       });
     }
 
@@ -201,7 +199,6 @@ export default async function handler(req, res) {
       usage: data.usage || {},
       isPremium,
     });
-
   } catch (error) {
     console.error('❌ API route error:', error);
 
@@ -209,13 +206,13 @@ export default async function handler(req, res) {
     if (error.message && error.message.includes('fetch')) {
       return res.status(503).json({
         success: false,
-        error: 'Network error connecting to AI service'
+        error: 'Network error connecting to AI service',
       });
     }
 
     return res.status(500).json({
       success: false,
-      error: 'AI service temporarily unavailable'
+      error: 'AI service temporarily unavailable',
     });
   }
 }
