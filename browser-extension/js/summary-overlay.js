@@ -1158,9 +1158,9 @@ for i in range(10):
     style.textContent = `
       .rf-summary-overlay {
         position: fixed;
-        top: 92px;
-        right: 20px;
-        bottom: 92px;
+        top: 0;
+        right: 0;
+        bottom: 0;
         width: auto;
         background: transparent;
         z-index: 2147483647;
@@ -1198,12 +1198,13 @@ for i in range(10):
       
       .rf-summary-container {
         background: #fbf9f7;
-        border-radius: 12px;
-        border: 2px solid #3d2f1f;
-        width: 460px;
-        max-width: calc(100vw - 40px);
+        border-radius: 0;
+        box-shadow: -2px 0 12px rgba(0, 0, 0, 0.08);
+        width: 500px;
+        max-width: 100vw;
+        height: 100vh;
         overflow: hidden;
-        transform: translateX(20px);
+        transform: translateX(100%);
         transition: transform 0.3s ease;
         display: flex;
         flex-direction: column;
@@ -1223,6 +1224,7 @@ for i in range(10):
         justify-content: space-between;
         position: relative;
         border-bottom: 1px solid #d4c4a8;
+        border-radius: 0;
       }
       
       .rf-summary-title {
@@ -1910,15 +1912,15 @@ for i in range(10):
       /* Mobile responsive */
       @media (max-width: 768px) {
         .rf-summary-overlay {
-          top: 10px;
-          right: 10px;
-          bottom: 10px;
+          top: 0;
+          right: 0;
+          bottom: 0;
         }
 
         .rf-summary-container {
-          width: calc(100vw - 20px);
-          max-width: calc(100vw - 20px);
-          height: calc(100vh - 20px);
+          width: 100vw;
+          max-width: 100vw;
+          height: 100vh;
         }
         
         .rf-summary-header {
