@@ -5,6 +5,7 @@
 ### 🗄️ Database Layer
 
 **File**: `/api/db-schema.sql`
+
 - Complete PostgreSQL schema for Supabase
 - 4 main tables: users, subscriptions, usage_logs, auth_tokens
 - Indexes for performance optimization
@@ -12,6 +13,7 @@
 - Automatic cleanup functions for expired tokens
 
 **File**: `/api/db.js`
+
 - Database helper module with Supabase client
 - CRUD operations for all tables
 - Type-safe query methods
@@ -20,12 +22,14 @@
 ### 🔐 Authentication System
 
 **Endpoints Created**:
+
 1. `/api/auth/register.js` - User registration with bcrypt password hashing
 2. `/api/auth/login.js` - JWT token generation (30-day expiry)
 3. `/api/auth/verify-token.js` - Token verification middleware
 4. `/api/auth/logout.js` - Token revocation
 
 **Features**:
+
 - Email/password authentication
 - JWT tokens with SHA-256 hashing
 - Token revocation capability
@@ -35,11 +39,13 @@
 ### 📊 Usage Tracking System
 
 **Endpoints Created**:
+
 1. `/api/usage/check.js` - Check remaining free summaries (3 limit)
 2. `/api/usage/increment.js` - Track summary generation per domain
 3. `/api/usage/history.js` - Get user's usage history
 
 **Features**:
+
 - Per-domain tracking (not per-summary)
 - Automatic limit enforcement (3 unique domains for free users)
 - Upsert logic prevents duplicate domain counting
@@ -48,23 +54,26 @@
 ### 💳 Stripe Integration
 
 **Endpoints Created**:
+
 1. `/api/stripe/create-checkout.js` - Create Stripe checkout session
 2. `/api/stripe/webhook.js` - Handle subscription lifecycle events
 3. `/api/stripe/portal.js` - Customer portal for subscription management
 4. `/api/stripe/check-subscription.js` - Get subscription status
 
 **Features**:
+
 - Support for monthly ($4.99) and annual ($49.99) plans
 - Automatic subscription status sync via webhooks
 - Handle payment success/failure
 - Handle subscription cancellation
 - Customer portal integration
 
-### 🤖 Modified Claude API
+### 🤖 Modified AI API (Smart Summarizer)
 
-**File**: `/api/claude.js`
+**File**: `/api/smart-summarizer.js`
 
 **New Features**:
+
 - Authentication required (JWT verification)
 - Usage limit checking before processing
 - Automatic usage logging after successful summary
@@ -74,11 +83,13 @@
 ### 📦 Package Management
 
 **File**: `/package.json`
+
 - All required dependencies specified
 - ES modules configuration
 - Vercel deployment scripts
 
 **Dependencies**:
+
 - `@supabase/supabase-js` - Database client
 - `bcryptjs` - Password hashing
 - `jsonwebtoken` - JWT tokens
@@ -87,6 +98,7 @@
 ### 📝 Documentation
 
 **Files Created**:
+
 1. `/.env.example` - Environment variable template with all required keys
 2. `/SETUP.md` - Comprehensive 8-step setup guide with:
    - Supabase database configuration
@@ -104,6 +116,7 @@
 ### Extension JavaScript Modules (To Be Created)
 
 1. **`/browser-extension/js/auth-manager.js`**
+
    - Manage authentication state in extension
    - Store/retrieve JWT token from chrome.storage.local
    - Auto-refresh token before expiry
@@ -111,6 +124,7 @@
    - Broadcast auth state changes
 
 2. **`/browser-extension/js/usage-tracker.js`**
+
    - Track local usage for UI display
    - Sync with backend usage API
    - Show "X summaries remaining" badge
@@ -125,6 +139,7 @@
 ### Extension UI (To Be Created)
 
 1. **Authentication Pages**
+
    - `/browser-extension/auth.html` - Sign in/Sign up form
    - `/browser-extension/styles/auth.css` - Styling for auth pages
    - Features: Email/password fields, form validation, error messages
@@ -137,6 +152,7 @@
 ### Extension Modifications
 
 1. **`/browser-extension/js/popup.js`**
+
    - Add authentication UI controls (Sign In/Sign Out buttons)
    - Show usage badges ("2/3 summaries used")
    - Show "Upgrade to Premium" button for free users
@@ -144,6 +160,7 @@
    - Handle unauthenticated state
 
 2. **`/browser-extension/js/options.js`**
+
    - Add "Account" section
    - Display email, subscription status
    - Show usage statistics
@@ -151,6 +168,7 @@
    - "Logout" button
 
 3. **`/browser-extension/js/content-summary-service.js`**
+
    - Check authentication before summary generation
    - Extract domain from current URL
    - Send domain with API request
@@ -158,6 +176,7 @@
    - Show upgrade prompt when limit reached
 
 4. **`/browser-extension/js/proxy-ai-client.js`**
+
    - Get JWT token from auth-manager
    - Send token in Authorization header
    - Handle 401 errors (prompt re-authentication)
@@ -190,7 +209,7 @@ curl -X POST https://your-api.vercel.app/api/usage/check \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 
 # 4. Test summary generation with usage tracking
-curl -X POST https://your-api.vercel.app/api/claude \
+curl -X POST https://your-api.vercel.app/api/smart-summarizer \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
   -H "Content-Type: application/json" \
   -d '{"prompt": "Summarize: AI is changing the world", "domain": "example.com"}'
@@ -240,7 +259,7 @@ Readfocus/
 │   │   └── check-subscription.js ✅ Created
 │   ├── db.js                   ✅ Created
 │   ├── db-schema.sql           ✅ Created
-│   └── claude.js               ✅ Modified
+│   └── smart-summarizer.js     ✅ Modified
 ├── browser-extension/
 │   ├── js/
 │   │   ├── auth-manager.js     ⏳ Pending
@@ -269,15 +288,18 @@ Readfocus/
 ### Immediate (Phase 2 - Extension Integration)
 
 1. **Create Extension Auth Manager**
+
    - Token storage and retrieval
    - Authentication state management
 
 2. **Create Extension UI Pages**
+
    - Build auth.html (sign in/sign up)
    - Build upgrade.html (premium conversion)
    - Style with modern, clean design
 
 3. **Modify Existing Extension Files**
+
    - Update popup.js with auth controls
    - Update options.js with account section
    - Update proxy-ai-client.js to send JWT tokens
@@ -308,6 +330,7 @@ Readfocus/
 ## 🔐 Security Considerations
 
 ✅ **Implemented**:
+
 - Password hashing with bcrypt (10 rounds)
 - JWT tokens with 30-day expiry
 - Token revocation system
@@ -316,6 +339,7 @@ Readfocus/
 - Environment variable security
 
 ⚠️ **For Production**:
+
 - Change JWT_SECRET to strong random value
 - Enable HTTPS only
 - Rate limiting on API endpoints

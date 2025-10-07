@@ -13,7 +13,7 @@ Consolidated related endpoints into single serverless functions using query para
 ### Before (13 files → 12 functions)
 
 ```
-/api/claude.js
+/api/smart-summarizer.js
 /api/auth/register.js
 /api/auth/login.js
 /api/auth/logout.js
@@ -31,7 +31,7 @@ Consolidated related endpoints into single serverless functions using query para
 ### After (5 files → 4 functions)
 
 ```
-/api/claude.js                    (1 function)
+/api/smart-summarizer.js                    (1 function)
 /api/auth.js                      (1 function - handles 4 actions)
 /api/usage.js                     (1 function - handles 3 actions)
 /api/stripe.js                    (1 function - handles 4 actions)
@@ -60,9 +60,9 @@ Consolidated related endpoints into single serverless functions using query para
 - **Customer Portal**: `POST /api/stripe?action=portal`
 - **Check Subscription**: `GET /api/stripe?action=check`
 
-### Claude AI: `/api/claude`
+### Smart Summarizer: `/api/smart-summarizer`
 
-- **Generate Summary**: `POST /api/claude` (unchanged)
+- **Generate Summary**: `POST /api/smart-summarizer` (unchanged)
 
 ## Updated Extension Files
 

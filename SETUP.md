@@ -126,6 +126,7 @@ vercel --prod
 ```
 
 Follow prompts:
+
 - **Setup and deploy?** Yes
 - **Which scope?** Your account
 - **Link to existing project?** No
@@ -224,6 +225,7 @@ curl -X POST https://your-vercel-url.vercel.app/api/auth/register \
 ```
 
 **Expected Response**:
+
 ```json
 {
   "success": true,
@@ -247,6 +249,7 @@ curl -X POST https://your-vercel-url.vercel.app/api/auth/login \
 ```
 
 **Expected Response**:
+
 ```json
 {
   "success": true,
@@ -271,6 +274,7 @@ curl -X POST https://your-vercel-url.vercel.app/api/usage/check \
 ```
 
 **Expected Response**:
+
 ```json
 {
   "success": true,
@@ -284,10 +288,10 @@ curl -X POST https://your-vercel-url.vercel.app/api/usage/check \
 }
 ```
 
-### 6.4 Test Claude API (Summary Generation)
+### 6.4 Test Smart Summarizer API (Summary Generation)
 
 ```bash
-curl -X POST https://your-vercel-url.vercel.app/api/claude \
+curl -X POST https://your-vercel-url.vercel.app/api/smart-summarizer \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
   -d '{
@@ -298,6 +302,7 @@ curl -X POST https://your-vercel-url.vercel.app/api/claude \
 ```
 
 **Expected Response**:
+
 ```json
 {
   "success": true,
@@ -319,6 +324,7 @@ curl -X POST https://your-vercel-url.vercel.app/api/usage/check \
 ```
 
 **Expected Response**:
+
 ```json
 {
   "success": true,
@@ -381,24 +387,28 @@ The remaining extension files (auth-manager.js, usage-tracker.js, auth UI, etc.)
 ### API Endpoints Reference
 
 **Authentication**:
+
 - `POST /api/auth/register` - Create user account
 - `POST /api/auth/login` - Login and get JWT token
 - `POST /api/auth/verify-token` - Verify token validity
 - `POST /api/auth/logout` - Logout and revoke token
 
 **Usage Tracking**:
+
 - `POST /api/usage/check` - Check remaining free summaries
 - `POST /api/usage/increment` - Track summary generation
 - `GET /api/usage/history` - Get usage history
 
 **Stripe Integration**:
+
 - `POST /api/stripe/create-checkout` - Create checkout session
 - `POST /api/stripe/webhook` - Handle subscription events
 - `POST /api/stripe/portal` - Get customer portal URL
 - `GET /api/stripe/check-subscription` - Get subscription status
 
-**Claude AI**:
-- `POST /api/claude` - Generate AI summary (requires auth)
+**Smart Summarizer**:
+
+- `POST /api/smart-summarizer` - Generate AI summary (requires auth)
 
 ---
 
@@ -433,6 +443,7 @@ The remaining extension files (auth-manager.js, usage-tracker.js, auth UI, etc.)
 ## 🎉 Next Steps
 
 After completing this setup:
+
 1. Continue with extension UI development (auth pages, upgrade page)
 2. Integrate auth manager in extension
 3. Test complete user flow end-to-end

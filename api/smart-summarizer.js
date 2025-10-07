@@ -102,10 +102,10 @@ export default async function handler(req, res) {
       }
     }
 
-    // Get Claude API key from environment
+    // Get AI API key from environment
     const apiKey = process.env.CLAUDE_API_KEY;
     if (!apiKey) {
-      console.error('❌ CLAUDE_API_KEY not found in environment variables');
+      console.error('❌ AI API key not found in environment variables');
       return res.status(500).json({
         success: false,
         error: 'AI service configuration error',
@@ -115,9 +115,9 @@ export default async function handler(req, res) {
     // Get model from environment or use default
     const model = process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514';
 
-    console.log(`🔄 [API] Making request to Claude with model: ${model}`);
+    console.log(`🔄 [API] Making request to AI service with model: ${model}`);
 
-    // Make request to Claude API
+    // Make request to AI API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -140,13 +140,13 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('❌ Claude API error:', {
+      console.error('❌ AI API error:', {
         status: response.status,
         statusText: response.statusText,
         error: errorData,
       });
 
-      // Handle specific Claude API errors
+      // Handle specific AI API errors
       if (response.status === 401) {
         return res.status(500).json({
           success: false,
@@ -173,14 +173,14 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (!data.content || !data.content[0] || !data.content[0].text) {
-      console.error('❌ Unexpected Claude API response structure:', data);
+      console.error('❌ Unexpected AI API response structure:', data);
       return res.status(500).json({
         success: false,
         error: 'Invalid response from AI service',
       });
     }
 
-    console.log('✅ [API] Claude request successful');
+    console.log('✅ [API] AI request successful');
 
     // Log usage for non-premium users after successful summary
     if (!isPremium && domain) {
