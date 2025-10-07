@@ -1272,7 +1272,7 @@ for i in range(10):
       
       .rf-summary-close {
         background: #fffaf3;
-        border: 1px solid #c9b896;
+        border: 1px solid #101828;
         border-radius: 6px;
         width: 32px;
         height: 32px;
@@ -1298,7 +1298,7 @@ for i in range(10):
         overflow-y: hidden;
         white-space: nowrap;
         scrollbar-width: thin;
-        scrollbar-color: #c9b896 #fffaf3;
+        scrollbar-color: #101828 #fffaf3;
       }
 
       .rf-summary-tabs::-webkit-scrollbar {
@@ -1310,7 +1310,7 @@ for i in range(10):
       }
 
       .rf-summary-tabs::-webkit-scrollbar-thumb {
-        background: #c9b896;
+        background: #101828;
         border-radius: 3px;
       }
 
@@ -1344,7 +1344,7 @@ for i in range(10):
       .rf-summary-tab.active {
         background: #fffaf3;
         color: #101828;
-        border-bottom: 2px solid #101828;
+        border-bottom: 1px solid #101828;
       }
       
       .rf-tab-icon {
@@ -1388,7 +1388,7 @@ for i in range(10):
         color: #101828;
         margin: 0 0 16px 0;
         padding-bottom: 8px;
-        border-bottom: 2px solid #62748e;
+        border-bottom: 1px solid #62748e;
         text-align: left;
       }
       
@@ -1436,11 +1436,11 @@ for i in range(10):
       .rf-summary-markdown code {
         background: #ffffff;
         color: #101828;
-        padding: 2px 6px;
+        padding: 1px 6px;
         border-radius: 4px;
         font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
         font-size: 14px;
-        border: 1px solid #c9b896;
+        border: 1px solid #101828;
       }
       
       .rf-summary-markdown blockquote {
@@ -1551,7 +1551,7 @@ for i in range(10):
         color: #101828;
         font-weight: 600;
         padding: 12px 16px;
-        border-bottom: 2px solid #62748e;
+        border-bottom: 1px solid #62748e;
         text-align: left;
       }
 
@@ -1621,7 +1621,7 @@ for i in range(10):
         border-radius: 16px;
         font-size: 14px;
         font-weight: 500;
-        border: 1px solid #c9b896;
+        border: 1px solid #101828;
       }
       
       .rf-key-points-list {
@@ -1654,7 +1654,7 @@ for i in range(10):
         background: #ffffff;
         border-radius: 12px;
         border-left: 4px solid #101828;
-        border: 2px solid #101828;
+        border: 1px solid #101828;
       }
       
       .rf-key-point ul {
@@ -1745,7 +1745,7 @@ for i in range(10):
         background: #ffffff;
         border-radius: 12px;
         border-left: 4px solid #101828;
-        border: 2px solid #101828;
+        border: 1px solid #101828;
       }
 
       .rf-action-item ul {
@@ -1857,7 +1857,7 @@ for i in range(10):
       .rf-btn-secondary {
         background: #fffaf3;
         color: #364153;
-        border: 1px solid #c9b896;
+        border: 1px solid #101828;
       }
 
       .rf-btn-secondary:hover {
@@ -1957,7 +1957,7 @@ for i in range(10):
         background: #f5f1eb;
         border-radius: 12px;
         padding: 24px;
-        border: 2px solid #101828;
+        border: 1px solid #101828;
         text-align: left;
       }
       
@@ -1967,7 +1967,7 @@ for i in range(10):
         gap: 12px;
         margin-bottom: 16px;
         padding-bottom: 12px;
-        border-bottom: 2px solid #c9b896;
+        border-bottom: 1px solid #101828;
       }
       
       .rf-eli15-header h4 {
@@ -2006,7 +2006,7 @@ for i in range(10):
       
       .rf-concept-item {
         background: #fffaf3;
-        border: 2px solid #101828;
+        border: 1px solid #101828;
         border-radius: 12px;
         padding: 20px;
         transition: all 0.2s ease;
@@ -2021,7 +2021,7 @@ for i in range(10):
         font-weight: 700;
         color: #101828;
         padding-bottom: 8px;
-        border-bottom: 2px solid #62748e;
+        border-bottom: 1px solid #62748e;
         text-align: left;
       }
       
@@ -2060,7 +2060,7 @@ for i in range(10):
         background: #ffffff;
         padding: 10px 12px;
         border-radius: 6px;
-        border-left: 3px solid #c9b896;
+        border-left: 3px solid #101828;
         border: 1px solid #101828;
         text-align: left;
       }
@@ -2072,7 +2072,7 @@ for i in range(10):
         background: #ffffff;
         padding: 10px 12px;
         border-radius: 6px;
-        border-left: 3px solid #c9b896;
+        border-left: 3px solid #101828;
         border: 1px solid #101828;
         text-align: left;
       }
