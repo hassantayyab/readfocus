@@ -299,9 +299,21 @@ class KuiqleeContentScript {
           const summaryResult = await this.summaryService.generateSummary(request.options);
 
           if (summaryResult.success) {
-            // Show the summary overlay
-            await this.showSummaryOverlay(summaryResult);
-            sendResponse(summaryResult);
+            // Check display mode from request
+            const displayMode = request.displayMode || 'overlay';
+
+            if (displayMode === 'sidepanel') {
+              // Store summary in storage for side panel to pick up
+              await chrome.storage.local.set({
+                currentSummary: summaryResult,
+                summaryTimestamp: Date.now(),
+              });
+              sendResponse({ success: true, displayMode: 'sidepanel' });
+            } else {
+              // Show the summary overlay on page
+              await this.showSummaryOverlay(summaryResult);
+              sendResponse(summaryResult);
+            }
           } else {
             sendResponse(summaryResult);
           }

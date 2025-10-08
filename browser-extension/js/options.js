@@ -11,6 +11,7 @@ class KuiqleeOptions {
     };
 
     this.currentSettings = { ...this.defaultSettings };
+    this.summaryDisplayMode = 'overlay'; // Default to overlay
     this.feedbackModal = null; // Feedback modal instance
     this.init();
   }
@@ -36,9 +37,12 @@ class KuiqleeOptions {
    */
   async loadSettings() {
     try {
-      const result = await chrome.storage.sync.get('readfocusSettings');
+      const result = await chrome.storage.sync.get(['readfocusSettings', 'summaryDisplayMode']);
       if (result.readfocusSettings) {
         this.currentSettings = { ...this.defaultSettings, ...result.readfocusSettings };
+      }
+      if (result.summaryDisplayMode) {
+        this.summaryDisplayMode = result.summaryDisplayMode;
       }
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -98,6 +102,9 @@ class KuiqleeOptions {
    * Update UI elements with current settings
    */
   updateUI() {
+    // Summary Display Mode
+    this.setElementValue('summary-display-mode', this.summaryDisplayMode);
+
     // Summary Configuration
     this.setElementValue('auto-summarize', this.currentSettings.autoSummarize);
 
@@ -114,6 +121,11 @@ class KuiqleeOptions {
    * Bind event listeners
    */
   bindEvents() {
+    // Summary display mode selector
+    document.getElementById('summary-display-mode')?.addEventListener('change', (e) => {
+      this.updateSummaryDisplayMode(e.target.value);
+    });
+
     // Checkboxes
     const checkboxes = [
       'auto-summarize',
@@ -167,6 +179,23 @@ class KuiqleeOptions {
       e.preventDefault();
       this.showUsageStats();
     });
+  }
+
+  /**
+   * Update summary display mode
+   */
+  async updateSummaryDisplayMode(mode) {
+    this.summaryDisplayMode = mode;
+
+    try {
+      await chrome.storage.sync.set({ summaryDisplayMode: mode });
+
+      const modeText = mode === 'sidepanel' ? 'Side Panel' : 'Page Overlay';
+      this.showNotification(`Summaries will now display in: ${modeText}`, 'success');
+    } catch (error) {
+      console.error('Error saving summary display mode:', error);
+      this.showNotification('Error saving summary display mode', 'error');
+    }
   }
 
   /**
@@ -523,7 +552,8 @@ Usage Statistics:
       accountEmail.textContent = user.email || 'N/A';
 
       if (isPremium) {
-        accountStatus.innerHTML = '<span style="color: #10b981; font-weight: 600;">✨ Premium</span>';
+        accountStatus.innerHTML =
+          '<span style="color: #10b981; font-weight: 600;">✨ Premium</span>';
         accountUsage.textContent = 'Unlimited summaries';
         manageBtn.style.display = 'inline-flex';
         upgradeBtn.style.display = 'none';

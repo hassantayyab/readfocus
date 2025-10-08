@@ -6,7 +6,10 @@ class KuiqleeBackground {
     this.init();
   }
 
-  init() {
+  async init() {
+    // Ensure popup is enabled (not side panel) on startup
+    await this.ensurePopupEnabled();
+
     // Handle extension installation
     chrome.runtime.onInstalled.addListener((details) => {
       this.handleInstallation(details);
@@ -25,19 +28,37 @@ class KuiqleeBackground {
       this.handleMessage(request, sender, sendResponse);
     });
 
-    // Handle extension icon clicks
-    chrome.action.onClicked.addListener((tab) => {
-      this.handleIconClick(tab);
+    // Handle commands (keyboard shortcuts)
+    chrome.commands.onCommand.addListener((command) => {
+      this.handleCommand(command);
     });
   }
 
-  handleInstallation(details) {
+  async ensurePopupEnabled() {
+    try {
+      // Make sure side panel doesn't open on action click
+      if (chrome.sidePanel && chrome.sidePanel.setPanelBehavior) {
+        await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
+      }
+      // Ensure popup is set
+      await chrome.action.setPopup({ popup: 'popup.html' });
+    } catch (error) {
+      console.error('Error ensuring popup enabled:', error);
+    }
+  }
+
+  async handleInstallation(details) {
     if (details.reason === 'install') {
-      // First time installation
+      // First time installation - set overlay as default for summary display
+      await chrome.storage.sync.set({ summaryDisplayMode: 'overlay' });
       this.showWelcomeNotification();
       this.setDefaultSettings();
     } else if (details.reason === 'update') {
-      // Extension updated
+      // Extension updated - set default if no preference
+      const result = await chrome.storage.sync.get('summaryDisplayMode');
+      if (!result.summaryDisplayMode) {
+        await chrome.storage.sync.set({ summaryDisplayMode: 'overlay' });
+      }
     }
   }
 
@@ -102,6 +123,18 @@ class KuiqleeBackground {
         });
         return true; // Keep message channel open
 
+      case 'openSummaryInSidePanel':
+        // Open side panel and send summary data
+        this.openSummaryInSidePanel(request.summary, sender.tab)
+          .then(() => {
+            sendResponse({ success: true });
+          })
+          .catch((error) => {
+            console.error('[Background] Error in openSummaryInSidePanel:', error);
+            sendResponse({ success: false, error: error.message });
+          });
+        return true; // Keep message channel open
+
       case 'selectionChanged':
         // Forward selection changes to popup if open
         this.notifyPopup(request);
@@ -141,8 +174,34 @@ class KuiqleeBackground {
     }
   }
 
-  handleIconClick(tab) {
-    // This is handled by the popup, but we can add fallback behavior
+  async openSummaryInSidePanel(summary, tab) {
+    try {
+      // Store summary data for side panel to retrieve
+      const storageData = {
+        currentSummary: summary,
+        summaryTabId: tab.id,
+        summaryTimestamp: Date.now(),
+      };
+
+      await chrome.storage.local.set(storageData);
+
+      // Open side panel
+      await chrome.sidePanel.open({ windowId: tab.windowId });
+    } catch (error) {
+      console.error('[Background] Error opening summary in side panel:', error);
+      throw error;
+    }
+  }
+
+  async handleCommand(command) {
+    // Handle keyboard shortcuts
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tabs[0]) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        type: 'KEYBOARD_COMMAND',
+        command: command,
+      });
+    }
   }
 
   async sendTextToKuiqlee(text, title = 'Captured Text', sourceUrl = '') {
@@ -215,11 +274,7 @@ class KuiqleeBackground {
     }
   }
 
-  showWelcomeNotification() {
-    console.log(
-      'Kuiqlee extension installed successfully! Right-click on any text to send it to Kuiqlee for guided reading.',
-    );
-  }
+  showWelcomeNotification() {}
 
   showSuccessNotification(message) {}
 
@@ -274,4 +329,8 @@ class KuiqleeBackground {
 }
 
 // Initialize background script
-new KuiqleeBackground();
+try {
+  new KuiqleeBackground();
+} catch (error) {
+  console.error('[Background] Error creating KuiqleeBackground:', error);
+}

@@ -4,7 +4,14 @@
   "version": "1.0.0",
   "description": "AI-powered content analyzer that transforms any webpage into quick, understandable summaries with key points, explanations, and action items",
 
-  "permissions": ["activeTab", "storage", "contextMenus", "scripting", "notifications"],
+  "permissions": [
+    "activeTab",
+    "storage",
+    "contextMenus",
+    "scripting",
+    "notifications",
+    "sidePanel"
+  ],
 
   "host_permissions": ["https://*/*"],
 
@@ -17,6 +24,10 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
+  },
+
+  "side_panel": {
+    "default_path": "sidepanel.html"
   },
 
   "options_page": "options.html",
@@ -82,7 +93,7 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["icons/*", "auth.html", "upgrade.html"],
+      "resources": ["icons/*", "auth.html", "upgrade.html", "popup.html", "sidepanel.html"],
       "matches": ["<all_urls>"]
     }
   ]

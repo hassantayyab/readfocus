@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kuiqlee - Understand Quickly</title>
+    <link rel="stylesheet" href="styles/popup.css" />
+    <link rel="stylesheet" href="styles/feedback-modal.css" />
+    <link rel="stylesheet" href="styles/content.css" />
+    <style>
+      /* Side panel specific styles */
+      body {
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .settings-main {
+        flex: 1;
+      }
+
+      /* Side panel badge */
+      .panel-mode-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 10px;
+        font-weight: 600;
+        border-radius: 12px;
+        margin-left: auto;
+      }
+
+      .switch-mode-btn {
+        margin-top: 8px;
+        padding: 6px 12px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 6px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+      }
+
+      .switch-mode-btn:hover {
+        background: rgba(102, 126, 234, 0.2);
+        border-color: rgba(102, 126, 234, 0.3);
+      }
+
+      /* Side Panel Summary Styles - Complete CSS from overlay */
+      .sidepanel-summary-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: #fffaf3;
+        overflow-y: auto;
+        z-index: 999999;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+
+      /* Complete RF Summary Styles from Overlay */
+      .sidepanel-summary-container .rf-summary-container {
+        background: #fffaf3;
+        border-radius: 0;
+        width: 100%;
+        max-width: none;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        box-shadow: none;
+      }
+
+      .sidepanel-summary-container .rf-summary-content * {
+        text-align: left !important;
+      }
+
+      .sidepanel-summary-container .rf-summary-tabs {
+        text-align: center !important;
+      }
+
+      .sidepanel-summary-container .rf-summary-header {
+        text-align: left !important;
+      }
+
+      .sidepanel-summary-container .rf-summary-footer {
+        text-align: left !important;
+      }
+
+      .sidepanel-summary-container .rf-summary-header {
+        background: #fffaf3;
+        color: #101828;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        border-bottom: 1px solid #62748e;
+        border-radius: 0;
+      }
+
+      .sidepanel-summary-container .rf-summary-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sidepanel-summary-container .rf-summary-title h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .sidepanel-summary-container .rf-summary-icon {
+        font-size: 24px;
+      }
+
+      .sidepanel-summary-container .rf-summary-meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .sidepanel-summary-container .rf-summary-badge {
+        background: #f5f5f5;
+        border: 1px solid #d1d1d1;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #333333;
+      }
+
+      .sidepanel-summary-container .rf-badge-success,
+      .sidepanel-summary-container .rf-badge-warning,
+      .sidepanel-summary-container .rf-badge-error,
+      .sidepanel-summary-container .rf-badge-info,
+      .sidepanel-summary-container .rf-badge-time,
+      .sidepanel-summary-container .rf-badge-level {
+        background: #f5f5f5;
+        border: 1px solid #d1d1d1;
+        color: #333333;
+      }
+
+      .sidepanel-summary-container .rf-summary-close {
+        background: #fffaf3;
+        border: 1px solid #101828;
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
+        color: #101828;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+
+      .sidepanel-summary-container .rf-summary-close:hover {
+        background: #e8ddc9;
+        transform: translateY(-1px);
+      }
+
+      .sidepanel-summary-container .rf-summary-tabs {
+        display: flex;
+        background: #fffaf3;
+        border-bottom: 1px solid #62748e;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        scrollbar-width: thin;
+        scrollbar-color: #101828 #fffaf3;
+      }
+
+      .sidepanel-summary-container .rf-summary-tabs::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .sidepanel-summary-container .rf-summary-tabs::-webkit-scrollbar-track {
+        background: #fffaf3;
+      }
+
+      .sidepanel-summary-container .rf-summary-tabs::-webkit-scrollbar-thumb {
+        background: #101828;
+        border-radius: 3px;
+      }
+
+      .sidepanel-summary-container .rf-summary-tabs::-webkit-scrollbar-thumb:hover {
+        background: #b5a582;
+      }
+
+      .sidepanel-summary-container .rf-summary-tab {
+        flex: 0 0 auto;
+        background: none;
+        border: none;
+        padding: 16px 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #364153;
+        min-width: 80px;
+        white-space: nowrap;
+      }
+
+      .sidepanel-summary-container .rf-summary-tab:hover {
+        background: #e8ddc9;
+        color: #5a4a36;
+      }
+
+      .sidepanel-summary-container .rf-summary-tab.active {
+        background: #fffaf3;
+        color: #101828;
+        border-bottom: 1px solid #101828;
+      }
+
+      .sidepanel-summary-container .rf-tab-icon {
+        font-size: 16px;
+      }
+
+      .sidepanel-summary-container .rf-summary-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-tab-content {
+        animation: fadeIn 0.3s ease;
+        text-align: left;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .sidepanel-summary-container .rf-summary-paragraph {
+        line-height: 1.7;
+        font-size: 16px;
+        color: #101828;
+        margin: 0 0 16px 0;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown {
+        line-height: 1.7;
+        color: #101828;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #101828;
+        margin: 0 0 16px 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #62748e;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #101828;
+        margin: 24px 0 12px 0;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333333;
+        margin: 20px 0 10px 0;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown h4 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #666666;
+        margin: 16px 0 8px 0;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown p {
+        margin: 0 0 16px 0;
+        font-size: 16px;
+        line-height: 1.7;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown strong {
+        font-weight: 600;
+        color: #101828;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown em {
+        font-style: italic;
+        color: #666666;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown code {
+        background: #ffffff;
+        color: #101828;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+        font-size: 14px;
+        border: 1px solid #101828;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown blockquote {
+        background: #ffffff;
+        border-left: 4px solid #101828;
+        margin: 16px 0;
+        padding: 12px 16px;
+        color: #364153;
+        font-style: italic;
+        border-radius: 0 6px 6px 0;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown ul {
+        margin: 16px 0;
+        padding-left: 24px;
+        list-style-type: disc;
+        list-style-position: outside;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown li {
+        margin: 8px 0;
+        font-size: 16px;
+        line-height: 1.6;
+        position: relative;
+        display: list-item;
+        list-style-type: disc;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown li::marker {
+        color: #101828;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown ol {
+        margin: 16px 0;
+        padding-left: 24px;
+        list-style-type: decimal;
+        list-style-position: outside;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-summary-markdown ol li {
+        list-style-type: decimal;
+      }
+
+      /* Code block styles */
+      .sidepanel-summary-container .rf-code-block {
+        margin: 16px 0;
+        background: #fffaf3;
+        border: 1px solid #101828;
+        border-radius: 8px;
+        overflow: hidden;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-code-language {
+        background: #fffaf3;
+        color: #364153;
+        padding: 8px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #62748e;
+      }
+
+      .sidepanel-summary-container .rf-code-block pre {
+        margin: 0;
+        padding: 16px;
+        background: #fffaf3;
+        overflow-x: auto;
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New',
+          monospace;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .sidepanel-summary-container .rf-code-block code {
+        background: none;
+        color: #101828;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        font-family: inherit;
+        font-size: inherit;
+        white-space: pre;
+      }
+
+      /* Table styles */
+      .sidepanel-summary-container .rf-table-container {
+        margin: 16px 0;
+        overflow-x: auto;
+        border: 1px solid #101828;
+        border-radius: 8px;
+      }
+
+      .sidepanel-summary-container .rf-markdown-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        text-align: left;
+        background: #fffaf3;
+      }
+
+      .sidepanel-summary-container .rf-markdown-table th {
+        background: #fffaf3;
+        color: #101828;
+        font-weight: 600;
+        padding: 12px 16px;
+        border-bottom: 1px solid #62748e;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-markdown-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #62748e;
+        color: #101828;
+        vertical-align: top;
+      }
+
+      .sidepanel-summary-container .rf-markdown-table tbody tr:hover {
+        background: #ffffff;
+      }
+
+      .sidepanel-summary-container .rf-markdown-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .sidepanel-summary-container .rf-main-topics {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #62748e;
+      }
+
+      .sidepanel-summary-container .rf-main-topics h4 {
+        margin: 0 0 12px 0;
+        color: #101828;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-topics-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        text-align: left;
+        justify-content: flex-start;
+      }
+
+      .sidepanel-summary-container .rf-topic-tag {
+        background: #ffffff;
+        color: #101828;
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border: 1px solid #101828;
+      }
+
+      .sidepanel-summary-container .rf-key-points-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-key-points-list ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidepanel-summary-container .rf-key-points-list li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidepanel-summary-container .rf-key-points-list li::marker {
+        display: none;
+      }
+
+      .sidepanel-summary-container .rf-key-point {
+        display: flex;
+        gap: 16px;
+        padding: 16px;
+        background: #ffffff;
+        border-radius: 12px;
+        border-left: 4px solid #101828;
+        border: 1px solid #101828;
+      }
+
+      .sidepanel-summary-container .rf-key-point ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidepanel-summary-container .rf-key-point li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidepanel-summary-container .rf-key-point li::marker {
+        display: none;
+      }
+
+      .sidepanel-summary-container .rf-point-number {
+        background: #101828;
+        color: #faf6f2;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .sidepanel-summary-container .rf-point-text {
+        color: #101828;
+        line-height: 1.6;
+        font-size: 15px;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-point-text ul {
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .sidepanel-summary-container .rf-point-text li {
+        list-style: none !important;
+        list-style-type: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .sidepanel-summary-container .rf-point-text li::marker {
+        display: none !important;
+      }
+
+      .sidepanel-summary-container .rf-point-text li::before {
+        display: none !important;
+      }
+
+      .sidepanel-summary-container .rf-action-items-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-action-items-list ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidepanel-summary-container .rf-action-items-list li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidepanel-summary-container .rf-action-items-list li::marker {
+        display: none;
+      }
+
+      .sidepanel-summary-container .rf-action-item {
+        display: flex;
+        gap: 16px;
+        padding: 16px;
+        background: #ffffff;
+        border-radius: 12px;
+        border-left: 4px solid #101828;
+        border: 1px solid #101828;
+      }
+
+      .sidepanel-summary-container .rf-action-item ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidepanel-summary-container .rf-action-item li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidepanel-summary-container .rf-action-item li::marker {
+        display: none;
+      }
+
+      .sidepanel-summary-container .rf-action-number {
+        background: #101828;
+        color: #faf6f2;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .sidepanel-summary-container .rf-action-text {
+        color: #101828;
+        line-height: 1.6;
+        font-size: 15px;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-action-text ul {
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .sidepanel-summary-container .rf-action-text li {
+        list-style: none !important;
+        list-style-type: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .sidepanel-summary-container .rf-action-text li::marker {
+        display: none !important;
+      }
+
+      .sidepanel-summary-container .rf-action-text li::before {
+        display: none !important;
+      }
+
+      .sidepanel-summary-container .rf-summary-footer {
+        background: #f8f8f8;
+        padding: 20px 24px;
+        border-top: 1px solid #d1d1d1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .sidepanel-summary-container .rf-summary-stats {
+        display: flex;
+        gap: 16px;
+        font-size: 14px;
+        color: #666666;
+        flex-wrap: wrap;
+      }
+
+      .sidepanel-summary-container .rf-summary-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .sidepanel-summary-container .rf-summary-btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .sidepanel-summary-container .rf-btn-primary {
+        background: #101828;
+        color: #faf6f2;
+      }
+
+      .sidepanel-summary-container .rf-btn-primary:hover {
+        background: #6b5011;
+        transform: translateY(-1px);
+      }
+
+      .sidepanel-summary-container .rf-btn-secondary {
+        background: #fffaf3;
+        color: #364153;
+        border: 1px solid #101828;
+      }
+
+      .sidepanel-summary-container .rf-btn-secondary:hover {
+        background: #fffaf3;
+        border-color: #101828;
+      }
+
+      .sidepanel-summary-container .rf-summary-empty {
+        text-align: center;
+        color: #364153;
+        font-style: italic;
+        padding: 40px 20px;
+      }
+
+      .sidepanel-summary-container .rf-summary-loading {
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .sidepanel-summary-container .rf-loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e8e8e8;
+        border-top: 3px solid #101828;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .sidepanel-summary-container .rf-summary-error .rf-error-message {
+        color: #101828;
+        margin-bottom: 16px;
+        font-weight: 600;
+      }
+
+      .sidepanel-summary-container .rf-error-content {
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .sidepanel-summary-container .rf-error-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 16px;
+      }
+
+      /* ELI15 Tab Styles */
+      .sidepanel-summary-container .rf-eli15-summary {
+        background: #f5f1eb;
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid #101828;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-eli15-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #101828;
+      }
+
+      .sidepanel-summary-container .rf-eli15-header h4 {
+        margin: 0;
+        color: #101828;
+        font-size: 18px;
+        font-weight: 600;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-eli15-icon {
+        font-size: 24px;
+        filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+      }
+
+      .sidepanel-summary-container .rf-eli15-text {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #101828;
+        background: #faf6f2;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #101828;
+        border: 1px solid #101828;
+        text-align: left;
+      }
+
+      /* Concepts Tab Styles */
+      .sidepanel-summary-container .rf-concepts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-concept-item {
+        background: #fffaf3;
+        border: 1px solid #101828;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.2s ease;
+      }
+
+      .sidepanel-summary-container .rf-concept-term {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        font-size: 18px;
+        font-weight: 700;
+        color: #101828;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #62748e;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-concept-icon {
+        background: #101828;
+        color: #faf6f2;
+        font-size: 14px;
+        font-weight: 600;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .sidepanel-summary-container .rf-concept-definition {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #101828;
+        margin-bottom: 12px;
+        background: #ffffff;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 3px solid #101828;
+        border: 1px solid #101828;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-concept-analogy {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #101828;
+        margin-bottom: 8px;
+        background: #ffffff;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border-left: 3px solid #101828;
+        border: 1px solid #101828;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-concept-example {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #101828;
+        background: #ffffff;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border-left: 3px solid #101828;
+        border: 1px solid #101828;
+        text-align: left;
+      }
+
+      .sidepanel-summary-container .rf-concept-analogy strong,
+      .sidepanel-summary-container .rf-concept-example strong {
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <img src="icons/icon32.png" alt="Kuiqlee" class="logo" />
+        <div class="header-text">
+          <h1>Kuiqlee</h1>
+          <p class="tagline">Understand Quickly</p>
+        </div>
+        <span class="panel-mode-badge">📌 Side Panel</span>
+        <button class="menu-toggle" id="menu-toggle">
+          <span class="hamburger-icon">⋯</span>
+        </button>
+        <!-- Menu Dropdown -->
+        <div class="menu-dropdown" id="menu-dropdown">
+          <button
+            class="menu-item"
+            id="how-to-use"
+            title="Navigate to any article → Click 'Understand' (Ctrl/Cmd+Shift+S) → Use Ctrl/Cmd+1-6 to switch tabs"
+          >
+            How to Use
+          </button>
+          <button class="menu-item" id="open-settings">Settings</button>
+          <button class="menu-item" id="send-feedback">Send Feedback</button>
+          <button class="menu-item" id="switch-to-popup">Switch to Page Overlay</button>
+          <button class="menu-item" id="menu-sign-out" style="display: none">Sign Out</button>
+        </div>
+      </div>
+
+      <!-- Auth Status Bar -->
+      <div class="auth-status" id="auth-status" style="display: none">
+        <div class="auth-info">
+          <span id="auth-user-email">Not signed in</span>
+          <span id="auth-badge" class="premium-badge" style="display: none">✨ Premium</span>
+        </div>
+        <button class="auth-button" id="auth-action-button">Sign In</button>
+      </div>
+
+      <!-- Usage Status (for free users) -->
+      <div class="usage-status" id="usage-status" style="display: none">
+        <div class="usage-info">
+          <span id="usage-text">Loading...</span>
+        </div>
+        <button class="upgrade-button" id="upgrade-button" style="display: none">
+          <span class="button-icon">✨</span>
+          Upgrade to Premium
+        </button>
+      </div>
+
+      <!-- Content Summary Section -->
+      <div class="summary-section" id="summary-section">
+        <div class="summary-description">
+          Transform any webpage into quick & easy understanding with AI. The side panel stays open
+          while you browse!
+        </div>
+        <div class="summary-actions">
+          <button class="summary-button" id="generate-summary" disabled>
+            <span class="button-icon">⚡</span>
+            Start
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div class="version-info">Kuiqlee v3.0.0 - Side Panel Mode</div>
+      </div>
+
+      <!-- Status Messages -->
+      <div class="status-message" id="status-message"></div>
+      <div class="error-message" id="error-message"></div>
+
+      <!-- How it Works Content (replaces main content) -->
+      <div class="how-it-works-content" id="how-it-works-content" style="display: none">
+        <!-- Back Button -->
+        <div class="how-it-works-header">
+          <button class="back-button" id="back-to-main-how">
+            <span class="button-icon">←</span>
+            Back
+          </button>
+          <h3>How to Use Kuiqlee</h3>
+        </div>
+
+        <!-- How it Works Instructions -->
+        <div class="how-it-works-instructions">
+          <div class="instruction-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Navigate to any article</h4>
+              <p>
+                Go to any webpage with an article or long-form content you want to understand
+                quickly.
+              </p>
+            </div>
+          </div>
+
+          <div class="instruction-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Click "Start" button</h4>
+              <p>
+                Use the Start button in this panel or press <strong>Ctrl/Cmd+Shift+S</strong> to
+                begin analysis.
+              </p>
+            </div>
+          </div>
+
+          <div class="instruction-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Explore different tabs</h4>
+              <p>Use <strong>Ctrl/Cmd+1-6</strong> to quickly switch between:</p>
+              <ul>
+                <li><strong>Quick Summary</strong> - Key points at a glance</li>
+                <li><strong>Detailed Summary</strong> - Comprehensive overview</li>
+                <li><strong>Key Points</strong> - Main takeaways</li>
+                <li><strong>Action Items</strong> - What to do next</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="instruction-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Side Panel Benefits</h4>
+              <p>
+                • The panel <strong>stays open</strong> while you browse<br />
+                • View summaries <strong>side-by-side</strong> with the article<br />
+                • <strong>Resize</strong> the panel to your preference<br />
+                • Press <strong>Esc</strong> to close the overlay on the page
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Content (replaces main content) -->
+      <div class="feedback-content" id="feedback-content" style="display: none">
+        <!-- Back Button -->
+        <div class="feedback-header">
+          <button class="back-button" id="back-to-main">
+            <span class="button-icon">←</span>
+            Back
+          </button>
+          <h3>Send Feedback</h3>
+        </div>
+
+        <!-- Feedback Form -->
+        <form class="feedback-form" id="feedback-form">
+          <div class="form-group">
+            <label for="feedback-type">Type</label>
+            <select id="feedback-type" required>
+              <option value="">Select type...</option>
+              <option value="bug">🐛 Bug Report</option>
+              <option value="feature">💡 Feature Request</option>
+              <option value="improvement">⚡ Improvement</option>
+              <option value="general">💬 General Feedback</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="feedback-title">Title</label>
+            <input type="text" id="feedback-title" placeholder="Brief description" required />
+          </div>
+
+          <div class="form-group">
+            <label for="feedback-description">Description</label>
+            <textarea
+              id="feedback-description"
+              rows="3"
+              placeholder="Describe your feedback..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="feedback-email">Email (optional)</label>
+            <input type="email" id="feedback-email" placeholder="your.email@example.com" />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="secondary-button" id="feedback-cancel">Cancel</button>
+            <button type="submit" class="primary-button" id="feedback-submit">Send</button>
+          </div>
+        </form>
+
+        <!-- Success View -->
+        <div class="feedback-success" id="feedback-success" style="display: none">
+          <div class="success-message">✅ Feedback sent successfully!</div>
+          <button class="primary-button" id="feedback-done">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/usage-tracker.js"></script>
+    <script src="js/stripe-manager.js"></script>
+    <script src="js/sidepanel-summary.js"></script>
+    <script src="js/sidepanel.js"></script>
+    <script>
+      // Side panel specific functionality
+      document.getElementById('switch-to-popup')?.addEventListener('click', async () => {
+        // Save preference to use overlay mode for summaries
+        await chrome.storage.sync.set({ summaryDisplayMode: 'overlay' });
+
+        // Show confirmation
+        const statusMsg = document.getElementById('status-message');
+        if (statusMsg) {
+          statusMsg.textContent = '✓ Summaries will now appear as page overlays!';
+          statusMsg.style.display = 'block';
+          setTimeout(() => {
+            statusMsg.style.display = 'none';
+          }, 3000);
+        }
+      });
+    </script>
+  </body>
+</html>

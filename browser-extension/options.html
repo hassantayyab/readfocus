@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -23,6 +23,33 @@
       <!-- Main Content -->
       <main class="settings-main">
         <div class="settings-container">
+          <!-- Summary Display Mode Setting Card -->
+          <section class="main-setting-card">
+            <div class="setting-header">
+              <div class="setting-icon">📌</div>
+              <div class="setting-title">
+                <h2>Summary Display Mode</h2>
+                <p>Choose how AI summaries are displayed when you click "Start"</p>
+              </div>
+            </div>
+
+            <div class="setting-control">
+              <div class="setting-info">
+                <h3>Where to show summaries</h3>
+                <select id="summary-display-mode" class="mode-select">
+                  <option value="sidepanel">
+                    Side Panel (Recommended) - View summaries side-by-side with the article
+                  </option>
+                  <option value="overlay">Page Overlay - Show summary over the current page</option>
+                </select>
+                <p style="margin-top: 8px; font-size: 12px; color: #6b7280">
+                  Side panel keeps summaries visible while you browse and read articles. Page
+                  overlay appears directly on the page you're reading.
+                </p>
+              </div>
+            </div>
+          </section>
+
           <!-- Main Setting Card -->
           <section class="main-setting-card">
             <div class="setting-header">
@@ -75,11 +102,21 @@
               </div>
 
               <div class="account-actions">
-                <button type="button" id="manage-subscription-btn" class="action-button primary" style="display: none">
+                <button
+                  type="button"
+                  id="manage-subscription-btn"
+                  class="action-button primary"
+                  style="display: none"
+                >
                   <span class="button-icon">✨</span>
                   Manage Subscription
                 </button>
-                <button type="button" id="upgrade-premium-btn" class="action-button primary" style="display: none">
+                <button
+                  type="button"
+                  id="upgrade-premium-btn"
+                  class="action-button primary"
+                  style="display: none"
+                >
                   <span class="button-icon">✨</span>
                   Upgrade to Premium
                 </button>
@@ -97,8 +134,8 @@
               <div class="info-icon">📊</div>
               <h3>How it works</h3>
               <p>
-                Kuiqlee analyzes page content and generates comprehensive summaries with key
-                points, concepts, and action items.
+                Kuiqlee analyzes page content and generates comprehensive summaries with key points,
+                concepts, and action items.
               </p>
             </div>
 

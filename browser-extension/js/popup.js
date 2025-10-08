@@ -671,13 +671,31 @@ class KuiqleePopup {
     try {
       this.updateSummaryStatus('processing');
 
+      // Get user's summary display preference
+      const result = await chrome.storage.sync.get('summaryDisplayMode');
+      const displayMode = result.summaryDisplayMode || 'overlay';
+
+      // If side panel mode, open it NOW while we have user gesture
+      if (displayMode === 'sidepanel') {
+        try {
+          // Get the current window ID
+          const currentWindow = await chrome.windows.getCurrent();
+          await chrome.sidePanel.open({ windowId: currentWindow.id });
+
+          // Side panel opened successfully
+        } catch (error) {
+          console.error('[Popup] Error opening side panel:', error);
+        }
+      }
+
       // Ensure content scripts are loaded
       await this.ensureContentScriptsInjected();
 
-      // Send request to content script
+      // Send request to content script with displayMode
       const response = await Promise.race([
         chrome.tabs.sendMessage(this.currentTab.id, {
           type: 'GENERATE_SUMMARY',
+          displayMode: displayMode, // Tell content script where to show summary
           options: {
             includeKeyPoints: true,
             includeQuickSummary: true,
@@ -691,15 +709,23 @@ class KuiqleePopup {
       ]);
 
       if (response && response.success) {
-        // Close popup - summary overlay will show automatically
-        window.close();
+        if (displayMode === 'sidepanel') {
+          // For side panel, update status and close
+          this.updateSummaryStatus('ready');
+
+          setTimeout(() => {
+            window.close();
+          }, 500);
+        } else {
+          // For overlay, close immediately
+          window.close();
+        }
       } else {
         throw new Error(response?.error || 'Failed to get summary');
       }
     } catch (error) {
       console.error('Summarize action failed:', error);
       this.updateSummaryStatus('error');
-      this.showErrorMessage(error.message);
     }
   }
 
@@ -735,7 +761,6 @@ class KuiqleePopup {
       }
     } catch (error) {
       console.error('Error showing summary:', error);
-      this.showErrorMessage(error.message);
     }
   }
 

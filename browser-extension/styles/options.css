@@ -22,8 +22,8 @@
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
   margin: 0;
   padding: 0;
   background: var(--rf-surface);
@@ -182,7 +182,7 @@ body {
 
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 26px;
   width: 26px;
   left: 4px;
@@ -225,7 +225,6 @@ input:checked + .slider:before {
   border-color: var(--rf-border-accent);
   transform: translateY(-2px);
 }
-
 
 .info-icon {
   font-size: 1.5rem;
@@ -345,6 +344,24 @@ select:focus {
   outline: none;
   border-color: var(--rf-primary);
   box-shadow: 0 0 0 3px rgb(31 41 55 / 0.1);
+}
+
+.mode-select {
+  font-weight: 500;
+  padding: 1rem;
+  border: 2px solid var(--rf-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-select:hover {
+  border-color: var(--rf-primary);
+  background-color: var(--rf-surface);
+}
+
+.mode-select:focus {
+  border-color: var(--rf-primary);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
 }
 
 textarea {
