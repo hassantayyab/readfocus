@@ -8,13 +8,14 @@
   --rf-surface: #f9fafb;
   --rf-surface-light: #fef7ed;
   --rf-border: #e5e7eb;
+  --rf-border-strong: #d1d5db;
   --rf-border-accent: #f97316;
   --rf-text: #1f2937;
   --rf-text-muted: #6b7280;
   --rf-success: #10b981;
   --rf-warning: #f59e0b;
-  --rf-radius: 8px;
-  --rf-shadow: 0 1px 3px 0 rgb(31 41 55 / 0.1), 0 1px 2px -1px rgb(31 41 55 / 0.1);
+  --rf-radius: 4px;
+  --rf-radius-lg: 6px;
 }
 
 * {
@@ -33,11 +34,10 @@ body {
 }
 
 .container {
-  max-width: 600px;
+  max-width: 900px;
   margin: 0 auto;
   background-color: var(--rf-background);
   min-height: 100vh;
-  box-shadow: 0 0 50px rgb(31 41 55 / 0.1);
 }
 
 /* Header */
@@ -45,7 +45,7 @@ body {
   background: var(--rf-background);
   color: var(--rf-text);
   padding: 2rem 2rem 1.5rem 2rem;
-  border-bottom: 1px solid var(--rf-border);
+  border-bottom: 2px solid var(--rf-border);
 }
 
 .header-content {
@@ -57,8 +57,8 @@ body {
 .logo {
   width: 56px;
   height: 56px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgb(31 41 55 / 0.15);
+  border-radius: var(--rf-radius-lg);
+  border: 2px solid var(--rf-border);
 }
 
 .header-text h1 {
@@ -81,23 +81,17 @@ body {
 }
 
 .settings-container {
-  max-width: 500px;
+  max-width: 700px;
   margin: 0 auto;
 }
 
 /* Main Setting Card */
 .main-setting-card {
   background: var(--rf-background);
-  border: 1px solid var(--rf-border);
-  border-radius: 16px;
+  border: 2px solid var(--rf-border);
+  border-radius: var(--rf-radius-lg);
   padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 25px rgb(31 41 55 / 0.1);
-  transition: box-shadow 0.3s ease;
-}
-
-.main-setting-card:hover {
-  box-shadow: 0 12px 40px rgb(31 41 55 / 0.15);
+  margin-bottom: 1.5rem;
 }
 
 .setting-header {
@@ -108,15 +102,13 @@ body {
 }
 
 .setting-icon {
-  font-size: 2rem;
-  width: 60px;
-  height: 60px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--rf-surface-light);
-  border-radius: 50%;
-  border: 2px solid var(--rf-border-accent);
+  color: var(--rf-text);
+  flex-shrink: 0;
 }
 
 .setting-title h2 {
@@ -207,29 +199,30 @@ input:checked + .slider:before {
 /* Info Cards */
 .info-cards {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 .info-card {
-  background: var(--rf-background);
-  border: 1px solid var(--rf-border);
-  border-radius: 12px;
+  background: var(--rf-surface);
+  border: 2px solid var(--rf-border);
+  border-radius: var(--rf-radius);
   padding: 1.5rem;
   text-align: center;
-  transition: all 0.2s ease;
-}
-
-.info-card:hover {
-  border-color: var(--rf-border-accent);
-  transform: translateY(-2px);
 }
 
 .info-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.75rem;
-  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rf-surface-light);
+  border-radius: var(--rf-radius);
+  border: 2px solid var(--rf-border);
+  color: var(--rf-primary);
 }
 
 .info-card h3 {
@@ -251,6 +244,7 @@ input:checked + .slider:before {
   display: flex;
   gap: 1rem;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .action-button {
@@ -258,12 +252,12 @@ input:checked + .slider:before {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
+  border-radius: var(--rf-radius);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid;
+  border: 2px solid;
   text-decoration: none;
 }
 
@@ -276,23 +270,23 @@ input:checked + .slider:before {
 .action-button.primary:hover {
   background-color: var(--rf-primary-hover);
   border-color: var(--rf-primary-hover);
-  transform: translateY(-1px);
 }
 
 .action-button.secondary {
   background-color: var(--rf-background);
   color: var(--rf-text);
-  border-color: var(--rf-border);
+  border-color: var(--rf-border-strong);
 }
 
 .action-button.secondary:hover {
   background-color: var(--rf-surface);
-  border-color: var(--rf-border-accent);
-  transform: translateY(-1px);
+  border-color: var(--rf-text);
 }
 
 .button-icon {
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Form Controls */
@@ -300,7 +294,7 @@ input[type='range'] {
   width: 100%;
   height: 6px;
   background: var(--rf-border);
-  border-radius: 3px;
+  border-radius: var(--rf-radius);
   outline: none;
   -webkit-appearance: none;
 }
@@ -333,7 +327,7 @@ input[type='checkbox'] {
 select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--rf-border);
+  border: 2px solid var(--rf-border);
   border-radius: var(--rf-radius);
   background-color: var(--rf-background);
   color: var(--rf-text);
@@ -343,7 +337,6 @@ select {
 select:focus {
   outline: none;
   border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgb(31 41 55 / 0.1);
 }
 
 .mode-select {
@@ -355,20 +348,19 @@ select:focus {
 }
 
 .mode-select:hover {
-  border-color: var(--rf-primary);
+  border-color: var(--rf-border-strong);
   background-color: var(--rf-surface);
 }
 
 .mode-select:focus {
   border-color: var(--rf-primary);
-  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
 }
 
 textarea {
   width: 100%;
   min-height: 100px;
   padding: 0.75rem;
-  border: 1px solid var(--rf-border);
+  border: 2px solid var(--rf-border);
   border-radius: var(--rf-radius);
   background-color: var(--rf-background);
   color: var(--rf-text);
@@ -380,7 +372,6 @@ textarea {
 textarea:focus {
   outline: none;
   border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgb(31 41 55 / 0.1);
 }
 
 .setting-value {
@@ -388,13 +379,13 @@ textarea:focus {
   margin-left: 1rem;
   padding: 0.25rem 0.5rem;
   background-color: var(--rf-surface-light);
-  border-radius: 4px;
+  border-radius: var(--rf-radius);
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--rf-text);
   min-width: 50px;
   text-align: center;
-  border: 1px solid var(--rf-border);
+  border: 2px solid var(--rf-border);
 }
 
 /* Buttons */
@@ -403,10 +394,10 @@ textarea:focus {
   padding: 0.75rem 1.5rem;
   border-radius: var(--rf-radius);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  border: 1px solid;
+  border: 2px solid;
 }
 
 .primary-button {
@@ -423,17 +414,17 @@ textarea:focus {
 .secondary-button {
   background-color: var(--rf-background);
   color: var(--rf-text);
-  border-color: var(--rf-border);
+  border-color: var(--rf-border-strong);
 }
 
 .secondary-button:hover {
   background-color: var(--rf-surface);
-  border-color: var(--rf-border-accent);
+  border-color: var(--rf-text);
 }
 
 /* Footer */
 .footer {
-  border-top: 1px solid var(--rf-border);
+  border-top: 2px solid var(--rf-border);
   padding: 1.5rem 2rem;
   background: var(--rf-background);
 }
@@ -465,6 +456,18 @@ textarea:focus {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .container {
+    max-width: 100%;
+    margin: 0;
+    box-shadow: none;
+  }
+
+  .settings-container {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     margin: 0;
@@ -502,6 +505,10 @@ textarea:focus {
     gap: 1.5rem;
   }
 
+  .info-cards {
+    grid-template-columns: 1fr;
+  }
+
   .quick-actions {
     flex-direction: column;
     align-items: center;
@@ -523,13 +530,12 @@ textarea:focus {
   background-color: var(--rf-surface-light);
   color: var(--rf-text);
   padding: 0.75rem 1.5rem;
-  border: 1px solid var(--rf-border);
+  border: 2px solid var(--rf-primary);
   border-radius: var(--rf-radius);
   margin-bottom: 1rem;
   text-align: center;
   opacity: 0;
   transition: opacity 0.3s;
-  box-shadow: var(--rf-shadow);
 }
 
 .save-success.show {
@@ -541,8 +547,7 @@ input:focus,
 select:focus,
 textarea:focus,
 button:focus {
-  outline: 2px solid var(--rf-primary);
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* Animation for settings changes */
@@ -568,7 +573,7 @@ button:focus {
 .api-key-input {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--rf-border);
+  border: 2px solid var(--rf-border);
   border-radius: var(--rf-radius);
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 13px;
@@ -579,17 +584,16 @@ button:focus {
 .api-key-input:focus {
   outline: none;
   border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgb(31 41 55 / 0.1);
 }
 
 .test-button {
   padding: 8px 16px;
   background: var(--rf-primary);
   color: white;
-  border: none;
+  border: 2px solid var(--rf-primary);
   border-radius: var(--rf-radius);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
   min-width: 60px;
@@ -615,24 +619,24 @@ button:focus {
 .api-status.success {
   background: var(--rf-surface-light);
   color: var(--rf-text);
-  border: 1px solid var(--rf-border);
+  border: 2px solid var(--rf-border);
 }
 
 .api-status.error {
   background: var(--rf-surface);
   color: var(--rf-text-muted);
-  border: 1px solid var(--rf-border);
+  border: 2px solid var(--rf-border);
 }
 
 .api-status.testing {
   background: var(--rf-surface);
   color: var(--rf-text-muted);
-  border: 1px solid var(--rf-border);
+  border: 2px solid var(--rf-border);
 }
 
 .usage-stats {
   background: var(--rf-surface-light);
-  border: 1px solid var(--rf-border);
+  border: 2px solid var(--rf-border);
   border-radius: var(--rf-radius);
   padding: 12px;
 }
@@ -702,9 +706,9 @@ button:focus {
 
 .feedback-modal {
   background: var(--rf-background);
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(31, 41, 55, 0.3);
-  max-width: 500px;
+  border-radius: var(--rf-radius-lg);
+  border: 2px solid var(--rf-border-strong);
+  max-width: 600px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -727,7 +731,7 @@ button:focus {
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 2rem 1rem 2rem;
-  border-bottom: 1px solid var(--rf-border);
+  border-bottom: 2px solid var(--rf-border);
 }
 
 .section-header h4 {
@@ -744,7 +748,7 @@ button:focus {
   color: var(--rf-text-muted);
   cursor: pointer;
   padding: 0.25rem;
-  border-radius: 4px;
+  border-radius: var(--rf-radius);
   transition: all 0.2s ease;
 }
 
@@ -762,8 +766,8 @@ button:focus {
 .feedback-form textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--rf-border);
-  border-radius: 8px;
+  border: 2px solid var(--rf-border);
+  border-radius: var(--rf-radius);
   font-size: 0.9rem;
   font-family: inherit;
   background: var(--rf-background);
@@ -778,7 +782,6 @@ button:focus {
 .feedback-form textarea:focus {
   outline: none;
   border-color: var(--rf-primary);
-  box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
 }
 
 .feedback-form textarea {
@@ -795,23 +798,23 @@ button:focus {
 .feedback-actions button {
   flex: 1;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--rf-radius);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid;
+  border: 2px solid;
 }
 
 .feedback-actions .secondary-button {
   background-color: var(--rf-background);
   color: var(--rf-text);
-  border-color: var(--rf-border);
+  border-color: var(--rf-border-strong);
 }
 
 .feedback-actions .secondary-button:hover {
   background-color: var(--rf-surface);
-  border-color: var(--rf-border-accent);
+  border-color: var(--rf-text);
 }
 
 .feedback-actions .primary-button {
@@ -823,7 +826,6 @@ button:focus {
 .feedback-actions .primary-button:hover {
   background-color: var(--rf-primary-hover);
   border-color: var(--rf-primary-hover);
-  transform: translateY(-1px);
 }
 
 .feedback-success {
@@ -840,8 +842,8 @@ button:focus {
 .feedback-success .primary-button {
   padding: 0.75rem 2rem;
   font-size: 0.9rem;
-  border: none;
-  border-radius: 8px;
+  border: 2px solid var(--rf-primary);
+  border-radius: var(--rf-radius);
   background: var(--rf-primary);
   color: white;
   cursor: pointer;
@@ -851,16 +853,16 @@ button:focus {
 
 .feedback-success .primary-button:hover {
   background: var(--rf-primary-hover);
-  transform: translateY(-1px);
+  border-color: var(--rf-primary-hover);
 }
 
 /* Account Section */
 .account-section {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--rf-radius-lg);
+  border: 2px solid var(--rf-border);
   padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 1px 3px 0 rgb(31 41 55 / 0.1);
+  margin-bottom: 1.5rem;
 }
 
 .account-details {
@@ -869,7 +871,8 @@ button:focus {
 
 .account-info {
   background: var(--rf-surface);
-  border-radius: 8px;
+  border-radius: var(--rf-radius);
+  border: 2px solid var(--rf-border);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -879,7 +882,7 @@ button:focus {
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--rf-border);
 }
 
 .info-row:last-child {
@@ -917,7 +920,7 @@ button:focus {
 
   .feedback-modal {
     margin: 0;
-    border-radius: 12px;
+    border-radius: var(--rf-radius-lg);
   }
 
   .section-header {
