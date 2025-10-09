@@ -552,11 +552,41 @@ Usage Statistics:
       accountEmail.textContent = user.email || 'N/A';
 
       if (isPremium) {
-        accountStatus.innerHTML =
-          '<span style="color: #10b981; font-weight: 600;">✨ Premium</span>';
-        accountUsage.textContent = 'Unlimited summaries';
-        cancelBtn.style.display = 'inline-flex';
-        upgradeBtn.style.display = 'none';
+        // Check if subscription is canceled but still active
+        const subscriptionInfo = await this.getSubscriptionInfo();
+        const isCanceled = subscriptionInfo?.cancelAtPeriodEnd;
+
+        if (isCanceled && subscriptionInfo?.currentPeriodEnd) {
+          // Subscription is canceled, show end date and option to resubscribe
+          const endDate = new Date(subscriptionInfo.currentPeriodEnd);
+          const formattedDate = endDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          });
+          accountStatus.innerHTML =
+            '<span style="color: #f59e0b; font-weight: 600;">⚠️ Canceled</span>';
+          accountUsage.textContent = `Premium access until ${formattedDate}`;
+          cancelBtn.style.display = 'none'; // Hide cancel button if already canceled
+          upgradeBtn.style.display = 'inline-flex'; // Show upgrade to allow resubscription
+
+          // Update button text while keeping the icon
+          const upgradeIcon = upgradeBtn.querySelector('svg');
+          if (upgradeIcon) {
+            upgradeBtn.innerHTML = '';
+            upgradeBtn.appendChild(upgradeIcon);
+            upgradeBtn.appendChild(document.createTextNode('Resubscribe'));
+          } else {
+            upgradeBtn.textContent = 'Resubscribe';
+          }
+        } else {
+          // Active premium subscription
+          accountStatus.innerHTML =
+            '<span style="color: #10b981; font-weight: 600;">✨ Premium</span>';
+          accountUsage.textContent = 'Unlimited summaries';
+          cancelBtn.style.display = 'inline-flex';
+          upgradeBtn.style.display = 'none';
+        }
       } else {
         accountStatus.textContent = 'Free Tier';
 
@@ -573,6 +603,22 @@ Usage Statistics:
     } else {
       accountSection.style.display = 'none';
     }
+  }
+
+  /**
+   * Get subscription info from Stripe
+   */
+  async getSubscriptionInfo() {
+    if (typeof stripeManager !== 'undefined') {
+      try {
+        const result = await stripeManager.checkSubscriptionStatus();
+        return result.subscription;
+      } catch (error) {
+        console.error('Error fetching subscription info:', error);
+        return null;
+      }
+    }
+    return null;
   }
 
   /**
