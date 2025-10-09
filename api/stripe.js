@@ -1,12 +1,12 @@
 /**
  * Consolidated Stripe API Routes
- * Handles: /api/stripe?action=checkout|webhook|portal|check
+ * Handles: /api/stripe?action=checkout|webhook|portal|check|cancel
  */
 
-import db from './db.js';
-import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import Stripe from 'stripe';
+import db from './db.js';
 
 // Helper to read raw body for webhook verification
 async function getRawBody(req) {
@@ -52,6 +52,8 @@ export default async function handler(req, res) {
         return await handlePortal(req, res);
       case 'check':
         return await handleCheckSubscription(req, res);
+      case 'cancel':
+        return await handleCancelSubscription(req, res);
       default:
         return res.status(400).json({ success: false, error: 'Invalid action parameter' });
     }
@@ -131,9 +133,7 @@ async function handleCreateCheckout(req, res) {
 
   // Determine price ID
   const priceId =
-    planId === 'monthly'
-      ? process.env.STRIPE_PRICE_MONTHLY
-      : process.env.STRIPE_PRICE_ANNUAL;
+    planId === 'monthly' ? process.env.STRIPE_PRICE_MONTHLY : process.env.STRIPE_PRICE_ANNUAL;
 
   if (!priceId) {
     return res.status(500).json({
@@ -314,6 +314,75 @@ async function handleCheckSubscription(req, res) {
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     },
   });
+}
+
+// Cancel subscription handler
+async function handleCancelSubscription(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  const userId = await verifyAuth(req, res);
+  if (!userId) return;
+
+  // Get user's subscription
+  const subscriptionResult = await db.subscriptions.getByUserId(userId);
+
+  if (!subscriptionResult.success || !subscriptionResult.subscription) {
+    return res.status(404).json({
+      success: false,
+      error: 'No active subscription found',
+    });
+  }
+
+  const subscription = subscriptionResult.subscription;
+
+  if (!subscription.stripe_subscription_id) {
+    return res.status(400).json({
+      success: false,
+      error: 'No Stripe subscription ID found',
+    });
+  }
+
+  try {
+    // Cancel subscription at period end (so user keeps access until then)
+    const updatedSubscription = await stripe.subscriptions.update(
+      subscription.stripe_subscription_id,
+      {
+        cancel_at_period_end: true,
+      },
+    );
+
+    // Update subscription in database
+    await db.subscriptions.upsert({
+      userId,
+      stripeCustomerId: subscription.stripe_customer_id,
+      stripeSubscriptionId: subscription.stripe_subscription_id,
+      status: updatedSubscription.status,
+      planId: subscription.plan_id,
+      currentPeriodStart: new Date(updatedSubscription.current_period_start * 1000).toISOString(),
+      currentPeriodEnd: new Date(updatedSubscription.current_period_end * 1000).toISOString(),
+      cancelAtPeriodEnd: true,
+    });
+
+    console.log('Subscription canceled:', {
+      userId,
+      subscriptionId: subscription.stripe_subscription_id,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Subscription canceled successfully',
+      cancelAtPeriodEnd: true,
+      currentPeriodEnd: new Date(updatedSubscription.current_period_end * 1000).toISOString(),
+    });
+  } catch (error) {
+    console.error('Error canceling subscription:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to cancel subscription',
+    });
+  }
 }
 
 // Webhook helpers

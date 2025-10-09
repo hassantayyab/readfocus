@@ -236,6 +236,54 @@ class StripeManager {
   }
 
   /**
+   * Cancel subscription
+   */
+  async cancelSubscription() {
+    try {
+      if (!authManager.isAuthenticated()) {
+        throw new Error('Please sign in to cancel subscription');
+      }
+
+      const token = authManager.getToken();
+      const response = await fetch(`${this.apiBaseUrl}/stripe?action=cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to cancel subscription');
+      }
+
+      console.log('✅ Subscription canceled successfully');
+
+      // Refresh user data to reflect cancellation
+      await authManager.refreshUserData();
+
+      // Show cancellation notification
+      if (chrome.notifications) {
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: chrome.runtime.getURL('icons/icon128.png'),
+          title: 'Subscription Canceled',
+          message:
+            "Your subscription has been canceled. You'll have access until the end of your billing period.",
+          priority: 2,
+        });
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error('❌ Error canceling subscription:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Format subscription display text
    */
   getSubscriptionDisplayText(subscription) {

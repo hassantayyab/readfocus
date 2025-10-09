@@ -164,8 +164,8 @@ class KuiqleeOptions {
     // Account management buttons
     document.getElementById('logout-btn')?.addEventListener('click', () => this.handleLogout());
     document
-      .getElementById('manage-subscription-btn')
-      ?.addEventListener('click', () => this.handleManageSubscription());
+      .getElementById('cancel-subscription-btn')
+      ?.addEventListener('click', () => this.handleCancelSubscription());
     document
       .getElementById('upgrade-premium-btn')
       ?.addEventListener('click', () => this.handleUpgrade());
@@ -538,7 +538,7 @@ Usage Statistics:
     const accountEmail = document.getElementById('account-email');
     const accountStatus = document.getElementById('account-status');
     const accountUsage = document.getElementById('account-usage');
-    const manageBtn = document.getElementById('manage-subscription-btn');
+    const cancelBtn = document.getElementById('cancel-subscription-btn');
     const upgradeBtn = document.getElementById('upgrade-premium-btn');
 
     if (!accountSection) return;
@@ -555,7 +555,7 @@ Usage Statistics:
         accountStatus.innerHTML =
           '<span style="color: #10b981; font-weight: 600;">✨ Premium</span>';
         accountUsage.textContent = 'Unlimited summaries';
-        manageBtn.style.display = 'inline-flex';
+        cancelBtn.style.display = 'inline-flex';
         upgradeBtn.style.display = 'none';
       } else {
         accountStatus.textContent = 'Free Tier';
@@ -567,7 +567,7 @@ Usage Statistics:
           accountUsage.textContent = 'Loading...';
         }
 
-        manageBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
         upgradeBtn.style.display = 'inline-flex';
       }
     } else {
@@ -595,18 +595,51 @@ Usage Statistics:
   }
 
   /**
-   * Handle manage subscription action
+   * Handle cancel subscription action
    */
-  async handleManageSubscription() {
+  async handleCancelSubscription() {
     if (typeof stripeManager !== 'undefined') {
+      // Show confirmation dialog
+      const confirmed = confirm(
+        'Are you sure you want to cancel your subscription?\n\n' +
+          'You will continue to have premium access until the end of your current billing period.\n\n' +
+          'After that, you will be downgraded to the free tier.',
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
       try {
-        const result = await stripeManager.openCustomerPortal();
+        // Show loading state
+        const cancelBtn = document.getElementById('cancel-subscription-btn');
+        const originalText = cancelBtn.textContent;
+        cancelBtn.textContent = 'Canceling...';
+        cancelBtn.disabled = true;
+
+        const result = await stripeManager.cancelSubscription();
+
         if (result.success) {
-          this.showNotification('Opening subscription management...', 'info');
+          this.showNotification('Subscription canceled successfully', 'success');
+
+          // Update UI to reflect cancellation
+          await this.updateAccountUI();
+        } else {
+          throw new Error('Failed to cancel subscription');
         }
       } catch (error) {
-        console.error('Error opening customer portal:', error);
-        this.showNotification('Failed to open subscription management', 'error');
+        console.error('Error canceling subscription:', error);
+        this.showNotification(
+          error.message || 'Failed to cancel subscription. Please try again.',
+          'error',
+        );
+
+        // Reset button state
+        const cancelBtn = document.getElementById('cancel-subscription-btn');
+        if (cancelBtn) {
+          cancelBtn.textContent = 'Cancel Subscription';
+          cancelBtn.disabled = false;
+        }
       }
     }
   }
