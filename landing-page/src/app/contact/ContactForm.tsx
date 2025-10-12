@@ -217,10 +217,10 @@ const ContactForm = () => {
                   <p className='text-gray-700'>
                     <span className='font-medium'>Email:</span>{' '}
                     <a
-                      href='mailto:hello@kuiqlee.com'
+                      href='mailto:hello.kuiqlee@gmail.com'
                       className='text-orange-600 hover:text-orange-700'
                     >
-                      hello@kuiqlee.com
+                      hello.kuiqlee@gmail.com
                     </a>
                   </p>
                   <p className='text-gray-700'>

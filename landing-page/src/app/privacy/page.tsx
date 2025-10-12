@@ -147,7 +147,7 @@ const PrivacyPage = () => {
           </p>
           <div className='bg-white p-4 rounded-lg border border-gray-200'>
             <p className='text-gray-700'>
-              <strong>Email:</strong> privacy@kuiqlee.com
+              <strong>Email:</strong> hello.kuiqlee@gmail.com
               <br />
               <strong>Support:</strong>{' '}
               <a href='/contact' className='text-orange-600 hover:text-orange-700'>

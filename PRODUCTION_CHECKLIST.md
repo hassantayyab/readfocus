@@ -66,7 +66,7 @@
 
 **Required:** Professional support contact
 
-- [ ] Create `support@kuiqlee.com` OR
+- [ ] Create `hello.kuiqlee@gmail.com` OR
 - [ ] Use personal email (less professional)
 - [ ] Update email in store listing
 - [ ] Test email is working
