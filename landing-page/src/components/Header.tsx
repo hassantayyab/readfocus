@@ -3,10 +3,8 @@ import Button from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 const Header = () => {
-  const router = useRouter();
   return (
     <motion.header
       initial={{ y: -100 }}
