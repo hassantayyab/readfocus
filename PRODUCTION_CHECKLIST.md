@@ -289,4 +289,3 @@ https://*/*: Required to work on all HTTPS websites for content analysis
 
 **Last Updated:** October 12, 2025  
 **Next Review Date:** After Chrome Web Store Approval
-
