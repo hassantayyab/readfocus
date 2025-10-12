@@ -10,9 +10,9 @@ const Footer = () => {
               <Image
                 src='/logo.png'
                 alt='Kuiqlee Logo'
-                width={48}
-                height={48}
-                className='w-10 h-10 sm:w-12 sm:h-12'
+                width={40}
+                height={40}
+                className='w-10 h-10'
               />
               <span className='text-lg sm:text-xl font-bold text-orange-500'>Kuiqlee</span>
             </div>
