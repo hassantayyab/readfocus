@@ -11,7 +11,7 @@ class KuiqleeOptions {
     };
 
     this.currentSettings = { ...this.defaultSettings };
-    this.summaryDisplayMode = 'overlay'; // Default to overlay
+    this.summaryDisplayMode = 'overlay'; // Default to overlay mode
     this.feedbackModal = null; // Feedback modal instance
     this.init();
   }
@@ -41,9 +41,11 @@ class KuiqleeOptions {
       if (result.readfocusSettings) {
         this.currentSettings = { ...this.defaultSettings, ...result.readfocusSettings };
       }
-      if (result.summaryDisplayMode) {
-        this.summaryDisplayMode = result.summaryDisplayMode;
-      }
+      // Force overlay mode as default - sidepanel setting is hidden for now
+      // if (result.summaryDisplayMode) {
+      //   this.summaryDisplayMode = result.summaryDisplayMode;
+      // }
+      this.summaryDisplayMode = 'overlay'; // Always use overlay mode
     } catch (error) {
       console.error('Error loading settings:', error);
       this.showNotification('Error loading settings', 'error');
@@ -102,8 +104,8 @@ class KuiqleeOptions {
    * Update UI elements with current settings
    */
   updateUI() {
-    // Summary Display Mode
-    this.setElementValue('summary-display-mode', this.summaryDisplayMode);
+    // Summary Display Mode - COMMENTED OUT (sidepanel setting is hidden)
+    // this.setElementValue('summary-display-mode', this.summaryDisplayMode);
 
     // Summary Configuration
     this.setElementValue('auto-summarize', this.currentSettings.autoSummarize);
@@ -121,10 +123,10 @@ class KuiqleeOptions {
    * Bind event listeners
    */
   bindEvents() {
-    // Summary display mode selector
-    document.getElementById('summary-display-mode')?.addEventListener('change', (e) => {
-      this.updateSummaryDisplayMode(e.target.value);
-    });
+    // Summary display mode selector - COMMENTED OUT (sidepanel setting is hidden)
+    // document.getElementById('summary-display-mode')?.addEventListener('change', (e) => {
+    //   this.updateSummaryDisplayMode(e.target.value);
+    // });
 
     // Checkboxes
     const checkboxes = [
@@ -182,21 +184,21 @@ class KuiqleeOptions {
   }
 
   /**
-   * Update summary display mode
+   * Update summary display mode - COMMENTED OUT (sidepanel setting is hidden)
    */
-  async updateSummaryDisplayMode(mode) {
-    this.summaryDisplayMode = mode;
+  // async updateSummaryDisplayMode(mode) {
+  //   this.summaryDisplayMode = mode;
 
-    try {
-      await chrome.storage.sync.set({ summaryDisplayMode: mode });
+  //   try {
+  //     await chrome.storage.sync.set({ summaryDisplayMode: mode });
 
-      const modeText = mode === 'sidepanel' ? 'Side Panel' : 'Page Overlay';
-      this.showNotification(`Summaries will now display in: ${modeText}`, 'success');
-    } catch (error) {
-      console.error('Error saving summary display mode:', error);
-      this.showNotification('Error saving summary display mode', 'error');
-    }
-  }
+  //     const modeText = mode === 'sidepanel' ? 'Side Panel' : 'Page Overlay';
+  //     this.showNotification(`Summaries will now display in: ${modeText}`, 'success');
+  //   } catch (error) {
+  //     console.error('Error saving summary display mode:', error);
+  //     this.showNotification('Error saving summary display mode', 'error');
+  //   }
+  // }
 
   /**
    * Update a single setting

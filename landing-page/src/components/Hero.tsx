@@ -3,6 +3,7 @@ import Button from '@/components/ui/button';
 import { fadeInUp, slideInRight, staggerContainer, staggerItem } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const Hero = () => {
   return (
@@ -103,9 +104,13 @@ const Hero = () => {
                       className='bg-background rounded-xl sm:rounded-2xl border border-orange-200 p-3 sm:p-4'
                     >
                       <div className='flex items-center space-x-2 sm:space-x-3 mb-2 sm:mb-3'>
-                        <div className='w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl flex items-center justify-center bg-orange-500 flex-shrink-0'>
-                          <span className='text-white text-xs sm:text-sm font-bold'>K</span>
-                        </div>
+                        <Image
+                          src='/logo.png'
+                          alt='Kuiqlee Logo'
+                          width={32}
+                          height={32}
+                          className='w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0'
+                        />
                         <span className='font-semibold text-sm sm:text-base text-gray-900'>
                           AI Summary
                         </span>

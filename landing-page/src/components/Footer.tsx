@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 const Footer = () => {
   return (
     <footer className='bg-gray-800 text-white'>
@@ -5,12 +7,14 @@ const Footer = () => {
         <div className='grid sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8'>
           <div className='col-span-1 sm:col-span-2'>
             <div className='flex items-center space-x-2 mb-3 sm:mb-4'>
-              <div
-                className='w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-orange-500'
-              >
-                <span className='text-white font-bold text-xs sm:text-sm'>K</span>
-              </div>
-              <span className='text-lg sm:text-xl font-bold'>Kuiqlee</span>
+              <Image
+                src='/logo.png'
+                alt='Kuiqlee Logo'
+                width={48}
+                height={48}
+                className='w-10 h-10 sm:w-12 sm:h-12'
+              />
+              <span className='text-lg sm:text-xl font-bold text-orange-500'>Kuiqlee</span>
             </div>
             <p className='text-gray-400 mb-4 sm:mb-6 max-w-md text-sm sm:text-base'>
               Transform any webpage into digestible, intelligent summaries with AI-powered content
@@ -96,10 +100,16 @@ const Footer = () => {
             © {new Date().getFullYear()} Kuiqlee. All rights reserved.
           </p>
           <div className='flex space-x-4 sm:space-x-6'>
-            <a href='/privacy' className='text-gray-400 hover:text-white text-xs sm:text-sm transition-colors'>
+            <a
+              href='/privacy'
+              className='text-gray-400 hover:text-white text-xs sm:text-sm transition-colors'
+            >
               Privacy Policy
             </a>
-            <a href='/terms' className='text-gray-400 hover:text-white text-xs sm:text-sm transition-colors'>
+            <a
+              href='/terms'
+              className='text-gray-400 hover:text-white text-xs sm:text-sm transition-colors'
+            >
               Terms of Service
             </a>
           </div>

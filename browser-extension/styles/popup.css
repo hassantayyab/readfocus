@@ -52,10 +52,11 @@ body {
 }
 
 .logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
   flex-shrink: 0;
+  object-fit: contain;
 }
 
 .header-text h1 {

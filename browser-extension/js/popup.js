@@ -671,22 +671,21 @@ class KuiqleePopup {
     try {
       this.updateSummaryStatus('processing');
 
-      // Get user's summary display preference
-      const result = await chrome.storage.sync.get('summaryDisplayMode');
-      const displayMode = result.summaryDisplayMode || 'overlay';
+      // Always use overlay mode - sidepanel setting is hidden for now
+      const displayMode = 'overlay';
 
-      // If side panel mode, open it NOW while we have user gesture
-      if (displayMode === 'sidepanel') {
-        try {
-          // Get the current window ID
-          const currentWindow = await chrome.windows.getCurrent();
-          await chrome.sidePanel.open({ windowId: currentWindow.id });
+      // Side panel code commented out - always using overlay mode
+      // if (displayMode === 'sidepanel') {
+      //   try {
+      //     // Get the current window ID
+      //     const currentWindow = await chrome.windows.getCurrent();
+      //     await chrome.sidePanel.open({ windowId: currentWindow.id });
 
-          // Side panel opened successfully
-        } catch (error) {
-          console.error('[Popup] Error opening side panel:', error);
-        }
-      }
+      //     // Side panel opened successfully
+      //   } catch (error) {
+      //     console.error('[Popup] Error opening side panel:', error);
+      //   }
+      // }
 
       // Ensure content scripts are loaded
       await this.ensureContentScriptsInjected();
@@ -709,17 +708,8 @@ class KuiqleePopup {
       ]);
 
       if (response && response.success) {
-        if (displayMode === 'sidepanel') {
-          // For side panel, update status and close
-          this.updateSummaryStatus('ready');
-
-          setTimeout(() => {
-            window.close();
-          }, 500);
-        } else {
-          // For overlay, close immediately
-          window.close();
-        }
+        // Always use overlay mode - close immediately
+        window.close();
       } else {
         throw new Error(response?.error || 'Failed to get summary');
       }
