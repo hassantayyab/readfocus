@@ -72,22 +72,27 @@
 - [ ] Test email is working
 - [ ] Set up auto-responder (optional)
 
-### 4. Stripe Production Keys ⚠️
+### 4. Stripe Production Setup ⚠️
 
-**Required:** Switch from test to production keys
+**Required:** Configure production Stripe account and products
 
 - [ ] Create production Stripe account (if not already done)
+- [ ] **Create Products & Prices in Production:**
+  - [ ] Create "Monthly Plan" product in Stripe Dashboard
+  - [ ] Create "Annual Plan" product in Stripe Dashboard
+  - [ ] Set up recurring prices for each plan
+  - [ ] Copy the Price IDs (price_xxx...) for both plans
 - [ ] Get production API keys from Stripe Dashboard:
-  - [ ] Publishable key (pk*live*...)
-  - [ ] Secret key (sk*live*...)
+  - [ ] Secret key (sk*live*...) - **ONLY key needed (no publishable key required)**
   - [ ] Webhook endpoint secret (whsec\_...)
 - [ ] Update Vercel environment variables:
   - [ ] `STRIPE_SECRET_KEY` → production secret key
-  - [ ] `STRIPE_PUBLISHABLE_KEY` → production publishable key
+  - [ ] `STRIPE_PRICE_MONTHLY` → production monthly price ID
+  - [ ] `STRIPE_PRICE_ANNUAL` → production annual price ID
   - [ ] `STRIPE_WEBHOOK_SECRET` → production webhook secret
-- [ ] Update extension config with production publishable key
-- [ ] Test payment flow with real Stripe test card numbers
+  - [ ] `LANDING_PAGE_URL` → your production landing page URL
 - [ ] Set up production webhook endpoint in Stripe Dashboard
+- [ ] Test payment flow with real Stripe test card numbers
 - [ ] Verify webhook is receiving events correctly
 
 ### 5. Chrome Developer Account ⚠️
