@@ -72,7 +72,25 @@
 - [ ] Test email is working
 - [ ] Set up auto-responder (optional)
 
-### 4. Chrome Developer Account ⚠️
+### 4. Stripe Production Keys ⚠️
+
+**Required:** Switch from test to production keys
+
+- [ ] Create production Stripe account (if not already done)
+- [ ] Get production API keys from Stripe Dashboard:
+  - [ ] Publishable key (pk*live*...)
+  - [ ] Secret key (sk*live*...)
+  - [ ] Webhook endpoint secret (whsec\_...)
+- [ ] Update Vercel environment variables:
+  - [ ] `STRIPE_SECRET_KEY` → production secret key
+  - [ ] `STRIPE_PUBLISHABLE_KEY` → production publishable key
+  - [ ] `STRIPE_WEBHOOK_SECRET` → production webhook secret
+- [ ] Update extension config with production publishable key
+- [ ] Test payment flow with real Stripe test card numbers
+- [ ] Set up production webhook endpoint in Stripe Dashboard
+- [ ] Verify webhook is receiving events correctly
+
+### 5. Chrome Developer Account ⚠️
 
 **Required:** Pay $5 registration fee
 
@@ -103,14 +121,16 @@
 ### 6. API & Backend
 
 - [ ] Verify API is deployed on Vercel
+- [ ] **CRITICAL:** Ensure Stripe production keys are deployed to Vercel
 - [ ] Test all API endpoints:
   - [ ] `/api/auth` (login, register, verify)
   - [ ] `/api/stripe` (checkout, cancel, check, webhook)
   - [ ] `/api/smart-summarizer` (summary generation)
   - [ ] `/api/usage` (usage tracking)
-- [ ] Ensure environment variables are set on Vercel
+- [ ] Ensure ALL environment variables are set on Vercel (including production Stripe keys)
 - [ ] Test API error handling
 - [ ] Monitor API logs for errors
+- [ ] **CRITICAL:** Test payment flow end-to-end with production Stripe keys
 
 ### 7. Security & Privacy
 
@@ -277,11 +297,12 @@ https://*/*: Required to work on all HTTPS websites for content analysis
 
 ---
 
-## ✨ **The 3 Things You MUST Do Right Now:**
+## ✨ **The 4 Things You MUST Do Right Now:**
 
-1. **📸 Create 5 Screenshots** (2-3 hours)
-2. **🌐 Host Privacy Policy** (30 minutes)
-3. **📧 Set Up Support Email** (30 minutes)
+1. **💳 Configure Stripe Production Keys** (1-2 hours)
+2. **📸 Create 5 Screenshots** (2-3 hours)
+3. **🌐 Host Privacy Policy** (30 minutes)
+4. **📧 Set Up Support Email** (30 minutes)
 
 **Then you can submit and launch within 24-48 hours!**
 
