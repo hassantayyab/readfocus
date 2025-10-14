@@ -20,20 +20,12 @@ class KuiqleePopup {
     this.isInitializing = true;
 
     try {
-      // Set initialization timeout
+      // Set initialization timeout (reduced from 3s to 2s)
       this.initTimeout = setTimeout(() => {
         this.showBasicInterface();
-      }, 3000);
+      }, 2000);
 
-      // Initialize auth and usage managers
-      if (typeof authManager !== 'undefined') {
-        await authManager.initialize();
-      }
-      if (typeof usageTracker !== 'undefined') {
-        await usageTracker.initialize();
-      }
-
-      // Get current tab
+      // Get current tab first (fast operation)
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tabs.length) {
         throw new Error('No active tab found');
@@ -55,24 +47,30 @@ class KuiqleePopup {
       // Initialize feedback modal
       this.initializeFeedbackModal();
 
-      // Update auth and usage UI
+      // OPTIMIZATION: Load preloaded data immediately for instant UI updates
+      await this.loadPreloadedData();
+
+      // Update UI optimistically based on preloaded data
       this.updateAuthUI();
       this.updateUsageUI();
 
-      // Check API status (may reference non-existent elements, handle gracefully)
+      // Check API status (fast operation)
       await this.checkApiStatus();
 
-      // Check summary status with timeout
+      // Check summary status with shorter timeout
       await Promise.race([
         this.checkSummaryStatus(),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Summary status check timeout')), 3000),
+          setTimeout(() => reject(new Error('Summary status check timeout')), 1500),
         ),
       ]).catch(() => {
         // Default to ready, but try again after a short delay
         this.updateSummaryStatus('ready');
-        setTimeout(() => this.checkSummaryStatus(), 500);
+        setTimeout(() => this.checkSummaryStatus(), 300);
       });
+
+      // Initialize managers in background (non-blocking)
+      this.initializeManagersInBackground();
 
       if (this.initTimeout) {
         clearTimeout(this.initTimeout);
@@ -87,6 +85,71 @@ class KuiqleePopup {
         clearTimeout(this.initTimeout);
         this.initTimeout = null;
       }
+    }
+  }
+
+  /**
+   * Load preloaded data from background script for instant UI updates
+   */
+  async loadPreloadedData() {
+    try {
+      const result = await chrome.storage.local.get('kuiqlee_preloaded_data');
+      const preloadedData = result.kuiqlee_preloaded_data;
+
+      if (!preloadedData || !preloadedData.ready) {
+        // No preloaded data available, will fall back to normal initialization
+        return;
+      }
+
+      // Apply preloaded auth data if available
+      if (preloadedData.auth && preloadedData.auth.valid) {
+        // Update auth manager with preloaded data
+        if (typeof authManager !== 'undefined') {
+          authManager.token = preloadedData.auth.token;
+          authManager.currentUser = preloadedData.auth.user;
+          authManager.initialized = true;
+        }
+      }
+
+      // Apply preloaded usage data if available
+      if (preloadedData.usage && typeof usageTracker !== 'undefined') {
+        usageTracker.cachedUsage = {
+          ...preloadedData.usage,
+          timestamp: preloadedData.timestamp,
+        };
+        usageTracker.lastSync = preloadedData.timestamp;
+      }
+    } catch (error) {
+      console.error('Error loading preloaded data:', error);
+      // Continue with normal initialization
+    }
+  }
+
+  /**
+   * Initialize managers in background (non-blocking)
+   */
+  async initializeManagersInBackground() {
+    try {
+      // Initialize auth and usage managers in background
+      const initPromises = [];
+
+      if (typeof authManager !== 'undefined' && !authManager.initialized) {
+        initPromises.push(authManager.initialize());
+      }
+
+      if (typeof usageTracker !== 'undefined') {
+        initPromises.push(usageTracker.initialize());
+      }
+
+      // Wait for initialization to complete, then update UI
+      await Promise.allSettled(initPromises);
+
+      // Update UI with fresh data after background initialization
+      this.updateAuthUI();
+      this.updateUsageUI();
+    } catch (error) {
+      console.error('Error in background manager initialization:', error);
+      // UI was already updated optimistically, so this is non-critical
     }
   }
 
@@ -774,9 +837,37 @@ class KuiqleePopup {
     if (generateBtn) {
       const isProcessing = status === 'processing';
 
-      // Check authentication first
-      const isAuthenticated = authManager && authManager.isAuthenticated();
+      // OPTIMIZATION: Check authentication with fallback to preloaded data
+      let isAuthenticated = false;
+      let isPremium = false;
+      let hasUsageRemaining = false;
 
+      if (authManager && authManager.isAuthenticated()) {
+        // Use auth manager data if available
+        isAuthenticated = true;
+        isPremium = authManager.isPremium();
+        const stats = usageTracker ? usageTracker.getUsageStats() : { remaining: 0 };
+        hasUsageRemaining = isPremium || stats.remaining > 0;
+      } else {
+        // Fallback to preloaded data for instant UI updates
+        try {
+          const preloadedResult = chrome.storage.local.get('kuiqlee_preloaded_data');
+          preloadedResult.then((result) => {
+            const preloadedData = result.kuiqlee_preloaded_data;
+            if (preloadedData && preloadedData.auth && preloadedData.auth.valid) {
+              isAuthenticated = true;
+              isPremium = preloadedData.usage ? preloadedData.usage.isPremium : false;
+              hasUsageRemaining =
+                isPremium || (preloadedData.usage ? preloadedData.usage.remaining > 0 : true);
+              this.updateSummaryStatus(status); // Recursive call with updated data
+            }
+          });
+        } catch (error) {
+          // Ignore errors, continue with current logic
+        }
+      }
+
+      // Set button state based on authentication and usage
       if (!isAuthenticated) {
         // Not logged in - show login prompt
         generateBtn.disabled = false;
@@ -784,10 +875,6 @@ class KuiqleePopup {
         generateBtn.title = 'Sign in to use AI summaries';
       } else {
         // Logged in - check usage limits
-        const isPremium = authManager.isPremium();
-        const stats = usageTracker ? usageTracker.getUsageStats() : { remaining: 0 };
-        const hasUsageRemaining = isPremium || stats.remaining > 0;
-
         // Only enable if processing OR has usage remaining
         generateBtn.disabled = isProcessing ? true : !hasUsageRemaining;
 
@@ -904,10 +991,34 @@ class KuiqleePopup {
 
     authStatusDiv.style.display = 'flex';
 
-    if (typeof authManager !== 'undefined' && authManager.isAuthenticated()) {
-      const user = authManager.getUser();
-      const isPremium = authManager.isPremium();
+    // OPTIMIZATION: Check auth manager first, then fallback to preloaded data
+    let isAuthenticated = false;
+    let user = null;
+    let isPremium = false;
 
+    if (typeof authManager !== 'undefined' && authManager.isAuthenticated()) {
+      isAuthenticated = true;
+      user = authManager.getUser();
+      isPremium = authManager.isPremium();
+    } else {
+      // Fallback to preloaded data for instant UI updates
+      try {
+        const preloadedResult = chrome.storage.local.get('kuiqlee_preloaded_data');
+        preloadedResult.then((result) => {
+          const preloadedData = result.kuiqlee_preloaded_data;
+          if (preloadedData && preloadedData.auth && preloadedData.auth.valid) {
+            isAuthenticated = true;
+            user = preloadedData.auth.user;
+            isPremium = preloadedData.usage ? preloadedData.usage.isPremium : false;
+            this.updateAuthUI(); // Recursive call with updated data
+          }
+        });
+      } catch (error) {
+        // Ignore errors, continue with current logic
+      }
+    }
+
+    if (isAuthenticated && user) {
       authEmailSpan.textContent = user.email || 'Signed in';
 
       // Hide the auth button when signed in (sign out is in menu now)
@@ -947,15 +1058,38 @@ class KuiqleePopup {
 
     if (!usageStatusDiv || !usageText || !upgradeButton) return;
 
-    if (typeof authManager !== 'undefined' && typeof usageTracker !== 'undefined') {
-      // Check if authenticated
-      if (!authManager.isAuthenticated()) {
-        usageStatusDiv.style.display = 'none';
-        return;
-      }
+    // OPTIMIZATION: Check auth and usage with fallback to preloaded data
+    let isAuthenticated = false;
+    let isPremium = false;
+    let stats = null;
 
+    if (typeof authManager !== 'undefined' && typeof usageTracker !== 'undefined') {
+      isAuthenticated = authManager.isAuthenticated();
+      if (isAuthenticated) {
+        isPremium = authManager.isPremium();
+        stats = usageTracker.getUsageStats();
+      }
+    } else {
+      // Fallback to preloaded data for instant UI updates
+      try {
+        const preloadedResult = chrome.storage.local.get('kuiqlee_preloaded_data');
+        preloadedResult.then((result) => {
+          const preloadedData = result.kuiqlee_preloaded_data;
+          if (preloadedData && preloadedData.auth && preloadedData.auth.valid) {
+            isAuthenticated = true;
+            isPremium = preloadedData.usage ? preloadedData.usage.isPremium : false;
+            stats = preloadedData.usage || { remaining: 0, limit: 3 };
+            this.updateUsageUI(); // Recursive call with updated data
+          }
+        });
+      } catch (error) {
+        // Ignore errors, continue with current logic
+      }
+    }
+
+    if (isAuthenticated) {
       // Check if premium
-      if (authManager.isPremium()) {
+      if (isPremium) {
         usageStatusDiv.style.display = 'none';
         // Enable button for premium users
         if (generateBtn) {
@@ -967,21 +1101,30 @@ class KuiqleePopup {
       }
 
       // Show usage for free users
-      const stats = usageTracker.getUsageStats();
-      usageStatusDiv.style.display = 'flex';
-      usageText.textContent = usageTracker.getUsageDisplayText();
+      if (stats) {
+        usageStatusDiv.style.display = 'flex';
 
-      if (stats.remaining <= 0) {
-        // Keep button disabled
-        upgradeButton.style.display = 'inline-flex';
-      } else {
-        // Enable button - user has summaries remaining
-        upgradeButton.style.display = 'none';
-        if (generateBtn) {
-          generateBtn.disabled = false;
-          generateBtn.innerHTML = '<span class="button-icon">⚡</span>Start';
-          generateBtn.title = '';
+        // Display usage text
+        if (stats.remaining <= 0) {
+          usageText.textContent = 'Upgrade for unlimited';
+        } else {
+          usageText.textContent = `${stats.remaining}/${stats.limit} summaries left`;
         }
+
+        if (stats.remaining <= 0) {
+          // Keep button disabled
+          upgradeButton.style.display = 'inline-flex';
+        } else {
+          // Enable button - user has summaries remaining
+          upgradeButton.style.display = 'none';
+          if (generateBtn) {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = '<span class="button-icon">⚡</span>Start';
+            generateBtn.title = '';
+          }
+        }
+      } else {
+        usageStatusDiv.style.display = 'none';
       }
     } else {
       usageStatusDiv.style.display = 'none';

@@ -10,6 +10,9 @@ class KuiqleeBackground {
     // Ensure popup is enabled (not side panel) on startup
     await this.ensurePopupEnabled();
 
+    // Preload auth and usage data for faster popup initialization
+    await this.preloadUserData();
+
     // Handle extension installation
     chrome.runtime.onInstalled.addListener((details) => {
       this.handleInstallation(details);
@@ -32,6 +35,16 @@ class KuiqleeBackground {
     chrome.commands.onCommand.addListener((command) => {
       this.handleCommand(command);
     });
+
+    // Listen for tab changes to preload data for new pages
+    chrome.tabs.onActivated.addListener((activeInfo) => {
+      this.preloadUserData();
+    });
+
+    // Periodic refresh of user data (every 5 minutes)
+    setInterval(() => {
+      this.preloadUserData();
+    }, 5 * 60 * 1000);
   }
 
   async ensurePopupEnabled() {
@@ -320,6 +333,130 @@ class KuiqleeBackground {
       await this.saveSettings(settings);
     } catch (error) {
       console.error('Error setting default settings:', error);
+    }
+  }
+
+  /**
+   * Preload user authentication and usage data for faster popup initialization
+   * This runs in the background to cache data before the popup opens
+   */
+  async preloadUserData() {
+    try {
+      // Load auth data from storage
+      const authResult = await chrome.storage.local.get('kuiqlee_auth');
+      const authData = authResult.kuiqlee_auth;
+
+      if (!authData || !authData.token) {
+        // No auth data, mark as ready for anonymous usage
+        await chrome.storage.local.set({
+          kuiqlee_preloaded_data: {
+            auth: null,
+            usage: null,
+            timestamp: Date.now(),
+            ready: true,
+          },
+        });
+        return;
+      }
+
+      // Check if we have recent cached data (less than 1 minute old)
+      const cachedResult = await chrome.storage.local.get('kuiqlee_preloaded_data');
+      const cachedData = cachedResult.kuiqlee_preloaded_data;
+
+      if (cachedData && cachedData.timestamp && Date.now() - cachedData.timestamp < 60000) {
+        // Use cached data if it's fresh
+        return;
+      }
+
+      // Fetch fresh auth verification and usage data
+      const [authResponse, usageResponse] = await Promise.allSettled([
+        this.verifyAuthToken(authData.token),
+        this.fetchUsageData(authData.token),
+      ]);
+
+      // Store preloaded data
+      await chrome.storage.local.set({
+        kuiqlee_preloaded_data: {
+          auth: authResponse.status === 'fulfilled' ? authResponse.value : null,
+          usage: usageResponse.status === 'fulfilled' ? usageResponse.value : null,
+          timestamp: Date.now(),
+          ready: true,
+        },
+      });
+    } catch (error) {
+      console.error('Error preloading user data:', error);
+      // Mark as ready even if preloading fails
+      await chrome.storage.local.set({
+        kuiqlee_preloaded_data: {
+          auth: null,
+          usage: null,
+          timestamp: Date.now(),
+          ready: true,
+          error: error.message,
+        },
+      });
+    }
+  }
+
+  /**
+   * Verify auth token
+   */
+  async verifyAuthToken(token) {
+    try {
+      const response = await fetch('https://kuiqlee-api.vercel.app/api/auth?action=verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success && data.valid) {
+        return {
+          valid: true,
+          user: data.user,
+          token: token,
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error verifying auth token:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch usage data
+   */
+  async fetchUsageData(token) {
+    try {
+      const response = await fetch('https://kuiqlee-api.vercel.app/api/usage?action=check', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        return {
+          isPremium: data.isPremium,
+          unlimited: data.unlimited,
+          used: data.used,
+          remaining: data.remaining,
+          limit: data.limit,
+          domains: data.domains || [],
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error fetching usage data:', error);
+      return null;
     }
   }
 
