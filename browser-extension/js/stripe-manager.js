@@ -151,11 +151,21 @@ class StripeManager {
           // Clear pending checkout
           await chrome.storage.local.remove('kuiqlee_pending_checkout');
 
+          // Clear preloaded data cache to force fresh data fetch
+          await chrome.storage.local.remove('kuiqlee_preloaded_data');
+
           // Show success notification
           this.showSubscriptionSuccessNotification();
 
           // Refresh usage tracker
           await usageTracker.forceRefresh();
+
+          // Notify background script to refresh data
+          try {
+            await chrome.runtime.sendMessage({ type: 'PREMIUM_STATUS_UPDATED' });
+          } catch (error) {
+            console.log('Background script not available for notification');
+          }
 
           return;
         }
@@ -261,6 +271,9 @@ class StripeManager {
 
       console.log('✅ Subscription canceled successfully');
 
+      // Clear preloaded data cache to force fresh data fetch
+      await chrome.storage.local.remove('kuiqlee_preloaded_data');
+
       // Refresh user data to reflect cancellation
       await authManager.refreshUserData();
 
@@ -279,6 +292,47 @@ class StripeManager {
       return { success: true, data };
     } catch (error) {
       console.error('❌ Error canceling subscription:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Handle resubscription (when user reactivates a canceled subscription)
+   */
+  async handleResubscription() {
+    try {
+      console.log('🔄 Handling resubscription...');
+
+      // Clear all cached data to force fresh fetch
+      await chrome.storage.local.remove('kuiqlee_preloaded_data');
+      await chrome.storage.local.remove('kuiqlee_pending_checkout');
+
+      // Refresh user data to get latest subscription status
+      const result = await authManager.refreshUserData();
+
+      if (result.success && result.user?.isPremium) {
+        console.log('✅ Resubscription successful!');
+
+        // Refresh usage tracker
+        await usageTracker.forceRefresh();
+
+        // Show success notification
+        this.showSubscriptionSuccessNotification();
+
+        // Notify background script to refresh data
+        try {
+          await chrome.runtime.sendMessage({ type: 'PREMIUM_STATUS_UPDATED' });
+        } catch (error) {
+          console.log('Background script not available for notification');
+        }
+
+        return { success: true };
+      } else {
+        console.log('⚠️ Resubscription not yet reflected in user data');
+        return { success: false, message: 'Subscription status not yet updated' };
+      }
+    } catch (error) {
+      console.error('❌ Error handling resubscription:', error);
       throw error;
     }
   }

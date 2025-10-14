@@ -608,6 +608,62 @@ Usage Statistics:
   }
 
   /**
+   * Check for recent subscription updates on page load
+   */
+  async checkForSubscriptionUpdates() {
+    try {
+      // Check if we have a pending checkout or recent subscription update
+      const pendingCheckout = await chrome.storage.local.get('kuiqlee_pending_checkout');
+      const preloadedData = await chrome.storage.local.get('kuiqlee_preloaded_data');
+
+      // If there's a pending checkout, check if it's been completed
+      if (pendingCheckout.kuiqlee_pending_checkout) {
+        console.log('🔄 Checking for completed checkout...');
+
+        // Try to refresh user data to see if subscription was activated
+        if (typeof authManager !== 'undefined' && authManager.isAuthenticated()) {
+          const result = await authManager.refreshUserData();
+
+          if (result.success && result.user?.isPremium) {
+            console.log('✅ Subscription activated! Clearing pending checkout.');
+
+            // Clear pending checkout
+            await chrome.storage.local.remove('kuiqlee_pending_checkout');
+
+            // Clear preloaded data cache
+            await chrome.storage.local.remove('kuiqlee_preloaded_data');
+
+            // Refresh the account UI
+            await this.updateAccountUI();
+
+            // Show success notification
+            alert('🎉 Welcome to Premium! Your subscription has been activated.');
+          }
+        }
+      }
+
+      // If preloaded data is stale (older than 5 minutes), refresh it
+      if (
+        preloadedData.kuiqlee_preloaded_data &&
+        preloadedData.kuiqlee_preloaded_data.timestamp &&
+        Date.now() - preloadedData.kuiqlee_preloaded_data.timestamp > 300000
+      ) {
+        console.log('🔄 Refreshing stale subscription data...');
+
+        // Clear stale data and refresh
+        await chrome.storage.local.remove('kuiqlee_preloaded_data');
+
+        if (typeof authManager !== 'undefined' && authManager.isAuthenticated()) {
+          await authManager.refreshUserData();
+          await this.updateAccountUI();
+        }
+      }
+    } catch (error) {
+      console.error('Error checking for subscription updates:', error);
+    }
+  }
+
+  /**
    * Get subscription info from Stripe
    */
   async getSubscriptionInfo() {
@@ -693,16 +749,68 @@ Usage Statistics:
   }
 
   /**
-   * Handle upgrade to premium action
+   * Handle upgrade to premium action (including resubscription)
    */
-  handleUpgrade() {
-    chrome.tabs.create({ url: chrome.runtime.getURL('upgrade.html') });
+  async handleUpgrade() {
+    try {
+      // Check if user has a canceled subscription that needs resubscription
+      const subscriptionInfo = await this.getSubscriptionInfo();
+      const isCanceled = subscriptionInfo?.cancelAtPeriodEnd;
+
+      if (isCanceled) {
+        // This is a resubscription - handle it specially
+        console.log('🔄 Handling resubscription...');
+
+        // Show loading state
+        const upgradeBtn = document.getElementById('upgrade-premium-btn');
+        if (upgradeBtn) {
+          const originalText = upgradeBtn.textContent;
+          upgradeBtn.textContent = 'Processing...';
+          upgradeBtn.disabled = true;
+        }
+
+        try {
+          // Use Stripe manager to handle resubscription
+          if (typeof stripeManager !== 'undefined') {
+            await stripeManager.handleResubscription();
+
+            // Refresh the account UI to show updated status
+            await this.updateAccountUI();
+
+            // Show success message
+            alert('🎉 Resubscription successful! Your premium access has been restored.');
+          } else {
+            // Fallback to opening upgrade page
+            chrome.tabs.create({ url: chrome.runtime.getURL('upgrade.html') });
+          }
+        } catch (error) {
+          console.error('Error handling resubscription:', error);
+          alert('Failed to process resubscription. Please try again or contact support.');
+        } finally {
+          // Restore button state
+          if (upgradeBtn) {
+            upgradeBtn.textContent = 'Resubscribe';
+            upgradeBtn.disabled = false;
+          }
+        }
+      } else {
+        // Regular upgrade flow
+        chrome.tabs.create({ url: chrome.runtime.getURL('upgrade.html') });
+      }
+    } catch (error) {
+      console.error('Error in handleUpgrade:', error);
+      // Fallback to opening upgrade page
+      chrome.tabs.create({ url: chrome.runtime.getURL('upgrade.html') });
+    }
   }
 }
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  new KuiqleeOptions();
+document.addEventListener('DOMContentLoaded', async () => {
+  const options = new KuiqleeOptions();
+
+  // Check for recent subscription updates on page load
+  await options.checkForSubscriptionUpdates();
 });
 
 // Export for testing

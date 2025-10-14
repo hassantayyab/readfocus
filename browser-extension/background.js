@@ -175,10 +175,16 @@ class KuiqleeBackground {
         priority: 2,
       });
 
+      // Clear preloaded data cache to force fresh data fetch
+      await chrome.storage.local.remove('kuiqlee_preloaded_data');
+
       // Refresh auth manager state by verifying token
       if (typeof authManager !== 'undefined' && authManager.isAuthenticated()) {
         await authManager.verifyToken();
       }
+
+      // Preload fresh data immediately
+      await this.preloadUserData();
 
       sendResponse({ success: true });
     } catch (error) {
