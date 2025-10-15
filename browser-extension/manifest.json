@@ -2,7 +2,10 @@
   "manifest_version": 3,
   "name": "Kuiqlee",
   "version": "1.0.0",
-  "description": "AI-powered content analyzer that transforms any webpage into quick, understandable summaries with key points, explanations, and action items",
+  "description": "AI-powered content analyzer that transforms any webpage into quick, understandable summaries with key points and action items",
+  "author": "Kuiqlee Team",
+  "homepage_url": "https://kuiqlee.com",
+  "minimum_chrome_version": "88",
 
   "permissions": [
     "activeTab",
@@ -96,5 +99,9 @@
       "resources": ["icons/*", "auth.html", "upgrade.html", "popup.html", "sidepanel.html"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
 }
