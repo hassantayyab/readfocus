@@ -1,5 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import { ReactNode } from 'react';
 
 interface ButtonProps {
@@ -11,6 +12,9 @@ interface ButtonProps {
   disabled?: boolean;
   type?: 'button' | 'submit' | 'reset';
   style?: React.CSSProperties;
+  href?: string;
+  target?: string;
+  rel?: string;
 }
 
 const Button = ({
@@ -22,10 +26,13 @@ const Button = ({
   disabled = false,
   type = 'button',
   style,
+  href,
+  target,
+  rel,
   ...props
 }: ButtonProps) => {
   const baseClasses =
-    'font-semibold transition-colors duration-200 cursor-pointer border-0 outline-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black';
+    'font-semibold transition-colors duration-200 cursor-pointer border-0 outline-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black inline-block text-center';
 
   const variants = {
     primary: 'text-white hover:shadow bg-gray-800 hover:bg-gray-900',
@@ -43,15 +50,43 @@ const Button = ({
 
   const disabledClasses = 'opacity-50 cursor-not-allowed';
 
+  const combinedClassName = cn(
+    baseClasses,
+    variants[variant],
+    sizes[size],
+    disabled && disabledClasses,
+    className,
+  );
+
+  // If href is provided, render as a link
+  if (href) {
+    // External link
+    if (href.startsWith('http')) {
+      return (
+        <a
+          href={href}
+          target={target || '_blank'}
+          rel={rel || 'noopener noreferrer'}
+          className={combinedClassName}
+          style={style}
+          {...props}
+        >
+          {children}
+        </a>
+      );
+    }
+    // Internal link
+    return (
+      <Link href={href} className={combinedClassName} style={style} {...props}>
+        {children}
+      </Link>
+    );
+  }
+
+  // Render as button
   return (
     <button
-      className={cn(
-        baseClasses,
-        variants[variant],
-        sizes[size],
-        disabled && disabledClasses,
-        className,
-      )}
+      className={combinedClassName}
       onClick={onClick}
       disabled={disabled}
       type={type}

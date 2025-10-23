@@ -1,6 +1,7 @@
 'use client';
 import Button from '@/components/ui/button';
 import { fadeInUp, staggerContainer, staggerItem, viewportOnce } from '@/lib/animations';
+import { CHROME_EXTENSION_URL } from '@/lib/constants';
 import { motion } from 'framer-motion';
 
 const Pricing = () => {
@@ -93,6 +94,7 @@ const Pricing = () => {
                 variant='primary'
                 size='lg'
                 className='w-full mb-3 sm:mb-4 text-sm sm:text-base'
+                href={CHROME_EXTENSION_URL}
               >
                 Add to Chrome - Free
               </Button>

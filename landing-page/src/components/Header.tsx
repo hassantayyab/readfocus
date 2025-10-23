@@ -1,5 +1,6 @@
 'use client';
 import Button from '@/components/ui/button';
+import { CHROME_EXTENSION_URL } from '@/lib/constants';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -48,7 +49,12 @@ const Header = () => {
           </nav>
 
           <div className='flex items-center space-x-2 sm:space-x-4'>
-            <Button variant='primary' size='md' className='text-sm sm:text-base px-3 sm:px-4'>
+            <Button
+              variant='primary'
+              size='md'
+              className='text-sm sm:text-base px-3 sm:px-4'
+              href={CHROME_EXTENSION_URL}
+            >
               Add to Chrome
             </Button>
           </div>

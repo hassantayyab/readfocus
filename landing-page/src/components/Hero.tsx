@@ -1,6 +1,7 @@
 'use client';
 import Button from '@/components/ui/button';
 import { fadeInUp, slideInRight, staggerContainer, staggerItem } from '@/lib/animations';
+import { CHROME_EXTENSION_URL, DEMO_VIDEO_URL } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -54,10 +55,20 @@ const Hero = () => {
               variants={staggerItem}
               className='flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-8 sm:mb-12'
             >
-              <Button variant='primary' size='lg' className='text-sm sm:text-base lg:text-lg'>
+              <Button
+                variant='primary'
+                size='lg'
+                className='text-sm sm:text-base lg:text-lg'
+                href={CHROME_EXTENSION_URL}
+              >
                 Add to Chrome - Free
               </Button>
-              <Button variant='outline' size='lg' className='text-sm sm:text-base lg:text-lg'>
+              <Button
+                variant='outline'
+                size='lg'
+                className='text-sm sm:text-base lg:text-lg'
+                href={DEMO_VIDEO_URL}
+              >
                 Watch Demo
               </Button>
             </motion.div>
