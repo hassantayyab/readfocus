@@ -142,18 +142,23 @@ class KuiqleeContentScript {
         return;
       }
 
+      // Set flag BEFORE starting generation to prevent race conditions
       this.isGeneratingSummary = true;
 
       // Generate summary in background
-      await this.summaryService.generateSummary({
+      const result = await this.summaryService.generateSummary({
         includeKeyPoints: true,
         includeQuickSummary: true,
         includeDetailedSummary: true,
         includeActionItems: true,
       });
+
+      // Only clear flag if generation actually completed
+      if (result && result.success) {
+        this.isGeneratingSummary = false;
+      }
     } catch (error) {
       console.error('Background generation error:', error);
-    } finally {
       this.isGeneratingSummary = false;
     }
   }
@@ -286,36 +291,49 @@ class KuiqleeContentScript {
           break;
 
         case 'GENERATE_SUMMARY':
-          // Initialize summary service if needed
-          if (!this.summaryService) {
-            const initialized = await this.initializeSummaryService();
-            if (!initialized) {
-              sendResponse({ success: false, error: 'Failed to initialize summary service' });
-              break;
+          try {
+            // Set generating flag to prevent race conditions
+            this.isGeneratingSummary = true;
+
+            // Initialize summary service if needed
+            if (!this.summaryService) {
+              const initialized = await this.initializeSummaryService();
+              if (!initialized) {
+                this.isGeneratingSummary = false;
+                sendResponse({ success: false, error: 'Failed to initialize summary service' });
+                break;
+              }
             }
-          }
 
-          // Generate or get cached summary
-          const summaryResult = await this.summaryService.generateSummary(request.options);
+            // Generate or get cached summary
+            const summaryResult = await this.summaryService.generateSummary(request.options);
 
-          if (summaryResult.success) {
-            // Check display mode from request
-            const displayMode = request.displayMode || 'overlay';
+            // Clear generating flag on success
+            if (summaryResult.success) {
+              this.isGeneratingSummary = false;
 
-            if (displayMode === 'sidepanel') {
-              // Store summary in storage for side panel to pick up
-              await chrome.storage.local.set({
-                currentSummary: summaryResult,
-                summaryTimestamp: Date.now(),
-              });
-              sendResponse({ success: true, displayMode: 'sidepanel' });
+              // Check display mode from request
+              const displayMode = request.displayMode || 'overlay';
+
+              if (displayMode === 'sidepanel') {
+                // Store summary in storage for side panel to pick up
+                await chrome.storage.local.set({
+                  currentSummary: summaryResult,
+                  summaryTimestamp: Date.now(),
+                });
+                sendResponse({ success: true, displayMode: 'sidepanel' });
+              } else {
+                // Show the summary overlay on page
+                await this.showSummaryOverlay(summaryResult);
+                sendResponse(summaryResult);
+              }
             } else {
-              // Show the summary overlay on page
-              await this.showSummaryOverlay(summaryResult);
+              this.isGeneratingSummary = false;
               sendResponse(summaryResult);
             }
-          } else {
-            sendResponse(summaryResult);
+          } catch (error) {
+            this.isGeneratingSummary = false;
+            sendResponse({ success: false, error: error.message });
           }
           break;
 
@@ -359,21 +377,42 @@ class KuiqleeContentScript {
           let exists = false;
           let isGenerating = false;
 
-          // Check if summary service has cached summary
-          if (this.summaryService) {
-            exists = await this.summaryService.hasSummaryForCurrentPage();
-            isGenerating = this.summaryService.isActivelyGenerating();
-          }
+          try {
+            // Initialize summary service if needed
+            if (!this.summaryService) {
+              const initialized = await this.initializeSummaryService();
+              // If initialization fails, just report current state
+              if (!initialized) {
+                sendResponse({
+                  exists: false,
+                  isGenerating: this.isGeneratingSummary,
+                });
+                break;
+              }
+            }
 
-          // Also check background generation state
-          if (this.isGeneratingSummary) {
-            isGenerating = true;
-          }
+            // Check if summary service has cached summary
+            if (this.summaryService) {
+              exists = await this.summaryService.hasSummaryForCurrentPage();
+              isGenerating = this.summaryService.isActivelyGenerating();
+            }
 
-          sendResponse({
-            exists: exists,
-            isGenerating: isGenerating,
-          });
+            // Also check background generation state (takes priority)
+            if (this.isGeneratingSummary) {
+              isGenerating = true;
+            }
+
+            sendResponse({
+              exists: exists,
+              isGenerating: isGenerating,
+            });
+          } catch (error) {
+            console.error('Error checking summary status:', error);
+            sendResponse({
+              exists: false,
+              isGenerating: this.isGeneratingSummary,
+            });
+          }
           break;
 
         case 'PING':

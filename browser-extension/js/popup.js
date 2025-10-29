@@ -57,6 +57,9 @@ class KuiqleePopup {
       // Check API status (fast operation)
       await this.checkApiStatus();
 
+      // Wait a bit for content script to initialize properly
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
       // Check summary status with shorter timeout
       await Promise.race([
         this.checkSummaryStatus(),
@@ -66,7 +69,7 @@ class KuiqleePopup {
       ]).catch(() => {
         // Default to ready, but try again after a short delay
         this.updateSummaryStatus('ready');
-        setTimeout(() => this.checkSummaryStatus(), 300);
+        setTimeout(() => this.checkSummaryStatus(), 500);
       });
 
       // Initialize managers in background (non-blocking)
@@ -825,6 +828,9 @@ class KuiqleePopup {
       clearInterval(this.statusPolling);
       this.statusPolling = null;
     }
+
+    // Stop status polling interval
+    this.stopStatusPolling();
   }
 
   /**
@@ -880,12 +886,18 @@ class KuiqleePopup {
 
         if (isProcessing) {
           generateBtn.innerHTML = '<span class="button-icon">⏳</span>Processing...';
+          // Start polling for completion if not already polling
+          this.startStatusPolling();
         } else if (!hasUsageRemaining) {
           generateBtn.innerHTML = '<span class="button-icon">🚫</span>Limit Reached';
           generateBtn.title = 'Upgrade to Premium for unlimited summaries';
+          // Stop polling when not processing
+          this.stopStatusPolling();
         } else {
           generateBtn.innerHTML = '<span class="button-icon">⚡</span>Start';
           generateBtn.title = '';
+          // Stop polling when ready
+          this.stopStatusPolling();
         }
       }
     }
@@ -894,6 +906,31 @@ class KuiqleePopup {
     const showBtn = document.getElementById('show-summary');
     if (showBtn) {
       showBtn.style.display = 'none';
+    }
+  }
+
+  /**
+   * Start polling for status updates when processing
+   */
+  startStatusPolling() {
+    // Don't start multiple polling intervals
+    if (this.statusPollingInterval) {
+      return;
+    }
+
+    // Poll every 1 second for status updates
+    this.statusPollingInterval = setInterval(() => {
+      this.checkSummaryStatus();
+    }, 1000);
+  }
+
+  /**
+   * Stop status polling
+   */
+  stopStatusPolling() {
+    if (this.statusPollingInterval) {
+      clearInterval(this.statusPollingInterval);
+      this.statusPollingInterval = null;
     }
   }
 
@@ -914,13 +951,27 @@ class KuiqleePopup {
             }),
           ]);
 
-          if (response?.exists && !response.isGenerating) {
-            this.updateSummaryStatus('completed');
-            return;
-          } else if (response?.isGenerating) {
+          // If generating, always show processing state
+          if (response?.isGenerating) {
             this.updateSummaryStatus('processing');
             return;
           }
+
+          // If exists and not generating, show completed
+          if (response?.exists) {
+            this.updateSummaryStatus('completed');
+            return;
+          }
+
+          // If neither exists nor generating, check storage as fallback
+          // before showing ready state
+          const summaryExists = await this.checkSummaryExistsInStorage();
+          if (summaryExists) {
+            this.updateSummaryStatus('completed');
+          } else {
+            this.updateSummaryStatus('ready');
+          }
+          return;
         } catch (contentScriptError) {
           // Content script failed, fall through to direct storage check
         }

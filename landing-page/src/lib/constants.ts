@@ -4,5 +4,4 @@ export const CHROME_EXTENSION_URL =
   'https://chromewebstore.google.com/detail/kuiqlee/cgfkiemgfkpcglbiedhkfblppbaebjpk';
 
 // Demo video URL (optional)
-export const DEMO_VIDEO_URL = 'https://www.youtube.com/watch?v=YOUR_VIDEO_ID';
-
+export const DEMO_VIDEO_URL = 'https://youtu.be/BGnxcVVI2FU';
