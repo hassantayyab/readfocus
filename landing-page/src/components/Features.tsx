@@ -120,7 +120,7 @@ const Features = () => {
                 viewport={viewportOnce}
               >
                 {[
-                  { label: 'Summary', desc: 'Essential points in 2-3 sentences' },
+                  { label: 'TLDR', desc: 'Essential points in 2-3 sentences' },
                   { label: 'Detailed', desc: 'Comprehensive analysis with insights' },
                   { label: 'ELI15', desc: 'Complex concepts in simple terms' },
                   { label: 'Concepts', desc: 'Key terms and definitions explained' },
@@ -151,7 +151,7 @@ const Features = () => {
               <div className='bg-white rounded-xl sm:rounded-2xl shadow-xl border border-gray-200 overflow-hidden'>
                 <div className='flex border-b border-gray-200 overflow-x-auto scrollbar-hide'>
                   <div className='px-2 sm:px-3 lg:px-4 xl:px-6 py-2 sm:py-2.5 lg:py-3 font-medium text-[10px] sm:text-xs lg:text-sm text-white bg-orange-500/90 whitespace-nowrap flex-shrink-0'>
-                    Summary
+                    TLDR
                   </div>
                   <div className='px-2 sm:px-3 lg:px-4 xl:px-6 py-2 sm:py-2.5 lg:py-3 text-gray-600 font-medium text-[10px] sm:text-xs lg:text-sm whitespace-nowrap flex-shrink-0'>
                     Detailed

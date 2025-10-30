@@ -30,7 +30,7 @@ class SidePanelSummaryRenderer {
           <button class="rf-summary-tab ${
             this.activeTab === 'quick' ? 'active' : ''
           }" data-tab="quick">
-            Summary
+            TLDR
           </button>
           <button class="rf-summary-tab ${
             this.activeTab === 'detailed' ? 'active' : ''
