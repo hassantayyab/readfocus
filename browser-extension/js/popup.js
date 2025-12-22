@@ -734,8 +734,6 @@ class KuiqleePopup {
    * Handle summarize button action - simplified flow
    */
   async handleSummarizeAction() {
-    console.log('🚀 [Popup] Starting summary generation...');
-    
     try {
       this.updateSummaryStatus('processing');
 
@@ -756,12 +754,9 @@ class KuiqleePopup {
       // }
 
       // Ensure content scripts are loaded
-      console.log('🔄 [Popup] Ensuring content scripts are injected...');
       await this.ensureContentScriptsInjected();
-      console.log('✅ [Popup] Content scripts ready');
 
       // Send request to content script with displayMode
-      console.log('📤 [Popup] Sending summary generation request...');
       const response = await Promise.race([
         chrome.tabs.sendMessage(this.currentTab.id, {
           type: 'GENERATE_SUMMARY',
@@ -778,29 +773,23 @@ class KuiqleePopup {
         }),
       ]);
 
-      console.log('📥 [Popup] Received response:', response);
-
       if (response && response.success) {
-        console.log('✅ [Popup] Summary generated successfully');
         // Always use overlay mode - close immediately
         window.close();
       } else if (response && response.requiresAuth) {
         // Handle authentication requirement
-        console.warn('⚠️ [Popup] Authentication required');
         this.updateSummaryStatus('ready');
         this.showErrorMessage('Please sign in to use Kuiqlee summaries.');
       } else if (response && response.limitReached) {
         // Handle limit reached
-        console.warn('⚠️ [Popup] Usage limit reached');
         this.updateSummaryStatus('ready');
         this.showErrorMessage('You have reached your free tier limit. Upgrade to Premium for unlimited summaries.');
       } else {
         const errorMessage = response?.error || 'Failed to generate summary. Please try again.';
-        console.error('❌ [Popup] Summary generation failed:', errorMessage);
         throw new Error(errorMessage);
       }
     } catch (error) {
-      console.error('❌ [Popup] Summarize action failed:', error);
+      console.error('Summarize action failed:', error);
       this.updateSummaryStatus('ready'); // Reset to ready instead of error
       
       // Show user-friendly error message
@@ -973,8 +962,6 @@ class KuiqleePopup {
    */
   async checkSummaryStatus() {
     try {
-      console.log('🔄 [Popup] Checking summary status...');
-      
       // First try to check content script
       const scriptsInjected = await this.checkContentScriptsInjected();
       if (scriptsInjected) {
@@ -987,24 +974,19 @@ class KuiqleePopup {
             }),
           ]);
 
-          console.log('📥 [Popup] Summary status response:', response);
-
           // If generating, always show processing state
           if (response?.isGenerating) {
-            console.log('⏳ [Popup] Summary is generating...');
             this.updateSummaryStatus('processing');
             return;
           }
 
           // If exists and not generating, show completed
           if (response?.exists) {
-            console.log('✅ [Popup] Summary exists');
             this.updateSummaryStatus('completed');
             return;
           }
           
           // Neither generating nor exists - show ready
-          console.log('🆕 [Popup] No summary, ready to generate');
           this.updateSummaryStatus('ready');
           return;
 
@@ -1019,22 +1001,17 @@ class KuiqleePopup {
           return;
         } catch (contentScriptError) {
           // Content script failed, fall through to direct storage check
-          console.warn('⚠️ [Popup] Content script status check failed:', contentScriptError.message);
         }
       }
 
       // Fallback: Check local storage directly
-      console.log('📦 [Popup] Checking storage directly...');
       const summaryExists = await this.checkSummaryExistsInStorage();
       if (summaryExists) {
-        console.log('✅ [Popup] Summary found in storage');
         this.updateSummaryStatus('completed');
       } else {
-        console.log('🆕 [Popup] No summary in storage, ready');
         this.updateSummaryStatus('ready');
       }
     } catch (error) {
-      console.error('❌ [Popup] Status check error:', error);
       this.updateSummaryStatus('ready');
     }
   }

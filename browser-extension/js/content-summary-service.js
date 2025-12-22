@@ -19,102 +19,55 @@ class ContentSummaryService {
    * Initialize the summary service
    */
   async initialize() {
-    console.log('🔄 [ContentSummaryService] Starting initialization...');
-
     try {
       // Check if ProxyAIClient is available
       if (typeof ProxyAIClient === 'undefined') {
-        console.error('❌ [ContentSummaryService] ProxyAIClient not available');
         throw new Error('ProxyAIClient not available. Make sure proxy-ai-client.js is loaded.');
       }
-      console.log('✅ [ContentSummaryService] ProxyAIClient available');
 
       // Check if ContentAnalyzer is available
       if (typeof ContentAnalyzer === 'undefined') {
-        console.error('❌ [ContentSummaryService] ContentAnalyzer not available');
         throw new Error('ContentAnalyzer not available. Make sure content-analyzer.js is loaded.');
       }
-      console.log('✅ [ContentSummaryService] ContentAnalyzer available');
 
       // Check if AIPromptBuilder is available
       if (typeof AIPromptBuilder === 'undefined') {
-        console.error('❌ [ContentSummaryService] AIPromptBuilder not available');
         throw new Error('AIPromptBuilder not available. Make sure ai-prompt-builder.js is loaded.');
       }
-      console.log('✅ [ContentSummaryService] AIPromptBuilder available');
 
       // Initialize auth manager if available (with error handling)
       if (typeof authManager !== 'undefined') {
         try {
           await authManager.initialize();
-          console.log('✅ [ContentSummaryService] Auth manager initialized');
         } catch (authError) {
-          console.warn(
-            '⚠️ [ContentSummaryService] Auth manager initialization failed:',
-            authError.message,
-          );
           // Continue anyway - auth is not critical for initialization
         }
-      } else {
-        console.warn('⚠️ [ContentSummaryService] authManager not available');
       }
 
       // Initialize usage tracker if available (with error handling)
       if (typeof usageTracker !== 'undefined') {
         try {
           await usageTracker.initialize();
-          console.log('✅ [ContentSummaryService] Usage tracker initialized');
         } catch (usageError) {
-          console.warn(
-            '⚠️ [ContentSummaryService] Usage tracker initialization failed:',
-            usageError.message,
-          );
           // Continue anyway - usage tracking is not critical for initialization
         }
-      } else {
-        console.warn('⚠️ [ContentSummaryService] usageTracker not available');
       }
 
       // Initialize Proxy AI client (no API key needed)
-      try {
-        this.aiClient = new ProxyAIClient();
-        await this.aiClient.initialize();
-        console.log('✅ [ContentSummaryService] Proxy AI client initialized');
-      } catch (aiError) {
-        console.error('❌ [ContentSummaryService] Proxy AI client initialization failed:', aiError);
-        throw new Error(`Proxy AI client initialization failed: ${aiError.message}`);
-      }
+      this.aiClient = new ProxyAIClient();
+      await this.aiClient.initialize();
 
       // Initialize content analyzer
-      try {
-        this.contentAnalyzer = new ContentAnalyzer();
-        console.log('✅ [ContentSummaryService] Content analyzer initialized');
-      } catch (analyzerError) {
-        console.error(
-          '❌ [ContentSummaryService] Content analyzer initialization failed:',
-          analyzerError,
-        );
-        throw new Error(`Content analyzer initialization failed: ${analyzerError.message}`);
-      }
+      this.contentAnalyzer = new ContentAnalyzer();
 
       // Initialize prompt builder
-      try {
-        this.promptBuilder = new AIPromptBuilder();
-        console.log('✅ [ContentSummaryService] Prompt builder initialized');
-      } catch (promptError) {
-        console.error(
-          '❌ [ContentSummaryService] Prompt builder initialization failed:',
-          promptError,
-        );
-        throw new Error(`Prompt builder initialization failed: ${promptError.message}`);
-      }
+      this.promptBuilder = new AIPromptBuilder();
 
       this.initialized = true;
-      console.log('✅ [ContentSummaryService] Initialization complete!');
 
       return { success: true };
     } catch (error) {
-      console.error('❌ [ContentSummaryService] Failed to initialize summary service:', error);
+      console.error('Failed to initialize summary service:', error);
       this.initialized = false;
       throw new Error(`Summary service initialization failed: ${error.message}`);
     }

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Kuiqlee",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered content analyzer that transforms any webpage into quick, understandable summaries with key points and action items",
   "author": "Kuiqlee Team",
   "homepage_url": "https://kuiqlee.com",
