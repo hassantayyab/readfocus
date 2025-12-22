@@ -75,7 +75,7 @@ const Hero = () => {
                 <div className='relative w-full' style={{ paddingBottom: '56.25%' }}>
                   <iframe
                     className='absolute top-0 left-0 w-full h-full rounded-lg'
-                    src='https://www.youtube.com/embed/BGnxcVVI2FU?controls=0&modestbranding=1&rel=0&showinfo=0&fs=0&iv_load_policy=3&autohide=1&loop=1&playlist=BGnxcVVI2FU'
+                    src='https://www.youtube.com/embed/df3O7DmV-pE?controls=0&modestbranding=1&rel=0&showinfo=0&fs=0&iv_load_policy=3&autohide=1&loop=1&playlist=df3O7DmV-pE'
                     title='Kuiqlee Demo Video'
                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
                   ></iframe>
