@@ -19,42 +19,102 @@ class ContentSummaryService {
    * Initialize the summary service
    */
   async initialize() {
+    console.log('🔄 [ContentSummaryService] Starting initialization...');
+
     try {
       // Check if ProxyAIClient is available
       if (typeof ProxyAIClient === 'undefined') {
+        console.error('❌ [ContentSummaryService] ProxyAIClient not available');
         throw new Error('ProxyAIClient not available. Make sure proxy-ai-client.js is loaded.');
       }
+      console.log('✅ [ContentSummaryService] ProxyAIClient available');
+
+      // Check if ContentAnalyzer is available
+      if (typeof ContentAnalyzer === 'undefined') {
+        console.error('❌ [ContentSummaryService] ContentAnalyzer not available');
+        throw new Error('ContentAnalyzer not available. Make sure content-analyzer.js is loaded.');
+      }
+      console.log('✅ [ContentSummaryService] ContentAnalyzer available');
 
       // Check if AIPromptBuilder is available
       if (typeof AIPromptBuilder === 'undefined') {
+        console.error('❌ [ContentSummaryService] AIPromptBuilder not available');
         throw new Error('AIPromptBuilder not available. Make sure ai-prompt-builder.js is loaded.');
       }
+      console.log('✅ [ContentSummaryService] AIPromptBuilder available');
 
-      // Initialize auth manager if available
+      // Initialize auth manager if available (with error handling)
       if (typeof authManager !== 'undefined') {
-        await authManager.initialize();
+        try {
+          await authManager.initialize();
+          console.log('✅ [ContentSummaryService] Auth manager initialized');
+        } catch (authError) {
+          console.warn(
+            '⚠️ [ContentSummaryService] Auth manager initialization failed:',
+            authError.message,
+          );
+          // Continue anyway - auth is not critical for initialization
+        }
+      } else {
+        console.warn('⚠️ [ContentSummaryService] authManager not available');
       }
 
-      // Initialize usage tracker if available
+      // Initialize usage tracker if available (with error handling)
       if (typeof usageTracker !== 'undefined') {
-        await usageTracker.initialize();
+        try {
+          await usageTracker.initialize();
+          console.log('✅ [ContentSummaryService] Usage tracker initialized');
+        } catch (usageError) {
+          console.warn(
+            '⚠️ [ContentSummaryService] Usage tracker initialization failed:',
+            usageError.message,
+          );
+          // Continue anyway - usage tracking is not critical for initialization
+        }
+      } else {
+        console.warn('⚠️ [ContentSummaryService] usageTracker not available');
       }
 
       // Initialize Proxy AI client (no API key needed)
-      this.aiClient = new ProxyAIClient();
-      await this.aiClient.initialize();
+      try {
+        this.aiClient = new ProxyAIClient();
+        await this.aiClient.initialize();
+        console.log('✅ [ContentSummaryService] Proxy AI client initialized');
+      } catch (aiError) {
+        console.error('❌ [ContentSummaryService] Proxy AI client initialization failed:', aiError);
+        throw new Error(`Proxy AI client initialization failed: ${aiError.message}`);
+      }
 
       // Initialize content analyzer
-      this.contentAnalyzer = new ContentAnalyzer();
+      try {
+        this.contentAnalyzer = new ContentAnalyzer();
+        console.log('✅ [ContentSummaryService] Content analyzer initialized');
+      } catch (analyzerError) {
+        console.error(
+          '❌ [ContentSummaryService] Content analyzer initialization failed:',
+          analyzerError,
+        );
+        throw new Error(`Content analyzer initialization failed: ${analyzerError.message}`);
+      }
 
       // Initialize prompt builder
-      this.promptBuilder = new AIPromptBuilder();
+      try {
+        this.promptBuilder = new AIPromptBuilder();
+        console.log('✅ [ContentSummaryService] Prompt builder initialized');
+      } catch (promptError) {
+        console.error(
+          '❌ [ContentSummaryService] Prompt builder initialization failed:',
+          promptError,
+        );
+        throw new Error(`Prompt builder initialization failed: ${promptError.message}`);
+      }
 
       this.initialized = true;
+      console.log('✅ [ContentSummaryService] Initialization complete!');
 
       return { success: true };
     } catch (error) {
-      console.error('Failed to initialize summary service:', error);
+      console.error('❌ [ContentSummaryService] Failed to initialize summary service:', error);
       this.initialized = false;
       throw new Error(`Summary service initialization failed: ${error.message}`);
     }
@@ -96,7 +156,8 @@ class ContentSummaryService {
         if (!usageCheck.canUse) {
           return {
             success: false,
-            error: 'You have reached your free tier limit. Upgrade to Premium for unlimited summaries.',
+            error:
+              'You have reached your free tier limit. Upgrade to Premium for unlimited summaries.',
             limitReached: true,
             used: usageCheck.used || 3,
             limit: 3,
@@ -199,7 +260,7 @@ class ContentSummaryService {
       const summaryResult = await this.generateMultiFormatSummary(
         analysisResult.processedContent,
         analysisResult.metadata,
-        summaryOptions
+        summaryOptions,
       );
 
       // Store the result permanently in local storage
@@ -303,7 +364,6 @@ class ContentSummaryService {
     }
   }
 
-
   /**
    * Parse and validate AI summary response
    * @param {string} response - Raw AI response
@@ -311,7 +371,6 @@ class ContentSummaryService {
    */
   parseSummaryResponse(response) {
     try {
-
       // Clean response
       let cleanResponse = response.trim();
 
@@ -320,7 +379,6 @@ class ContentSummaryService {
       if (jsonMatch) {
         cleanResponse = jsonMatch[1];
       }
-
 
       // Find problematic characters
       for (let i = 0; i < cleanResponse.length; i++) {
@@ -337,7 +395,6 @@ class ContentSummaryService {
         // First attempt: direct parsing
         summary = JSON.parse(cleanResponse);
       } catch (firstError) {
-
         // Extract error position for debugging
         const posMatch = firstError.message.match(/position (\d+)/);
         const errorPos = posMatch ? parseInt(posMatch[1]) : 1548;
@@ -347,12 +404,11 @@ class ContentSummaryService {
           const cleanedResponse = cleanResponse.replace(/[\x00-\x1F\x7F]/g, '');
           summary = JSON.parse(cleanedResponse);
         } catch (secondError) {
-
           try {
             // Third attempt: more aggressive cleaning
             const sanitizedResponse = cleanResponse
               .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove all control chars except \t and \n
-              .replace(/\n/g, '\\n')  // Escape remaining newlines
+              .replace(/\n/g, '\\n') // Escape remaining newlines
               .replace(/\t/g, '\\t'); // Escape remaining tabs
 
             summary = JSON.parse(sanitizedResponse);
@@ -383,8 +439,8 @@ class ContentSummaryService {
         conceptDictionary: Array.isArray(summary.conceptDictionary)
           ? summary.conceptDictionary
           : Array.isArray(summary.concept_dictionary)
-            ? summary.concept_dictionary
-            : [],
+          ? summary.concept_dictionary
+          : [],
         keyPoints: Array.isArray(summary.key_points) ? summary.key_points : [],
         actionItems: Array.isArray(summary.action_items) ? summary.action_items : [],
         mainTopics: Array.isArray(summary.main_topics) ? summary.main_topics : [],

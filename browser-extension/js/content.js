@@ -57,10 +57,16 @@ class KuiqleeContentScript {
       // Start background summary generation only if auto-summarize is enabled
       if (this.settings.autoSummarize === true) {
         if (document.readyState === 'complete') {
-          this.startBackgroundSummaryGeneration();
+          // Add a small delay to ensure all scripts are loaded
+          setTimeout(() => {
+            this.startBackgroundSummaryGeneration();
+          }, 1000);
         } else {
           window.addEventListener('load', () => {
-            this.startBackgroundSummaryGeneration();
+            // Add a small delay to ensure all scripts are loaded
+            setTimeout(() => {
+              this.startBackgroundSummaryGeneration();
+            }, 1000);
           });
         }
       }
@@ -156,6 +162,8 @@ class KuiqleeContentScript {
       // Only clear flag if generation actually completed
       if (result && result.success) {
         this.isGeneratingSummary = false;
+      } else {
+        this.isGeneratingSummary = false;
       }
     } catch (error) {
       console.error('Background generation error:', error);
@@ -180,7 +188,7 @@ class KuiqleeContentScript {
       showQuizHints: true,
       trackComprehension: true,
       autoDetectArticles: true,
-      autoSummarize: true, // Added to match options.js default
+      autoSummarize: false, // Default to OFF - user must explicitly enable
     };
   }
 
@@ -1586,14 +1594,39 @@ class KuiqleeContentScript {
   }
 
   /**
-   * Initialize summary service
+   * Initialize summary service with retry logic
    */
-  async initializeSummaryService() {
+  async initializeSummaryService(retryCount = 0) {
+    const maxRetries = 3;
+    const retryDelay = 500; // ms
+
     try {
-      if (!window.ContentSummaryService) {
+      // Check if ContentSummaryService is available
+      if (typeof ContentSummaryService === 'undefined' || !window.ContentSummaryService) {
+        // Retry if we haven't exceeded max retries
+        if (retryCount < maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+          return this.initializeSummaryService(retryCount + 1);
+        }
         return false;
       }
 
+      // Check if required dependencies are loaded
+      const requiredClasses = ['ProxyAIClient', 'ContentAnalyzer', 'AIPromptBuilder'];
+      const missingClasses = requiredClasses.filter(
+        (className) => typeof window[className] === 'undefined',
+      );
+
+      if (missingClasses.length > 0) {
+        // Retry if we haven't exceeded max retries
+        if (retryCount < maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+          return this.initializeSummaryService(retryCount + 1);
+        }
+        return false;
+      }
+
+      // Create the service instance
       this.summaryService = new ContentSummaryService();
 
       // Initialize the service (no API key needed with proxy)
@@ -1602,6 +1635,13 @@ class KuiqleeContentScript {
       return true;
     } catch (error) {
       console.error('Failed to initialize summary service:', error);
+
+      // Retry if we haven't exceeded max retries
+      if (retryCount < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+        return this.initializeSummaryService(retryCount + 1);
+      }
+
       return false;
     }
   }
